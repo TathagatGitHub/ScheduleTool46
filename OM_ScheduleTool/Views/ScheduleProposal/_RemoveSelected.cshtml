@@ -1,0 +1,243 @@
+@model ProposalViewModel
+
+<div class="modal fade" id="modal-removeselected" tabindex="-1" role="dialog" aria-labelledby="modal-removeselected" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Remove Selected</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert">
+                            <p class="mb-0">
+                                <strong>You have selected the following properties to be removed from this @(Model.ProposalInfo.ScheduleTypeId == 1 ? "Proposal" : "Schedule").</strong><br />
+                                @(Model.ProposalInfo.ScheduleTypeId == 2 ? "(Note: Properties in use by a PreLog or PostLog are not available to be removed.)" : "")
+                                 
+                            </p>
+                        </div>
+                        <div class="block block-themed block-bordered">
+                            <div class="block-content">
+                                <div class="block">
+                                    <table class="display compact" id="tblRemoveSelected" name="tblRemoveSelected">
+                                        <thead>
+                                            <tr>
+                                                <th class="d-none d-sm-table-cell text-center">Network</th>
+                                                <th class="d-none d-sm-table-cell text-center">Property Name</th>
+                                                <th class="d-none d-sm-table-cell text-center">Start-End</th>
+                                                <th class="d-none d-sm-table-cell text-center">BuyType</th>
+                                                <th class="d-none d-sm-table-cell text-center">SpotLen</th>
+                                                <th class="d-none d-sm-table-cell text-center">Total Spots</th>
+                                                <th class="d-none d-sm-table-cell text-center">ScheduleLineId</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnRemove" onclick="javascript: RemoveSelected();">
+                    <i class="fa fa-check"></i>Proceed
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+    var selected = [];
+                                        var removeselected;
+    $(document).ready(function () {        
+        $("#modal-removeselected").on("hidden.bs.modal", function () {
+                                                ClearScheduledProposalLines();
+                                            });
+
+        $("#modal-removeselected").on('shown.bs.modal', function () {
+                                                removeselected = $('#tblRemoveSelected').DataTable({
+                                                info: false,
+                scrollX: false,
+                scrollY: 400,
+                scrollCollapse: true,
+                paging: false,
+                destroy: true,
+                processing: true,
+                columns: [
+                                                        {
+                                                    targets: 0,
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(33, true)
+                    },
+                    {
+                        targets: 1,
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(33, true)
+                    },
+                    {
+                        targets: 2,
+                        class: "d-none d-sm-table-cell text-center"
+                    },
+                    {
+                        targets: 3,
+                        class: "d-none d-sm-table-cell text-center"
+                    },
+                    {
+                        targets: 4,
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row, meta) {
+                            if (data === 120) {
+                                return "<span class='badge badge-pill badge-danger'>" + data + "</span>";
+                            }
+                            else if (data === 60) {
+                                return "<span class='badge badge-pill badge-primary'>" + data + "</span>";
+                            }
+                            else if (data === 15) {
+                                return "<span class='badge badge-pill badge-warning'>" + data + "</span>";
+                            }
+                            else {
+                                return "<span class='badge badge-pill badge-success'>" + data + "</span>";
+                            }
+                        }
+                    },
+                    {
+                        targets: 5,
+                        class: "d-none d-sm-table-cell text-center",
+                    },
+                    {
+                        targets: 6,
+                        visible: false,
+                        class: "d-none d-sm-table-cell text-center",
+                    },
+                ]
+            });
+
+            $('.selected').each(function (i, obj) {
+                                    selected.length = 0;
+                                    removeselected.clear();
+                                    var table = $("#MyProposalTable").DataTable();
+                                    var data = table.row(obj.sectionRowIndex).data();
+                $.ajax({
+                                    url: '/ScheduleProposal/IsLineInUse',
+                    data: { ScheduleLineId: data.scheduleLineId },
+                    cache: false,
+                    type: "POST",
+                    success: function (result) {
+                                            console.log(result);
+                                            if (result.success == true) {
+                                                if (parseInt(result.responseCode) == 0) {
+                                                    selected.push(data.scheduleLineId);
+                                                    removeselected.row.add([
+                                                        data.networkName,
+                                                        data.propertyName,
+                                                        data.startToEndTime,
+                                                        data.buyTypeCode,
+                                                        data.spotLen,
+                                                        data.totalSpots,
+                                                        data.scheduleLineId
+                                                    ]).draw();
+                                                }
+                                            }
+                                        },
+                    error: function (response) {
+                                            swal('Stop!', response.responseText, 'error');
+                                        }
+                                    });
+                                });
+
+            removeselected.columns.adjust().draw();
+        });
+    });   
+    function RemoveSelected() {
+                                    var table = $("#tblRemoveSelected").DataTable();
+                                    for (var i = 0; i < selected.length; i++) {
+            $.ajax({
+                                        url: '/ScheduleProposal/DeleteLine',
+                data: { ScheduleLineId: selected[i] },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                                                if (result.success == false) {
+                                                    swal('Stop!', result.responseText, 'error')
+                                                        .then(
+                                                        function (result) {
+                                                        var table = $("#MyProposalTable").DataTable();
+                                                        table.ajax.reload();
+                                                    });
+                                }
+                    else {
+                          swal({
+                                title: 'Success',
+                            text: 'Click OK to refresh page.',
+                            type: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK',
+                            preConfirm: function () {
+                                        return new Promise(function (resolve) {
+                                    setTimeout(function () {
+                                        resolve();
+                                    }, 50);
+                                });
+                            }
+                        }).then(
+                            function (result) {
+                                    var table = $("#MyProposalTable").DataTable();
+                                    table.ajax.reload();
+                                });
+                    }
+                },
+                error: function (response) {
+                                    swal('Stop!', response.responseText, 'error');
+                                }
+            });
+        }
+        //swal({
+        //    title: 'Success',
+        //    text: 'Click OK to refresh page.',
+        //    type: 'success',
+        //    showCancelButton: false,
+        //    confirmButtonColor: '#3085d6',
+        //    cancelButtonColor: '#d33',
+        //    confirmButtonText: 'OK',
+        //    preConfirm: function () {
+        //        return new Promise(function (resolve) {
+        //            setTimeout(function () {
+        //                resolve();
+        //            }, 50);
+        //        });
+        //    }
+        //}).then(
+        //    function (result) {
+        //        var table = $("#MyProposalTable").DataTable();
+        //        table.ajax.reload();
+        //    });
+    }
+    function PopulatePropertiesToDelete() {
+        $('#modal-removeselected').modal('show');
+                                }
+
+                                ClearScheduledProposalLines = function () {
+                                    //empty your array
+                                    selected.length = 0;
+
+                                    if ($.fn.dataTable.isDataTable('#tblRemoveSelected'))
+            removeselected = $('#tblRemoveSelected').DataTable();
+                                    removeselected.clear()
+                                        .draw();
+                                };
+</script>
+
+

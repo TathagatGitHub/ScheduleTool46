@@ -1,0 +1,11 @@
+﻿@media print {
+    @page {
+        size: landscape;
+    }
+    body {
+        zoom: 30%;
+    }
+}
+.table {
+    width: 100% !important;
+}

@@ -1,0 +1,77 @@
+
+
+<script type="text/javascript">    
+    
+    function Save() {        
+        if ($("input[name='rdYearlyQuarterly']:checked").length == 0)
+            document.getElementById("spanYearlyQuarterlyRequired").style.visibility = "visible";
+        else {
+            $.ajax({
+                url: "/UpfrontExpansion/SaveYearlyOrQuarterly",
+                data: {
+                    UpfrontId: document.getElementById("hidValues").getAttribute("data-upfront"),
+                    YearlyQuarterly: $("input[name='rdYearlyQuarterly']:checked").val(),
+                    LoggedOnUserId: document.getElementById("hidValues").getAttribute("data-user")
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if ($("input[name='rdYearlyQuarterly']:checked").val() == "year")
+                        OpenNewWindow(@ViewData["LastWindowHeight"], screen.width, "/UpfrontExpansion/Index?upfrontid=" + document.getElementById("hidValues").getAttribute("data-upfront") + "&Yearly=" + true, "/ManageMedia/Index?UpfrontId=" + document.getElementById("hidValues").getAttribute("data-upfront"));
+                    else
+                        OpenNewWindow(@ViewData["LastWindowHeight"], screen.width, "/UpfrontExpansion/Index?upfrontid=" + document.getElementById("hidValues").getAttribute("data-upfront") + "&Yearly=" + false, "/ManageMedia/Index?UpfrontId=" + document.getElementById("hidValues").getAttribute("data-upfront"));
+                },
+                error: function (response) {
+                    swal('', response.responseText, 'error');
+                }
+            });
+        }
+    }
+</script>
+
+<input id="hidValues" type="hidden" data-upfront="@ViewData["UpfrontId"]" data-user="@ViewData["LoggedOnUserId"]" />
+
+<div class="block block-themed block-transparent mb-0">
+    <div class="block-header bg-primary-dark" style="padding:15px; border-bottom:1px solid #eaecee;">
+        <h5 class="modal-title" style="color:#fff">Please choose Quarterly or Yearly For Upfront Expansion @ViewData["Network"] @ViewData["Quarter"]</h5>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                <i class="si si-close"></i>
+            </button>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row">
+            <label for="Network" class="col-sm-3 col-form-label">Network:</label>
+            <div class="col-sm-9">
+                <input type="text" readonly class="form-control-plaintext w-100" id="staticNetwork" value="@ViewData["Network"]">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Quarter" class="col-sm-3 col-form-label">Quarter:</label>
+            <div class="col-sm-9">
+                <input type="text" readonly class="form-control-plaintext" id="staticQuarter" value="@ViewData["Quarter"]">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Budgeting" class="col-sm-3 col-form-label">Budgeting: <span class="text-danger">*</span></label>
+            <div class="col-sm-9">
+                <label class="col-form-label">
+                    @Html.RadioButton("rdYearlyQuarterly", "quarter")&nbsp;&nbsp;Quarterly
+                </label>&nbsp;&nbsp;
+                <label class="col-form-label">
+                    @Html.RadioButton("rdYearlyQuarterly", "year")&nbsp;&nbsp;Yearly
+                </label>
+                <span id="spanYearlyQuarterlyRequired" class="text-danger" style="display:block; margin-top:8px; visibility:hidden">Please choose either Quarterly or Yearly.</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal"><i class="fa fa-close mr-5"></i>Cancel</button>
+    <button type="button" class="btn btn-alt-success" onclick="Save();"><i class="fa fa-check mr-5"></i>Save</button>
+</div>
+
+
+
+

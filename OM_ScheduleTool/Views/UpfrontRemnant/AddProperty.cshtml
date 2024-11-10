@@ -1,0 +1,17 @@
+﻿@model ViewUpfrontsViewModel
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<main id="main-container" style="min-height: 629.1px;">
+    <div class="content">
+        <input name="rateImpRequired" id="rateImpRequired" type="text" hidden />
+        <input name="rateFound" id="rateFound" type="text" hidden />
+        <input name="isModal" id="isModal" type="text" value="1" hidden />
+
+        @Html.Partial("_CreateNewProperty", Model.createNewPropertyViewModel)
+    </div>
+
+</main>
+
+
+

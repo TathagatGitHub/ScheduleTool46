@@ -1,0 +1,228 @@
+﻿<!doctype html>
+<!--[if lte IE 9]>     <html lang="en" class="no-focus lt-ie10 lt-ie10-msg"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html lang="en" class="no-focus">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" contenteditable="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ocean Media Scheduling Tool</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+    <!--<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />-->
+    <link href="~/css/codebase.css" rel="stylesheet" />
+    <link href="~/css/common.css" rel="stylesheet" />
+    <link href="~/css.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+    <!-- Schedule Tool Custom -->
+    <script asp-append-version="true" src="~/js/common.js"></script>
+
+    <!-- Stylesheets -->
+    <!-- Page JS Plugins CSS -->
+    <link rel="stylesheet" href="~/js/plugins/datatables/dataTables.bootstrap4.min.css">
+
+    <!-- Codebase framework -->
+    <link rel="stylesheet" id="css-main" href="~/css/codebase.min.css">
+</head>
+
+<body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script language="javascript" type="text/javascript">
+        $(document).ready(function () {
+            var $acctname = $('#acctname');
+            var options_acctname = {
+                url: "/Global/GetAppVersion",
+                type: "get",
+                async: false
+            };
+
+            var $server = $('#server');
+            var options_server = {
+                url: "/Global/GetDatabaseServer",
+                type: "get",
+                async: false
+            };
+
+            var $database = $('#database');
+            var options_database = {
+                url: "/Global/GetDatabaseName",
+                type: "get",
+                async: false
+            };
+
+            $.ajax(options_acctname).done(function (data) {
+                $acctname.text(data);
+            });
+
+            $.ajax(options_server).done(function (data) {
+                $server.text(data);
+            });
+
+            $.ajax(options_database).done(function (data) {
+                $database.text(data);
+            });
+        });
+    </script>
+    <!-- Page Container -->
+    <!--
+        Available classes for #page-container:
+
+    GENERIC
+
+        'enable-cookies'                            Remembers active color theme between pages (when set through color theme helper Codebase() -> uiHandleTheme())
+
+    SIDEBAR & SIDE OVERLAY
+
+        'sidebar-r'                                 Right Sidebar and left Side Overlay (default is left Sidebar and right Side Overlay)
+        'sidebar-mini'                              Mini hoverable Sidebar (screen width > 991px)
+        'sidebar-o'                                 Visible Sidebar by default (screen width > 991px)
+        'sidebar-o-xs'                              Visible Sidebar by default (screen width < 992px)
+        'sidebar-inverse'                           Dark themed sidebar
+
+        'side-overlay-hover'                        Hoverable Side Overlay (screen width > 991px)
+        'side-overlay-o'                            Visible Side Overlay by default
+
+        'side-scroll'                               Enables custom scrolling on Sidebar and Side Overlay instead of native scrolling (screen width > 991px)
+
+    HEADER
+
+        ''                                          Static Header if no class is added
+        'page-header-fixed'                         Fixed Header
+
+    HEADER STYLE
+
+        ''                                          Classic Header style if no class is added
+        'page-header-modern'                        Modern Header style
+        'page-header-inverse'                       Dark themed Header (works only with classic Header style)
+        'page-header-glass'                         Light themed Header with transparency by default
+                                                    (absolute position, perfect for light images underneath - solid light background on scroll if the Header is also set as fixed)
+        'page-header-glass page-header-inverse'     Dark themed Header with transparency by default
+                                                    (absolute position, perfect for dark images underneath - solid dark background on scroll if the Header is also set as fixed)
+
+    MAIN CONTENT LAYOUT
+
+        ''                                          Full width Main Content if no class is added
+        'main-content-boxed'                        Full width Main Content with a specific maximum width (screen width > 1200px)
+        'main-content-narrow'                       Full width Main Content with a percentage width (screen width > 1200px)
+    -->
+    <div id="page-container" class="sidebar-o side-scroll page-header-modern">
+        @RenderBody()
+
+        <div class="ui-widget">
+            <select id="combobox">
+                <option value="">Select one...</option>
+                <option value="12a">12:00 AM</option>
+                <option value="12:30a">12:30 AM</option>
+                <option value="1a">1:00 AM</option>
+                <option value="1:30a">1:30 AM</option>
+                <option value="2a">2:00 AM</option>
+                <option value="2:30a">2:30 AM</option>
+                <option value="3a">3:00 AM</option>
+                <option value="3:30a">3:30 AM</option>
+                <option value="4a">4:00 AM</option>
+                <option value="4:30a">4:30 AM</option>
+                <option value="5a">5:00 AM</option>
+                <option value="5:30a">5:30 AM</option>
+                <option value="6a">6:00 AM</option>
+                <option value="6:30a">6:30 AM</option>
+                <option value="6a">6:00 AM</option>
+                <option value="6:30a">6:30 AM</option>
+                <option value="7a">7:00 AM</option>
+                <option value="7:30a">7:30 AM</option>
+                <option value="8a">8:00 AM</option>
+                <option value="8:30a">8:30 AM</option>
+                <option value="9a">9:00 AM</option>
+                <option value="9:30a">9:30 AM</option>
+                <option value="10a">10:00 AM</option>
+                <option value="10:30a">10:30 AM</option>
+                <option value="11a">11:00 AM</option>
+                <option value="11:30a">11:30 AM</option>
+                <option value="12p">12:00 PM</option>
+                <option value="12:30p">12:00 PM</option>
+                <option value="1p">1:00 PM</option>
+                <option value="1:30p">1:30 PM</option>
+                <option value="2p">2:00 PM</option>
+                <option value="2:30p">2:30 PM</option>
+                <option value="3p">3:00 PM</option>
+                <option value="3:30p">3:30 PM</option>
+                <option value="4p">4:00 PM</option>
+                <option value="4:30p">4:30 PM</option>
+                <option value="5p">5:00 PM</option>
+                <option value="5:30p">5:30 PM</option>
+                <option value="6p">6:00 PM</option>
+                <option value="6:30p">6:30 PM</option>
+                <option value="7p">7:00 PM</option>
+                <option value="7:30p">7:30 PM</option>
+                <option value="8p">8:00 PM</option>
+                <option value="8:30p">8:30 PM</option>
+                <option value="9p">9:00 PM</option>
+                <option value="9:30p">9:30 PM</option>
+                <option value="10p">10:00 PM</option>
+                <option value="10:30p">10:30 PM</option>
+                <option value="11p">11:00 PM</option>
+                <option value="11:30p">11:30 PM</option>
+            </select>
+        </div>
+
+        <!-- Footer -->
+        <footer class="opacity-0" id="page-footer" style="opacity: 1;">
+            <div class="content py-20 font-size-xs clearfix">
+                <div class="float-right">
+                    <label id="server" name="server"></label>  <label id="database" name="database"></label>
+                </div>
+                <div class="float-left">
+                    <a class="font-w600" href="https://www.oceanmediainc.com" target="_blank">Schedule Tool <label id="acctname" name="acctname"></label></a> © <span class="js-year-copy">2017</span>
+                </div>
+            </div>
+        </footer>
+        <!-- END Footer -->
+    </div>
+    <!-- END Page Container -->
+    <!-- Codebase Core JS -->
+    <script src="~/js/core/jquery.min.js"></script>
+    <script src="~/js/core/popper.min.js"></script>
+    <script src="~/js/core/bootstrap.min.js"></script>
+    <script src="~/js/core/jquery.slimscroll.min.js"></script>
+    <script src="~/js/core/jquery.scrollLock.min.js"></script>
+    <script src="~/js/core/jquery.appear.min.js"></script>
+    <script src="~/js/core/jquery.countTo.min.js"></script>
+    <script src="~/js/core/js.cookie.min.js"></script>
+    <script src="~/js/codebase.js"></script>
+
+    <script src="assets/js/core/jquery.scrollLock.min.js"></script>
+    <script src="assets/js/core/jquery.appear.min.js"></script>
+    <script src="assets/js/core/jquery.countTo.min.js"></script>
+    <script src="assets/js/core/js.cookie.min.js"></script>
+    <script src="assets/js/codebase.js"></script>
+
+    <!-- Page JS Plugins -->
+    <script src="~/js/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/js/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/js/plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src="~/js/plugins/sweetalert2/es6-promise.auto.min.js"></script>
+    <script src="~/js/plugins/sweetalert2/sweetalert2.min.js"></script>
+
+    <!-- Page JS Code -->
+    <script src="~/js/pages/be_tables_datatables.js"></script>
+    <script src="~/js/pages/be_ui_activity.js"></script>
+
+    <!-- Page JS Code -->
+    <script>
+        jQuery(function () {
+            // Init page helpers (Table Tools helper)
+            Codebase.helpers('table-tools');
+            Codebase.helpers('notify');
+            Codebase.helpers('core-tooltip');
+            //Codebase.helpers('masked-inputs');
+            Codebase.layout($("#sidebarstyle").val());
+        });
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+﻿@model ProposalViewModel
+<style>
+    
+
+    .childPropertySplit-Dropdown {
+        position: absolute;
+        display: inline-block;
+    }
+
+    .childPropertySplit-DropdownContent {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 241px;
+        z-index: 1;
+        margin-top: 17px;
+        margin-left: -245px;
+        border-radius: 3px;
+        text-align: center;
+        color: #5c852c;
+        background-color: #ebf5df;
+        border-color: #ebf5df;
+        height: 32px;
+        font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        font-weight: 500;
+    }
+
+        .childPropertySplit-DropdownContent a {
+            color: #171717;
+            padding: 8px 14px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .childPropertySplit-DropdownContent a:hover {
+            background-color: #cde0b6;
+            min-width: 241px;
+            border-radius: 3px;
+            text-align: center;
+            border-color: #ebf5df;
+            height: 32px;
+            font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+            font-weight: 500;
+        }
+
+    .modal-footer .btn + .btn {
+        margin-bottom: 0;
+        margin-left: -32px;
+    }
+
+    .modal-footer > :not(:last-child) {
+        margin-right: 3.22rem;
+    }  
+
+
+</style>
+<div class="modal fade" id="modal-addnewpropertyProposal" tabindex="-1" role="dialog" aria-labelledby="modal-addnewproperty" aria-hidden="true" style="width:2300px;max-width: 2300px;">
+    <div class="modal-dialog modal-xl" role="document" style="width:2250px;max-width: 2250px;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Add New Property to @Model.ProposalInfo.ScheduleName</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close" onclick="return CloseAddNewPropModal();">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row gutters-tiny">
+                        <label class="col-2"><strong style="font-weight:bold;">Network</strong><span class="text-danger">*</span></label>
+                        <label class="col-1 col-form-label" for="ClientId"><strong style="font-weight:bold;">Demo</strong><span class="text-danger">*</span></label>
+                        <label class="col-1"><strong style="font-weight:bold;">Length</strong></label>
+                        <label class="col-1"><strong style="font-weight:bold;">Buy Type</strong></label>
+                        <label class="col-1"><strong style="font-weight:bold;">Status</strong></label>
+                        <label class="col-1"></label>
+                        <label class="col-5"></label>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     new SelectList(Model.Networks, "NetworkId", "StdNetName"),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlNetworks" }
+                                     )
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId">
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.DemographicSettingsId,
+                                     new SelectList(Model.DemographicSettings, "DemographicSettingsId", "DemoName"),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlDemoName", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlLen", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlBuyType", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlStatus", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <label class="col-1" style="margin-top: 10px;color: #42A4F4;" onclick="Toggle();" id="divToggleCtrl">More filters</label>
+                        <label class="col-5"></label>
+                    </div>
+                    <div id="divChild" style="display:none" class="form-group row gutters-tiny">
+                        <label class="col-1"><strong style="font-weight:bold;">Start Time</strong></label>
+                        <label class="col-1"><strong style="font-weight:bold;">End Time </strong></label>
+                        <label class="col-1"><strong style="font-weight:bold;">Day Part</strong></label>
+                        <label class="col-1"><strong style="font-weight:bold;">Days</strong></label>
+                        <label class="col-8"></label>
+                        @*    <label class="col-1">Len</label>
+                        <label class="col-2">BuyType</label>
+                        <label class="col-3">Status</label>*@
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlStartTime", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlEndTime", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlDP", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                     Enumerable.Empty<SelectListItem>(),
+                                     "Please select ...",
+                                     new { @class = "form-control", @sizeof = "1", @id = "ddlDays", @disabled = "disabled" }
+                                     )
+                        </div>
+                        <div class="col-8"></div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="block-content block-content-full" id="divAvailableProperties" style="width:2250px;max-width:2250px;">
+                            @{
+                                Html.RenderPartial("_AddNewProperty_AvailablePropertiesProposal", Model);
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal" id="btnAddPropProposalClose" onclick="return CloseAddNewPropModal();">Close</button>
+                <button type="button" disabled class="btn btn-alt-success" id="btnAdd" onclick="javascript: AddScheduleLines();">
+                    <i class="fa fa-check"></i> Add Selected Properties
+                </button>
+                <div class="childPropertySplit-Dropdown">
+                    <button type="button" disabled id="btnSplitAddChildProperties" class="btn btn-alt-success mr-auto float-right" style="margin-left: -46px;margin-top: -18px;position: absolute;border-left: 1px solid #ccc;">
+                        <i class="fa fa-angle-down" aria-hidden="true">&nbsp;</i>
+                    </button>
+                    <div class="childPropertySplit-DropdownContent">
+                        <a style="cursor:pointer;" onclick="OpenChildPropertyModal();">Customize & Add</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="hdnAddNewPropClientId" value="@Model.ClientInfo.ClientId" />
+<input type="hidden" id="hdnAddNewPropQuarterId" value="@Model.ProposalQuarter.QuarterId" />
+<input type="hidden" id="hdnAddNewPropScheduleId" value="@Model.ProposalInfo.ScheduleId" />
+<input type="hidden" id="hdnAddNewPropCountryId" value="@Model.ProposalInfo.CountryId" />
+<script asp-append-version="true" src="~/js/scheduleproposal/AddNewPropertyProposal.js"></script>
+<script asp-append-version="true" src="~/js/mediaplanning/CreateEditMediaPlan.js"></script>

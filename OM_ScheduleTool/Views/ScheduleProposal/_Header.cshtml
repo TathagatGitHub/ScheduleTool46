@@ -1,0 +1,186 @@
+@model ProposalViewModel
+
+<div class="block block-themed block-rounded" id="divHeader">
+    @if (Model.ProposalInfo.ScheduleType.ScheduleTypeId == 1)
+    {
+        <div class="block-header block-header-default bg-success">
+            <h3 class="block-title">@Model.ProposalInfo.ScheduleType.Description Information @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="block-header block-header-default bg-pulse">
+            <h3 class="block-title">@Model.ProposalInfo.ScheduleType.Description Information @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    <div class="block-content">
+        <div class="row gutters-tiny">
+            <div id="HeaderCol1" class="col-md-5">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td><label for="upfront_name">@Model.ProposalInfo.ScheduleType.Description Name</label></td>
+                        <td colspan="2">@Model.ProposalInfo.ScheduleName</td>
+                    </tr>
+                    <tr>
+                        <td><label>Type</label></td>
+                        <td colspan="2">@Model.ProposalInfo.ScheduleType.Description</td>
+                    </tr>
+                    <tr>
+                        <td><label>Country</label></td>
+                        <td colspan="2">@Model.ClientInfo.Country.CountryLong<input id="CountryID" type="hidden" value="@Model.ClientInfo.Country.CountryId" /></td>
+                    </tr>
+                    <tr>
+                        <td><label>Client</label></td>
+                        <td colspan="2">@Model.ProposalInfo.Client.ClientName</td>
+                    </tr>
+                    <tr>
+                        <td><label for="upfront_name">Buyer</label></td>
+                        <td colspan="2">
+                            @if (Model.ProposalInfo.BuyerUser != null)
+                            {
+                                @Model.ProposalInfo.BuyerUser.DisplayName
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="ue_billing_type">UE Billing Type</label></td>
+                        <td colspan="2" id="TotalScheduleBillingType"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="commission_structure">Commission Structure</label></td>
+                        @{
+                            bool isTempCommStructure = Model.ClientInfo.IsTempCommStructure ?? false;
+                            if (isTempCommStructure)
+                            {
+                                <td title="This is not a finalized commission rate" style="color:#FF0000">@Model.ProposalInfo.Client.CommStructure</td>
+                                <td title="This is not a finalized commission rate"  style="color:#FF0000">
+                                    <select class="DiscountPrice" id="DiscountPrice" name="DiscountPrice" disabled>
+                                        @if (Model.ClientCommissionRates.Count() > 0)
+                                        {
+                                            @foreach (float rate in Model.ClientCommissionRates)
+                                            {
+                                                <option value="@rate">@String.Format("{0:n2}", rate*100)  %</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="0">0  %</option>
+                                        }
+                                    </select>
+                                    <!--<span class="caret"></span>-->
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@Model.ProposalInfo.Client.CommStructure</td>
+                                <td>
+                                    <select class="DiscountPrice" id="DiscountPrice" name="DiscountPrice">
+                                        @if (Model.ClientCommissionRates.Count() > 0)
+                                        {
+                                            @foreach (float rate in Model.ClientCommissionRates)
+                                            {
+                                                <option value="@rate">@String.Format("{0:n2}", rate*100)  %</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="0">0  %</option>
+                                        }
+                                    </select>
+                                    <!--<span class="caret"></span>-->
+                                </td>
+                            }                            
+                        }                        
+                    </tr>
+                </table>
+            </div>
+            <div id="HeaderCol2" class="col-md-4">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td><label for="upfront_name">Plan Year Type</label></td>
+                        <td>@Model.ProposalInfo.PlanYearTypeString</td>
+                    </tr>
+                    <tr>
+                        <td><label for="upfront_name">Plan Year</label></td>
+                        <td>@Model.ProposalInfo.PlanYr</td>
+                    </tr>
+                    <tr>
+                        <td><label>Quarter</label></td>
+                        <td>@Model.ProposalInfo.QtrName</td>
+                    </tr>
+                    <tr>
+                        <td><label for="upfront_name">Last Updated On</label></td>
+                        <td>@Model.ProposalInfo.UpdateDtString</td>
+                    </tr>
+                    <tr>
+                        <td><label for="upfront_name">Last Updated By</label></td>
+                        <td>@Model.ProposalInfo.UpdatedBy.DisplayName</td>
+                    </tr>
+                    <tr>
+                        <td><label for="networks_with_ue">Networks With UE</label></td>
+                        <td id="TotalScheduleNetworkCount"></td>
+                    </tr>
+                    <tr>
+                        <td><label for="client_exchange_rate">Client Exchange Rate</label></td>
+                        <td>@String.Format("{0:n4}", Model.ClientExchangeRate)</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="HeaderCol3" class="col-md-3">
+                <div class="block-content block-content-full">
+                    <div class="row py-10 text-center">
+                        <div class="col-6 border-r">
+                            <label><u>PROPOSED</u></label>
+                        </div>
+                        <div class="col-6">
+                            <label><u>SCHEDULED</u></label>
+                        </div>
+                    </div>
+                    <div class="row py-10 text-center">
+                        <div class="col-6 border-r">
+                            <div id="TotalScheduleAvailableUE" class="font-size-h3 font-w600 text-success">N/A</div>
+                            <div class="font-size-sm font-w600 text-uppercase text-muted">UE REMAINING</div>
+                        </div>
+                        <div class="col-6">
+                            <div id="AvailableUESaved" class="font-size-h3 font-w600 text-info">N/A</div>
+                            <div class="font-size-sm font-w600 text-uppercase text-muted">AVAILABLE UE</div>
+                        </div>
+                    </div>
+                    <div class="row py-10 text-center">
+                        <div class="col-6 border-r">
+                            <div id="TotalScheduleBookedUE" class="font-size-h3 font-w600 text-success">N/A</div>
+                            <div id="TotalScheduleBookedUELabel" class="font-size-sm font-w600 text-uppercase text-muted">PROPOSED UE</div>
+                        </div>
+                        <div class="col-6">
+                            <div id="BookedUESaved" class="font-size-h3 font-w600 text-info">N/A</div>
+                            <div class="font-size-sm font-w600 text-uppercase text-muted">UE Booked (SCHEDULED)</div>
+                        </div>
+                    </div>
+                    <div class="row py-10 text-center">
+                        <div class="col=12">
+                            <div id="ErrorDescription" class="font-size-sm font-w600"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+//    $(document).ready(function () {
+//        $("#divHeader").width($(window).width()-40);
+//    });
+//
+//    $(window).resize(function () {
+//        $("#divHeader").width($(window).width()-40);
+//    });
+
+</script>
+

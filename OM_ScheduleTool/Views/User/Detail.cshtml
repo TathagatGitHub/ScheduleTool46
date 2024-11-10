@@ -1,0 +1,1252 @@
+﻿@model UserViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script language="javascript" type="text/javascript">
+    /*
+    if (window.attachEvent) {
+        window.attachEvent('onload', PopulateCurrentBuyers);
+    } else {
+        if (window.onload) {
+            var curronload = window.onload;
+            var newonload = function (evt) {
+                curronload(evt);
+                PopulateCurrentBuyers(evt);
+            };
+            window.onload = newonload;
+        } else {
+            window.onload = PopulateCurrentBuyers;
+        }
+    }
+    */
+
+    $("document").ready(function () {
+        //PopulateCurrentBuyers();
+        GetNetworkUserJobs(2);
+        GetNetworkUserJobs(1);
+        GetNetworkUserJobs(3);
+
+        GetUnassignedNetworkUserJobs(1);
+        GetUnassignedNetworkUserJobs(2);
+        GetUnassignedNetworkUserJobs(3);
+
+        $("#USBuyer").on("change", function () {
+            if (!this.checked) {
+
+                var usClientAssignedCount = $("#ddlbuyer option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length +
+                    $("#ddlasst option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length +
+                    $("#ddlbackup option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length;
+
+                var usNetworkAssignedCount = $("#ddlnetworkbuyer option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length +
+                    $("#ddlnetworkasst option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length +
+                    $("#ddlnetworkbackup option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(US)') { return true; } }).length;
+
+                swal({
+                    html: "<div style='text-align:left'>You are removing access to US Clients and Networks for @Model.SelectedUser.DisplayName "+
+                        "<br/> There are " + usClientAssignedCount + " US Client assignments" +
+                        "<br/> There are " + usNetworkAssignedCount + " US Network assignments <br> Do you wan to continue?</div>",
+                    type: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes",
+                    preConfirm: function () {
+                        return new Promise(function (resolve) {
+                            setTimeout(function () {
+                                resolve();
+                            }, 50);
+                        });
+                    }
+                }).then(function (result) { }, function (dismiss) {
+                    if (dismiss == "cancel" || dismiss == "overlay") {
+                        $("#USBuyer").prop("checked", true);
+                    }
+                });
+
+            }
+        });
+
+        $("#CABuyer").on("change", function () {
+            if (!this.checked) {
+
+                var caClientAssignedCount = $("#ddlbuyer option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length +
+                    $("#ddlasst option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length +
+                    $("#ddlbackup option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length;
+
+                var caNetworkAssignedCount = $("#ddlnetworkbuyer option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length +
+                    $("#ddlnetworkasst option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length +
+                    $("#ddlnetworkbackup option").filter(function () { if ($(this).text().substring($(this).text().length - 4) == '(CA)') { return true; } }).length;
+                swal({
+                    html: "<div style='text-align:left'>You are removing access to CA clients and Networks for @Model.SelectedUser.DisplayName "+
+                        "<br/> There are " + caClientAssignedCount + " CA Client assignments" +
+                        "<br/> There are " + caNetworkAssignedCount + " CA Network assignments <br> Do you wan to continue? <div>",
+                    type: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes",
+                    preConfirm: function () {
+                        return new Promise(function (resolve) {
+                            setTimeout(function () {
+                                resolve();
+                            }, 50);
+                        });
+                    }
+                }).then(function (result) { }, function (dismiss) {
+                    if (dismiss == "cancel" || dismiss == "overlay") {
+                        $("#CABuyer").prop("checked", true);
+                    }
+                });
+            }
+        });
+    });
+
+    function PopulateCurrentBuyers() {
+        var spacesToAdd = 60;
+        var biggestLength = 0;
+        $("#ddlbuyer option").each(function () {
+            var len = $(this).text().length;
+            if (len > biggestLength) {
+                biggestLength = len;
+            }
+        });
+        $("#ddlbuyeradd option").each(function () {
+            var len = $(this).text().length;
+            if (len > biggestLength) {
+                biggestLength = len;
+            }
+        });
+        var padLength = biggestLength + spacesToAdd;
+        $("#ddlbuyer option").each(function () {
+            var parts = $(this).text().split('+');
+            var strLength = parts[0].length;
+            for (var x = 0; x < (padLength - strLength); x++) {
+                parts[0] = parts[0] + ' ';
+            }
+            $(this).text(parts[0].replace(/ /g, '\u00a0') + parts[1]).text;
+        });
+    }
+
+    function GetClients(_jobid) {
+
+        var procemessage = "<option value='0'> Please wait...</option>";
+        if (_jobid == 1) {
+            $("#ddlasst").html(procemessage).show();
+        }
+        else if (_jobid == 2) {
+            $("#ddlbuyer").html(procemessage).show();
+        }
+        else if (_jobid == 3) {
+            $("#ddlbackup").html(procemessage).show();
+        }
+        var url = "/User/GetClients/";
+
+        $.ajax({
+            url: url,
+            data: {
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (result[x].value < 0) {
+                        markup += "<option class='text-primary' value=" + Math.abs(result[x].value) + ">" + result[x].text + "</option>";
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+
+                    }
+                }
+                if (_jobid == 1) {
+                    $("#ddlasst").html(markup).show();
+                }
+                else if (_jobid == 2) {
+                    $("#ddlbuyer").html(markup).show();
+                }
+                else if (_jobid == 3) {
+                    $("#ddlbackup").html(markup).show();
+                }
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+    }
+
+    function GetClientsExceptJobId(_jobid) {
+
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#lstClients").html(procemessage).show();
+        //if (_jobid == 1) {
+        //    $("#ddlasstadd").html(procemessage).show();
+        //}
+        //else if (_jobid == 2) {
+        //    $("#ddlbuyeradd").html(procemessage).show();
+        //}
+        //else if (_jobid == 3) {
+        //    $("#ddlbackupadd").html(procemessage).show();
+        //}
+        var url = "/User/GetClientsExceptJobId/";
+
+        $.ajax({
+            url: url,
+            data: {
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                //var markup = "<option value='0'>Please select client</option>";
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (result[x].value < 0) {
+                        markup += "<option class='text-primary' value=" + Math.abs(result[x].value) + ">" + result[x].text + "</option>";
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+
+                    }
+                }
+
+                $("#lstClients").html(markup).show();
+                //if (_jobid == 1) {
+                //    $("#ddlasstadd").html(markup).show();
+                //}
+                //else if (_jobid == 2) {
+                //    $("#ddlbuyeradd").html(markup).show();
+                //}
+                //else if (_jobid == 3) {
+                //    $("#ddlbackupadd").html(markup).show();
+                //}
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+    }
+
+    function ChangeClientJob(_clientid, _jobid) {
+        var url = "/User/ChangeClientJob/";
+
+        $.ajax({
+            url: url,
+            data: {
+                clientids: _clientid,
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                /*
+                if (_jobid == 1) {
+                }
+                if (_jobid == 2)
+                {
+                    $('#ddlbuyeradd option:selected').remove().appendTo('#ddlbuyer').removeAttr('selected');
+                }
+                else
+                {
+                    $('#ddlbuyer option:selected').remove().appendTo('#ddlbuyeradd').removeAttr('selected');
+                }
+                */
+
+                GetClients(1);
+                GetClients(2);
+                GetClients(3);
+
+                //GetClientsExceptJobId(1);
+                //GetClientsExceptJobId(2);
+                //GetClientsExceptJobId(3);
+                if (jobId != "") {
+                    GetClientsExceptJobId(jobId);
+                }
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+    function GetNetworkUserJobs(_jobid) {
+
+        var procemessage = "<option value='0'> Please wait...</option>";
+        if (_jobid == 1) {
+            $("#ddlnetworkasst").html(procemessage).show();
+        }
+        else if (_jobid == 2) {
+            $("#ddlnetworkbuyer").html(procemessage).show();
+        }
+        else if (_jobid == 3) {
+            $("#ddlnetworkbackup").html(procemessage).show();
+        }
+        var url = "/NetworkUserJob/GetNetworkUserJob/";
+
+        $.ajax({
+            url: url,
+            data: {
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (result[x].value < 0) {
+                        markup += "<option class='text-primary' value=" + Math.abs(result[x].value) + ">" + result[x].text + "</option>";
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+
+                    }
+                }
+                if (_jobid == 1) {
+                    $("#ddlnetworkasst").html(markup).show();
+                }
+                else if (_jobid == 2) {
+                    $("#ddlnetworkbuyer").html(markup).show();
+                }
+                else if (_jobid == 3) {
+                    $("#ddlnetworkbackup").html(markup).show();
+                }
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+    }
+
+    function GetUnassignedNetworkUserJobs(_jobid) {
+
+        var procemessage = "<option value='0'> Please wait...</option>";
+        if (_jobid == 1) {
+            $("#ddlnetworkasstadd").html(procemessage).show();
+        }
+        else if (_jobid == 2) {
+            $("#ddlnetworkbuyeradd").html(procemessage).show();
+        }
+        else if (_jobid == 3) {
+            $("#ddlnetworkbackupadd").html(procemessage).show();
+        }
+        var url = "/NetworkUserJob/GetUnassignedNetworkUserJobs/";
+
+        $.ajax({
+            url: url,
+            data: {
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "<option value='0'>Please select network</option>";
+                for (var x = 0; x < result.length; x++) {
+                    if (result[x].value < 0) {
+                        markup += "<option class='text-primary' value=" + Math.abs(result[x].value) + ">" + result[x].text + "</option>";
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+
+                    }
+                }
+                if (_jobid == 1) {
+                    $("#ddlnetworkasstadd").html(markup).show();
+                }
+                else if (_jobid == 2) {
+                    $("#ddlnetworkbuyeradd").html(markup).show();
+                }
+                else if (_jobid == 3) {
+                    $("#ddlnetworkbackupadd").html(markup).show();
+                }
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+    }
+
+    function ChangeNetworkJob(_networkid, _jobid) {
+        var url = "/NetworkUserJob/ChangeNetworkJob/";
+
+        $.ajax({
+            url: url,
+            data: {
+                networkid: _networkid,
+                id: $("#acctname").val(),
+                jobid: _jobid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                GetNetworkUserJobs(1);
+                GetNetworkUserJobs(2);
+                GetNetworkUserJobs(3);
+
+                GetUnassignedNetworkUserJobs(1);
+                GetUnassignedNetworkUserJobs(2);
+                GetUnassignedNetworkUserJobs(3);
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+
+</script>
+
+<div class="bg-image bg-image-bottom">
+    <div class="bg-primary-dark-op py-30">
+        <div class="content content-full text-center">
+            <!-- Avatar -->
+            <div class="mb-15">
+                <a class="img-link" href="@Model.SelectedUser.ImageUrl">
+                    <img class="img-avatar img-avatar96 img-avatar-thumb" src="@Model.SelectedUser.ImageUrl" alt="@Model.SelectedUser.DisplayName">
+                </a>
+            </div>
+            <!-- Personal -->
+            <h1 class="h3 text-white font-w700 mb-10">@Model.SelectedUser.DisplayName (@Model.SelectedUser.PermissionLevel.Description)</h1>
+            <h2 class="h5 text-white-op">
+                <a class="text-primary-light" href="mailto:@Model.SelectedUser.EmailAddress">@Model.SelectedUser.EmailAddress</a>
+            </h2>
+            <h2 class="h5 text-white-op">
+                @Model.SelectedUser.JobTitleType.Description
+            </h2>
+            <h2 class="h5 text-white-op">
+                @if (Model.SelectedUser.LastLoginDt != null)
+                {
+                    @("Last Login:  " + @Model.SelectedUser.LastLoginDt)
+                }
+            </h2>
+            <!-- END Personal -->
+        </div>
+    </div>
+</div>
+
+<input id="acctname" name="acctname" value="@Model.SelectedUser.AccountName" hidden="hidden" />
+@{
+    string PL = Model.SelectedUser.PermissionLevel.Description.ToLower();
+}
+<div class="content">
+    <div class="block">
+        <ul class="nav nav-tabs nav-tabs-block" data-toggle="tabs" role="tablist">
+            @if(PL == "admin" || PL == "buyer" || PL == "assistant")
+            {
+                <li class="nav-item">
+                    <a class="nav-link active" href="#btabs-static-home">Client</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#btabs-static-network">Network</a>
+                </li>
+            }
+            <li class="nav-item">
+                <a class="nav-link @((PL =="general" || PL=="client management")? "active":"")" href="#btabs-static-profile">Permissions</a>
+            </li>
+        </ul>
+        <div class="block-content tab-content">
+            @if (PL == "admin" || PL == "buyer" || PL == "assistant")
+            {
+                <!-- Begin Client Assignments Tab -->
+                <div class="tab-pane active" id="btabs-static-home" role="tabpanel">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Client Assignments</h3>
+                        <div class="block-options">
+                            <label class="css-control css-control css-control-success css-checkbox">
+                                @if (Model.SelectedUser.US_User == true)
+                                {
+                                    <input class="css-control-input" type="checkbox" checked="" disabled>
+                                }
+                                else
+                                {
+                                    <input class="css-control-input" type="checkbox" disabled>
+                                }
+                                <span class="css-control-indicator"></span> US
+                            </label>
+                            <label class="css-control css-control css-control-success css-checkbox">
+                                @if (Model.SelectedUser.CA_User == true)
+                                {
+                                    <input class="css-control-input" type="checkbox" checked="" disabled>
+                                }
+                                else
+                                {
+                                    <input class="css-control-input" type="checkbox" disabled>
+                                }
+                                <span class="css-control-indicator"></span> CA
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        &nbsp;
+                    </div>
+
+                    <div class="row">
+                        <!-- Begin Client Buyer -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-success">
+                                    <h3 class="block-title">Buyer for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Remove Client" id="btnRemoveClient" name="btnRemoveClient" onclick='javascript: ChangeClientJob($("#ddlbuyer").find(":selected").val(), 4);'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetClients(2);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlbuyer" class="form-control" id="ddlbuyer" size="10">
+                                        @foreach (var buyer in Model.ClientUserJobs_Buyer)
+                                        {
+                                            if (buyer.Client.New == true)
+                                            {
+                                                <option class="text-primary" value="@buyer.Client.ClientId">@buyer.Client.ClientName (@buyer.Client.Country.CountryShort)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@buyer.Client.ClientId">@buyer.Client.ClientName (@buyer.Client.Country.CountryShort)</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                @*<select name="ddlbuyeradd" class="form-control" id="ddlbuyeradd">
+                                        <option value="0">Please select client</option>
+                                        @foreach (var client in Model.ClientUserJobs_NoBuyer)
+                                        {
+                                        if (client.New == true)
+                                        {
+                                        <option class="text-primary" value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        }
+                                        </select>*@
+                                                <button id="btnBuyer" class="btn btn-alt-success mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Buyer for Client" data-toggle="modal" data-target="#modal-add-clients"><i class="fa fa-plus mr-5"></i>Buyer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Client Buyer -->
+                        <!-- Begin Client Assistant -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-success">
+                                    <h3 class="block-title">Assistant for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Remove Client" id="btnRemoveClientAsst" name="btnRemoveClientAsst" onclick='javascript: ChangeClientJob($("#ddlasst").find(":selected").val(), 4);'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetClients(1);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlasst" class="form-control" id="ddlasst" size="10">
+                                        @foreach (var asst in Model.ClientUserJobs_Assistant)
+                                        {
+                                            if (asst.Client.New == true)
+                                            {
+                                                <option class="text-primary" value="@asst.Client.ClientId">@asst.Client.ClientName (@asst.Client.Country.CountryShort)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@asst.Client.ClientId">@asst.Client.ClientName (@asst.Client.Country.CountryShort)</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                @*<select name="ddlasstadd" class="form-control" id="ddlasstadd">
+                                        <option value="0">Please select client</option>
+                                        @foreach (var client in Model.ClientUserJobs_NoAssistant)
+                                        {
+                                        if (client.New == true)
+                                        {
+                                        <option class="text-primary" value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        }
+                                        </select>*@
+                                                <button id="btnAssistant" class="btn btn-alt-success mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Assistant for Client" data-toggle="modal" data-target="#modal-add-clients"><i class="fa fa-plus mr-5"></i>Assistant</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Client Assistant -->
+                        <!-- Begin Client Backup -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-success">
+                                    <h3 class="block-title">Backup for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Remove Client" id="btnRemoveClientBackup" name="btnRemoveClientBackup" onclick='javascript: ChangeClientJob($("#ddlbackup").find(":selected").val(), 4);'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetClients(3);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlbackup" class="form-control" id="ddlbackup" size="10">
+                                        @foreach (var backup in Model.ClientUserJobs_Backup)
+                                        {
+                                            if (backup.Client.New == true)
+                                            {
+                                                <option class="text-primary" value="@backup.Client.ClientId">@backup.Client.ClientName (@backup.Client.Country.CountryShort)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@backup.Client.ClientId">@backup.Client.ClientName (@backup.Client.Country.CountryShort)</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                @*<select name="ddlbackupadd" class="form-control" id="ddlbackupadd">
+                                        <option value="0">Please select client</option>
+                                        @foreach (var client in Model.ClientUserJobs_NoBackup)
+                                        {
+                                        if (client.New == true)
+                                        {
+                                        <option class="text-primary" value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@client.ClientId">@client.ClientName (@client.Country.CountryShort)</option>
+                                        }
+                                        }
+                                        </select>*@
+                                                <button id="btnBackup" class="btn btn-alt-success mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Backup for Client" data-toggle="modal" data-target="#modal-add-clients"><i class="fa fa-plus mr-5"></i>Backup</button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Client Backup -->
+                    </div>
+
+                </div>
+                <!-- End Client Assignments Tab -->
+                <!-- Begin Network Assignments Tab -->
+                <div class="tab-pane" id="btabs-static-network" role="tabpanel">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Network Assignments</h3>
+                        <div class="block-options">
+                            <label class="css-control css-control css-control-info css-checkbox">
+                                @if (Model.SelectedUser.US_User == true)
+                                {
+                                    <input class="css-control-input" type="checkbox" checked="" disabled>
+                                }
+                                else
+                                {
+                                    <input class="css-control-input" type="checkbox" disabled>
+                                }
+                                <span class="css-control-indicator"></span> US
+                            </label>
+                            <label class="css-control css-control css-control-info css-checkbox">
+                                @if (Model.SelectedUser.CA_User == true)
+                                {
+                                    <input class="css-control-input" type="checkbox" checked="" disabled>
+                                }
+                                else
+                                {
+                                    <input class="css-control-input" type="checkbox" disabled>
+                                }
+                                <span class="css-control-indicator"></span> CA
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        &nbsp;
+                    </div>
+                    <div class="row">
+                        <!-- Begin Network Buyer -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-info">
+                                    <h3 class="block-title">Buyer for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Delete Alias" id="btnDeleteAlias" name="btnDeleteAlias" onclick='javascript: ChangeNetworkJob($("#ddlnetworkbuyer").find(":selected").val(), 4)'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetNetworkUserJobs(2);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlnetworkbuyer" class="form-control" id="ddlnetworkbuyer" size="10">
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                <select name="ddlnetworkbuyeradd" class="form-control" id="ddlnetworkbuyeradd">
+                                                </select>
+                                                <button class="btn btn-alt-info mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Buyer for Network" onclick='javascript: ChangeNetworkJob($("#ddlnetworkbuyeradd").find(":selected").val(), 2);'><i class="fa fa-plus mr-5"></i>Buyer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Network Buyer -->
+                        <!-- Begin Network Assistant -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-info">
+                                    <h3 class="block-title">Assistant for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Delete Alias" id="btnDeleteAlias" name="btnDeleteAlias" onclick='javascript: ChangeNetworkJob($("#ddlnetworkasst").find(":selected").val(), 4)'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetClients(1);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlnetworkasst" class="form-control" id="ddlnetworkasst" size="10">
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                <select name="ddlnetworkasstadd" class="form-control" id="ddlnetworkasstadd">
+                                                </select>
+                                                <button class="btn btn-alt-info mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Assistant for Network" onclick='javascript: ChangeNetworkJob($("#ddlnetworkasstadd").find(":selected").val(), 1);'><i class="fa fa-plus mr-5"></i>Assistant</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Network Assistant -->
+                        <!-- Begin Network Backup -->
+                        <div class="col-xl-4">
+                            <div class="block block-themed">
+                                <div class="block-header block-header-default bg-info">
+                                    <h3 class="block-title">Backup for</h3>
+                                    <div class="block-options">
+                                        @if (Model.CanEditUserSettings == true)
+                                        {
+                                            <button type="button" class="btn-block-option" title="Delete Alias" id="btnDeleteAlias" name="btnDeleteAlias" onclick='javascript: ChangeNetworkJob($("#ddlnetworkbackup").find(":selected").val(), 4)'>
+                                                <i class="si si-minus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetClients(3);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="block-bordered">
+                                    <select name="ddlnetworkbackup" class="form-control" id="ddlnetworkbackup" size="10">
+                                    </select>
+                                </div>
+                                <div class="block-bordered">
+                                    &nbsp;
+                                </div>
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-lg-12">
+                                            <div class="input-group">
+                                                <select name="ddlnetworkbackupadd" class="form-control" id="ddlnetworkbackupadd">
+                                                </select>
+                                                <button class="btn btn-alt-info mr-5 mb-5" type="button" title="Make @Model.SelectedUser.FirstName Backup for Client" onclick='javascript: ChangeNetworkJob($("#ddlnetworkbackupadd").find(":selected").val(), 3);'><i class="fa fa-plus mr-5"></i>Backup</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <!-- End Network Backup -->
+                    </div>
+
+                </div>
+                <!-- End Network Assignments Tab -->
+            }
+            <div class="tab-pane @((PL =="general"|| PL=="client management")? "active":"")" id="btabs-static-profile" role="tabpanel">
+                <h2 class="content-heading">User Permissions</h2>
+                <form asp-action="SaveProfile" method="post" role="form" onsubmit="return SaveProfile()">
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <label class="col-12" for="contact1-subject">Access Level</label>
+                            <div class="col-12">
+                                <select class="form-control" asp-for="PermissionLevelId" size="1">
+                                    @if (Model.CanEditUserSettings == true)
+                                    {
+                                        @foreach (var pl in Model.PermissionLevels)
+                                        {
+                                            if (Model.SelectedUser.PermissionLevel.PermissionLevelId == pl.PermissionLevelId)
+                                            {
+                                                <option value="@pl.PermissionLevelId" selected>@pl.Description</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@pl.PermissionLevelId">@pl.Description</option>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="@Model.SelectedUser.PermissionLevel.PermissionLevelId" selected>@Model.SelectedUser.PermissionLevel.Description</option>
+                                    }
+                                </select>
+                                <input class="form-control" asp-for="SelectedUserId" hidden="hidden">
+                            </div>
+                        </div>
+                        <div class="col-6" id="divJobTitle" @((PL=="client management")? "hidden":"")>
+                            <label asp-for="JobTitleTypeId">Job Title</label>
+                            <select class="form-control" asp-for="JobTitleTypeId" size="1">
+                                @if (Model.CanEditUserSettings == true)
+                                {
+                                    @foreach (var jtt in Model.JobTitleTypes)
+                                    {
+                                        if (Model.SelectedUser.JobTitleType.JobTitleTypeId == jtt.JobTitleTypeId)
+                                        {
+                                            <option value="@jtt.JobTitleTypeId" selected>@jtt.Description</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@jtt.JobTitleTypeId">@jtt.Description</option>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="@Model.SelectedUser.JobTitleType.JobTitleTypeId" selected>@Model.SelectedUser.JobTitleType.Description</option>
+                                }
+                            </select>
+                            <input class="form-control" asp-for="LoggedOnUserId" hidden="hidden">
+                        </div>
+                    </div>
+
+                    <div class="form-group row" id="divGroup1" @((PL=="client management")? "hidden":"")>
+                        <div class="col-1">
+                            <div class="col-12">
+                                <label asp-for="Finance" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @if (Model.CanEditUserSettings == true && (PL == "admin" || PL == "general")) {
+                                        @Html.CheckBoxFor(m => Model.Finance, new { @class = "css-control-input" })
+                                    }
+                                    else
+                                    {
+                                        @Html.CheckBoxFor(m => Model.Finance, new { @class = "css-control-input", @disabled="disabled" })
+                                    }
+                                    <span class="css-control-indicator"></span> Finance
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="col-12">
+                                <label asp-for="CAClientExchRate" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @if (Model.CanEditUserSettings == true)
+                                    {
+                                        @Html.CheckBoxFor(m => Model.CAClientExchRate, new { @class = "css-control-input" })
+                                    }
+                                    <span class="css-control-indicator"></span> CA Client Exchange Rate
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="col-12">
+                                <label asp-for="CAActualExchRate" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @if (Model.CanEditUserSettings == true)
+                                    {
+                                        @Html.CheckBoxFor(m => Model.CAActualExchRate, new { @class = "css-control-input" })
+                                    }
+                                    <span class="css-control-indicator"></span> CA Actual Exchange Rate
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="col-12">
+                                <label asp-for="USBuyer" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @if (Model.CanEditUserSettings == true)
+                                    {
+                                        @Html.CheckBoxFor(m => Model.USBuyer, new { @class = "css-control-input" })
+                                    }
+                                    <span class="css-control-indicator"></span> US Buyer
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="col-12">
+                                <label asp-for="CABuyer" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @if (Model.CanEditUserSettings == true)
+                                    {
+                                        @Html.CheckBoxFor(m => Model.CABuyer, new { @class = "css-control-input" })
+                                    }
+                                    <span class="css-control-indicator"></span> CA Buyer
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="divGroup2" style="height:50px;" @((PL=="client management")? "":"hidden")>
+                        <div class="col-1">
+                            <div class="col-12">
+                                <label asp-for="Digital" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @Html.CheckBoxFor(m => Model.Digital, new { @class = "css-control-input" })
+                                    <span class="css-control-indicator"></span> Digital
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="col-12">
+                                <label asp-for="Local" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @Html.CheckBoxFor(m => Model.Local, new { @class = "css-control-input" })
+                                    <span class="css-control-indicator"></span> Local
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="col-12">
+                                <label asp-for="Podcast" class="css-control css-control-sm css-control-primary css-checkbox">
+                                    @Html.CheckBoxFor(m => Model.Podcast, new { @class = "css-control-input" })
+                                    <span class="css-control-indicator"></span> Podcast
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="js-table-sections table table-hover" id="tblFeature" @((PL=="client management")? "hidden":"")>
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;"></th>
+                                <th>Feature</th>
+                                <th style="width: 15%;">Access</th>
+                                <th class="d-none d-sm-table-cell" style="width: 20%;">Date</th>
+                            </tr>
+                        </thead>
+
+                        @foreach (var af in Model.UserPermissions)
+                        {
+                            @if (af.ParentAppFeatureId.HasValue == false)
+                            {
+                                <tbody class="js-table-sections-header ">
+                                    <tr>
+                                        <td class="text-center">
+                                            <i class="fa fa-angle-right"></i>
+                                        </td>
+                                        <td class="font-w600">@af.FeatureDescription</td>
+                                        <td>
+                                            @if (af.AllowSetPermission == true)
+                                            {
+                                                @if (Model.CanEditUserSettings == true)
+                                                {
+                                                    <select name="@(String.Format("afuca_{0}", af.FeatureId))" class="form-control-sm" size="1">
+                                                        @foreach (var act in Model.Actions)
+                                                        {
+                                                            @if (af.ActionId == act.ActionId)
+                                                            {
+                                                                <option value="@act.ActionId" selected>@act.Description</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@act.ActionId">@act.Description</option>
+                                                            }
+                                                        }
+                                                    </select>
+
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge @(af.ActionId == 1 ? "badge-danger" :
+                                                  af.ActionId == 2 ? "badge-warning" :
+                                                  af.ActionId == 3 ? "badge-info" :
+                                                  af.ActionId == 4 ? "badge-success" :
+                                                  "badge-primary")">@af.ActionDescription</span>
+                                                }
+                                            }
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                            <em class="text-muted">@af.UpdateDt</em>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody>
+                                    @foreach (var sf in Model.UserPermissions)
+                                    {
+                                        if (sf.ParentAppFeatureId == af.FeatureId)
+                                        {
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="font-w600 @(sf.ActionId == 1? "text-success" :
+                                                                               sf.ActionId == 2? "text-warning" :
+                                                                               sf.ActionId == 3? "text-info" :
+                                                                               sf.ActionId == 4? "text-success" :
+                                                                               "text-primary")">
+                                                    @sf.FeatureDescription
+                                                </td>
+                                                <td class="font-size-sm">
+                                                    @if (Model.CanEditUserSettings == true)
+                                                    {
+                                                        <select name="@(String.Format("afuca_{0}", sf.FeatureId))" class="form-control-sm" size="1">
+                                                            @foreach (var act in Model.Actions)
+                                                            {
+                                                                @if (sf.ActionId == act.ActionId)
+                                                                {
+                                                                    <option value="@act.ActionId" selected>@act.Description</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="@act.ActionId">@act.Description</option>
+                                                                }
+                                                            }
+                                                        </select>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge @(sf.ActionId == 1 ? "badge-danger" :
+                                                                                sf.ActionId == 2 ? "badge-warning" :
+                                                                                sf.ActionId == 3 ? "badge-info" :
+                                                                                sf.ActionId == 4 ? "badge-success" :
+                                                                                "badge-primary")">@sf.ActionDescription</span>
+                                                    }
+
+                                                </td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <span class="font-size-sm text-muted">@sf.UpdateDt</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            }
+                        }
+
+                    </table>
+                    <!-- END Permissions Table -->
+                    <div class="form-group row @(Model.LoggedOnUser.PermissionLevelId == 1 ? "" : "invisible")">
+                        <div class="col-12">
+                            <button class="btn btn-alt-primary" type="submit">
+                                <i class="fa fa-check mr-5"></i> Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-12">
+            <!-- Bootstrap Contact -->
+            <div class="block block-themed">
+                <div class="block-content">
+                    <!-- Info Message -->
+                    <div class="alert alert-success @ViewBag.DetailMessageVisible" role="alert">
+                        <p class="mb-0">@Html.Raw(ViewBag.DetailMessage)</p>
+                    </div>
+                    <!-- End Info Message -->
+
+
+                </div>
+            </div>
+            <!-- END Bootstrap Contact -->
+        </div>
+    </div>
+    <!-- END Contact Forms -->
+</div>
+
+<div class="modal fade" id="modal-add-clients" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form class="js-validation-bootstrap" name="form_addclients" method="post" onsubmit="javascript: return false;">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Add Clients</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12">Client List</label>
+                            <div id="divClients" class="col-md-12">
+                                <select class="form-control" id="lstClients" multiple="multiple" name="lstClients" size="12">
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 text-center">
+                                <label id="lblSelectedClients"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-alt-success" id="btnAddClients" name="btnAddClients" onclick="">
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function SaveProfile(e) {
+        var pl = $("#PermissionLevelId option:selected").text().toLowerCase();
+        if (!$("#Digital").prop("checked") && !$("#Local").prop("checked") && !$("#Podcast").prop("checked") && pl == "client management") {
+            swal("", "Please select permission option.", "warning");
+            return false;
+        }
+        if (pl == "client management") {
+            $("#Finance").prop("checked", false);
+            $("#CAActualExchRate").prop("checked", false);
+            $("#CAClientExchRate").prop("checked", false);
+            $("#USBuyer").prop("checked", false);
+            $("#CABuyer").prop("checked", false);
+        }
+        else {
+            $("#Digital").prop("checked", false);
+            $("#Local").prop("checked", false);
+            $("#Podcast").prop("checked", false);
+        }
+    }
+
+    var jobId = "";
+    $("document").ready(function () {
+        $("#divGroup2 input[type='checkbox']").on("click", function () {
+            $("#divGroup2 input[type='checkbox']").not(this).prop("checked", false);
+        });
+
+        $(document).on("mousedown", "#modal-add-clients select[multiple] option", (function (e) {
+            e.preventDefault();
+            this.selected = !this.selected;
+            return false;
+        }));
+
+        $("#modal-add-clients select[multiple]").click(function (e) {
+            var selectedClients="";
+            $("#lstClients  option:selected").each(function (i) {
+                if (i == 0)
+                    selectedClients = $("#lstClients  option:selected")[i].text;
+                else {
+                    selectedClients = selectedClients + ", " + $("#lstClients  option:selected")[i].text;
+                }
+            });
+            setTimeout(function () { if ($("#lstClients option:selected").length == 0) { $("#lblSelectedClients").text(""); } else { $("#lblSelectedClients").text(selectedClients); } }, 300);
+
+        });
+
+        $("#modal-add-clients").on("hidden.bs.modal", function (e) {
+            $("#lstClients  option:selected").each(function (i) {
+                this.selected = !this.selected;
+            });
+            $("#lblSelectedClients").text("");
+        });
+        $("#btnBuyer").on("click", function () {
+            jobId = "2";
+            GetClientsExceptJobId(2);
+        });
+        $("#btnAssistant").on("click", function () {
+            jobId = "1";
+            GetClientsExceptJobId(1);
+        });
+        $("#btnBackup").on("click", function () {
+            jobId = "3";
+            GetClientsExceptJobId(3);
+        });
+        $("#btnAddClients").on("click", function () {
+            ChangeClientJob($("#lstClients").val(), jobId);
+        });
+        $("#PermissionLevelId").on("change", function () {
+            var permissionLevel = $("#PermissionLevelId option:selected").text().toLowerCase();
+            $("#divGroup1").removeAttr("hidden");
+            $("#divJobTitle").removeAttr("hidden");
+            $("#tblFeature").removeAttr("hidden");
+            $("#divGroup2").attr("hidden", "hidden");
+
+            if (permissionLevel == "buyer" || permissionLevel == "assistant") {
+                $("#Finance").prop("disabled", true);
+                $("#Finance").prop("checked", false);
+            }
+            else if (permissionLevel == "general" || permissionLevel == "admin") {
+                $("#Finance").prop("disabled", false);
+                $("#Finance").prop("checked", false);
+            }
+            else if (permissionLevel == "client management") {
+                $("#divGroup1").attr("hidden", "hidden");
+                $("#divJobTitle").attr("hidden", "hidden");
+                $("#tblFeature").attr("hidden", "hidden");
+                $("#divGroup2").removeAttr("hidden", "hidden");
+            }
+
+        });
+
+    });
+</script>

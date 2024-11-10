@@ -1,0 +1,65 @@
+﻿<style>
+  
+</style>
+
+<div class="modal draggable fade" id="CopyMediaPlanModal" tabindex="-1" role="dialog"
+     aria-labelledby="CopyMediaPlanModal" aria-hidden="true">
+    <div class="modal-dialog modal-sm" id="copyMediaPlanModalDialogue" role="document" style="max-width: 20%;margin-top:5%">
+        <div class="modal-content" style="height:100%;">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="modal-header block-header bg-primary-dark">
+                    <h3 class="block-title" id="copyMediaPlanHeading" style="font-weight: bold;">Copy Media Plan</h3>
+                </div>
+                <div class="block-content">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group col-3">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Plan Year</label>
+                                <select class="form-control" id="ddlCopyMediaPlanYear" placeholder="" onchange="GetFilteredMediaPlanData();">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Plan Quarter</label>
+                                <table id="cmpBtnGroup" border="0" cellspacing="0" cellpadding="0" style="width:108%;margin-left:-21px;">
+                                    <tr>
+                                        <td align="center" style="width:12%;">
+                                            <button type="button" id="btncmpQ4" name="btncmpQ4" class="btn btnBTG" style="width:65%;border-radius: 25px;" value="" onclick="return ToggleQuarterSelection(this);">Q4</button>
+                                        </td>
+                                        <td align="center" style="width:12%;">
+                                            <button type="button" id="btncmpQ1" name="btncmpQ1" class="btn btnBTG" style="width:65%;border-radius: 25px;" value="" onclick="return ToggleQuarterSelection(this);">Q1</button>
+                                        </td>
+                                        <td align="center" style="width:12%;">
+                                            <button type="button" id="btncmpQ2" name="btncmpQ2" class="btn btnBTG" style="width:65%;border-radius: 25px;" value="" onclick="return ToggleQuarterSelection(this);">Q2</button>
+                                        </td>
+                                        <td align="center" style="width:12%;">
+                                            <button type="button" id="btncmpQ3" name="btncmpQ3" class="btn btnBTG" style="width:65%;border-radius: 25px;" value="" onclick="return ToggleQuarterSelection(this);">Q3</button>
+                                        </td>                                        
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Media Plan Name*</label>
+                            <select class="form-control" id="ddlCopyMediaPlanName" disabled placeholder="">
+                               
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="width: 95%;margin-left: 14px;">
+                <div style="width: 100%;">
+                    <button type="button" id="btnCancelMediaPlanCopy" class="btn btn-alt-secondary mr-auto float-left" style="margin-left: -18px;" onclick="CancelCopyMediaPlanPopUp();">Cancel</button>
+                    <button type="button" id="btnMediaPlanCopy" class="btn btn-alt-secondary mr-auto float-right" disabled style="margin-left: -46px;position: absolute;" onclick="CopyMediaPlanFromYrQtr();">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,151 @@
+
+
+@model UpfrontExpansionGroupingViewModel
+
+
+<script type="text/javascript">
+
+    $("document").ready(function () {
+
+        $("#selectedNetworkGroup option").each(function (i) {
+            var networks = $(this).text().split(',');
+            for (a = 0; a < networks.length; a++) {
+                $("#listMultiNetworks option:contains('" + networks[a] + "')").remove();
+            }
+        });
+    });
+
+    function NetworkGroupSelected() {
+        if ($("#selectedYear").val() >= new Date().getFullYear()) {   
+            $.ajax({
+                url: "/UpfrontExpansion/NetworkGroupSelected",
+                data: {
+                    UpfrontExpansionNetworkGroupId: $("#selectedNetworkGroup option:selected").val(),
+                    Year: $("#selectedYear").val(),
+                },
+                cache: false,
+                type: "GET",
+                success: function (result) {                  
+                    $("#div_SelectedNetworkGroup").html(result);
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'error');
+                }
+            });
+        }
+    }
+
+    function AddNewNetworkGroup() {
+        if ($("#listMultiNetworks").val().length < 2) {
+            $("#errorMessage").text("Please select at least two networks.");
+            return false;
+        }
+        else {
+            $.ajax({
+                url: "/UpfrontExpansion/AddNewNetworkGroup",
+                data: {
+                    Year: $("#selectedYear").val(),
+                    Country: $("#CountryId option:selected").text(),
+                    Networks: $("#listMultiNetworks").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    window.location = "/UpfrontExpansion/ManageGroup?Year=" + $("#selectedYear option:selected").val() + "&Country=" + $("#CountryId option:selected").text() +
+                        "&UpfrontExpansionNetworkGroupId=" + $("#selectedNetworkGroup option:selected").val() 
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'error');
+                }
+            });
+        }
+
+    }
+
+
+</script>
+
+
+
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            @Html.DropDownListFor(m => m.selectedNetworkGroup, new SelectList(Model.NetworkGroups.Select(x => new { Key = x.Key, Value = x.Value }), "Key", "Value", Model.selectedNetworkGroup), new { @class = "form-control", size = 6, onchange = "NetworkGroupSelected();" })
+        </div>
+        <div class="col-12 col-lg-6" id="div_SelectedNetworkGroup" style="border:1px solid #dcdfe3; border-radius:.25rem">
+            @await Html.PartialAsync("_NetworkGroupSelected", Model)
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-add-network-group" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form class="js-validation-bootstrap" name="form_addnewnetwork" method="post" onsubmit="javascript: return false;">
+                    <div class="block block-themed block-transparent mb-0">
+                        <div class="block-header bg-primary-dark">
+                            <h3 class="block-title">Add New Network Group</h3>
+                            <div class="block-options">
+                                <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                    <i class="si si-close"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="block-content">
+                            <div class="form-group row">
+                                <label class="col-12" for="txtNetworkName">Network List</label>
+                                <div class="col-md-12">
+                                    @Html.ListBox("listMultiNetworks", new MultiSelectList(Model.Networks, "NetworkId", "StdNetName"), new { @class = "form-control", size = 12 })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-12 text-center">
+                                    <span>In browser IE press the "Ctrl" Key to select multiple networks</span>
+                                </div>
+                            </div>                           
+                            <div class="form-group row">
+                                <div class="col-12 text-center">
+                                    <label id="lblSelectedNetworks"></label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12 col-form-label text-danger text-center" id="errorMessage" name="errorMessage"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-alt-success" id="btnAddNetworkGroup" name="btnAddNetworkGroup" onclick="AddNewNetworkGroup();">
+                            <i class="fa fa-check"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#modal-add-network-group select[multiple] option').mousedown(function (e) {
+            e.preventDefault();           
+            this.selected = !this.selected;                      
+            return false;
+        });
+
+        $('#modal-add-network-group select[multiple]').click(function (e) {
+            var list;
+            $("#listMultiNetworks  option:selected").each(function (i) {
+                if (i == 0)
+                    list = $("#listMultiNetworks  option:selected")[i].text;
+                else {
+                    list = list + ", " + $("#listMultiNetworks  option:selected")[i].text;
+                    $("#errorMessage").text("");
+                }
+            });
+            setTimeout(function () { if ($("#listMultiNetworks option:selected").length == 0) {$("#lblSelectedNetworks").text(""); } else { $("#lblSelectedNetworks").text(list); } }, 300);
+            
+        });    
+        $('#modal-add-network-group').on('hidden.bs.modal',function (e) {
+            $("#listMultiNetworks  option:selected").each(function (i) {
+                this.selected = !this.selected;
+            });
+            $("#lblSelectedNetworks").text("");
+        });
+    </script>

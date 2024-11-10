@@ -1,0 +1,128 @@
+@model ViewUpfrontsViewModel
+
+<div class="block block-themed block-rounded">
+    @if (Model.UpfrontInfo.UpfrontTypeId == 2)
+    {
+        <div class="block-header block-header-default bg-primary">
+            <h3 class="block-title">@Model.UpfrontInfo.UpfrontType.Description Information @Model.UpfrontInfo.Name</h3>
+            <div class="block-options">
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="block-header block-header-default bg-warning">
+            <h3 class="block-title">@Model.UpfrontInfo.UpfrontType.Description Information @Model.UpfrontInfo.Name</h3>
+            <div class="block-options">
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    <div class="block-content">
+        <div class="row gutters-tiny">
+            <div class="col-md-5">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        @if (Model.UpfrontInfo.UpfrontTypeId == 2)
+                        {
+                            <td><label for="upfront_name">Upfront Name</label></td>
+                        }
+                        else
+                        {
+                            <td><label for="upfront_name">Remnant Name</label></td>
+                        }
+
+                        <td colspan="2">@Model.UpfrontInfo.Name</td>
+                    </tr>
+                    <tr>
+                        <td><label>Country</label></td>
+                        <td>@Model.NetworkInfo.Country.CountryShort</td>
+                    </tr>
+                    <tr>
+                        <td><label>Plan Year</label></td>
+                        <td>@Model.PlanYear</td>
+                    </tr>
+                    <tr>
+                        <td><label>Network</label></td>
+                        <td>@Model.NetworkInfo.StdNetName</td>
+                    </tr>
+                    <tr>
+                        <td><label>Quarter</label></td>
+                        <td>@Model.UpfrontInfo.Quarter.QuarterName</td>
+                    </tr>
+
+                </table>
+            </div>
+            <div class="col-md-5">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td><label for="upfront_name">Buyer</label></td>
+                        <td>
+                            @if (Model.UpfrontInfo.BuyerName != null)
+                            {
+                                @Model.UpfrontInfo.BuyerName.DisplayName
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Media Type</label></td>
+                        <td>@Model.NetworkInfo.MediaType.MediaTypeName</td>
+                    </tr>
+                    <tr>
+                        <td><label>Last Modified By</label></td>
+                        <td>
+                            @if (Model.UpfrontInfo.UpdatedByUser != null)
+                            {
+                                @Model.UpfrontInfo.UpdatedByUser.DisplayName
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Last Modified On</label></td>
+                        <td>@Model.UpfrontInfo.UpdateDt</td>
+                    </tr>
+                    <tr>
+                        <td><label>Mode</label></td>
+                        @if (Model.ViewOnly == false)
+                        {
+                            <td>EDIT</td>
+                        }
+                        else
+                        {
+                            <td>VIEW</td>
+                        }
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-2">
+                <div class="block-content">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td class="table-danger text-center">Do Not Buy</td>
+                        </tr>
+                        <tr>
+                            <td class="table-info text-center">Buy At Your Risk</td>
+                        </tr>
+                        <tr>
+                            <td class="table-success text-center">Client Mandate</td>
+                        </tr>
+                        <tr>
+                            <td class="table-warning text-center">Client Specific</td>
+                        </tr>
+                        <tr>
+                            <td class="table-primary text-center">Log Actual</td>
+                        </tr>
+                        @if (Model.ViewOnly == false)
+                        {
+                            <tr>
+                                <td class="bg-gray-lighter text-danger text-center">Pending Changes</td>
+                            </tr>
+                        }
+                    </table>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,455 @@
+﻿@model BroadcastYearViewModel
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<style type="text/css">
+    .clsBold {
+        font-weight: bold;
+    }
+</style>
+<main id="main-container">
+    <div class="content">
+        <div class="block">
+            <div class="block block-themed">
+                <div class="block-header bg-primary">
+                    <h3 class="block-title">Broadcast Year Management</h3>
+                </div>
+                <div class="block-content">
+                    <form class="js-validation-bootstrap" method="post" action="javascript: SaveBroadcastYear();" >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold">Year</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <select name="ddlYear" id="ddlYear" class="form-control" size="1" onchange="javascript: ChangeYear(this.value, this.id);">
+                                            <option value="0">Select Year</option>
+                                            @foreach (var yr in Model.Year)
+                                            {
+                                                <option value="@yr">@yr</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-3">
+
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold">Start Week</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold">End Week</label>
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label clsBold">Number Of weeks</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold" id="lblPrevYear4Q" name="lblPrevYear4Q">4Q</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label" id="lblPrevYear4QStartWeek" name="lblPrevYear4QStartWeek"></label>
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label" id="lblPrevYear4QEndWeek" name="lblPrevYear4QEndWeek"></label>
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label" id="lblPrevYear4QNoOfWeeks" name="lblPrevYear4QNoOfWeeks"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold" id="lblYear1Q" name="lblYear1Q">1Q</label>
+                                    </div>
+                                    <div class="col-2" id="divYear1QStartWeek" name="divYear1QStartWeek">
+                                    </div>
+                                    <div class="col-2" id="divYear1QEndWeek" name="divYear1QEndWeek">
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label" id="lblYear1QNoOfWeeks" name="lblYear1QNoOfWeeks"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold" id="lblYear2Q" name="lblYear2Q">2Q</label>
+                                    </div>
+                                    <div class="col-2" id="divYear2QStartWeek" name="divYear2QStartWeek">
+                                    </div>
+                                    <div class="col-2" id="divYear2QEndWeek" name="divYear2QEndWeek">
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label" id="lblYear2QNoOfWeeks" name="lblYear2QNoOfWeeks"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold" id="lblYear3Q">3Q</label>
+                                    </div>
+                                    <div class="col-2" id="divYear3QStartWeek" name="divYear3QStartWeek">
+                                    </div>
+                                    <div class="col-2" id="divYear3QEndWeek" name="divYear3QEndWeek">
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label" id="lblYear3QNoOfWeeks" name="lblYear3QNoOfWeeks"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <label class="clsBold" style="color:red">** Please ADD DATES for the next Broadcast Year</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-1">
+                                    </div>
+                                    <div class="col-2">
+                                        <label class="col-form-label clsBold" id="lblYear4Q" name="lblYear4Q">4Q</label>
+                                    </div>
+                                    <div class="col-2" id="divYear4QStartWeek" name="divYear4QStartWeek">
+                                    </div>
+                                    <div class="col-2" id="divYear4QEndWeek" name="divYear4QEndWeek">
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <label class="col-form-label" id="lblYear4QNoOfWeeks" name="lblYear4QNoOfWeeks"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9" id="divBtn">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+<script type="text/javascript">
+    function ValidateFileds() {
+        var prvYear4QEndWeek = $("#lblPrevYear4QEndWeek").text()
+        var dtPrvYear4QEndWeek = new Date($("#lblPrevYear4QEndWeek").text());
+        var year1QStartWeek = $("#txtYear1QStartWeek").val();
+        if (year1QStartWeek != "")
+            var dtYear1QStartWeek = new Date($("#txtYear1QStartWeek").val());
+        var year2QStartWeek = $("#txtYear2QStartWeek").val();
+        if (year2QStartWeek != "")
+            var dtYear2QStartWeek = new Date($("#txtYear2QStartWeek").val());
+        var year3QStartWeek = $("#txtYear3QStartWeek").val();
+        if (year3QStartWeek != "")
+            var dtYear3QStartWeek = new Date($("#txtYear3QStartWeek").val());
+        var year4QStartWeek = $("#txtYear4QStartWeek").val();
+        if (year4QStartWeek != "")
+            var dtYear4QStartWeek = new Date($("#txtYear4QStartWeek").val());
+        var year1QEndWeek = $("#txtYear1QEndWeek").val();
+        if (year1QEndWeek != "")
+            var dtYear1QEndWeek = new Date($("#txtYear1QEndWeek").val());
+        var year2QEndWeek = $("#txtYear2QEndWeek").val();
+        if (year2QEndWeek != "")
+            var dtYear2QEndWeek = new Date($("#txtYear2QEndWeek").val());
+        var year3QEndWeek = $("#txtYear3QEndWeek").val();
+        if (year3QEndWeek != "")
+            var dtYear3QEndWeek = new Date($("#txtYear3QEndWeek").val());
+        var year4QEndWeek = $("#txtYear4QEndWeek").val();
+        if (year4QEndWeek != "")
+            var dtYear4QEndWeek = new Date($("#txtYear4QEndWeek").val());
+
+        if (year1QStartWeek != "" && prvYear4QEndWeek !== "") {
+            if (dtYear1QStartWeek <= dtPrvYear4QEndWeek || moment(year1QStartWeek).day() != 1) {
+                alert("Please select proper Start Week for 1Q.");
+                return false;
+            }
+        }
+        if (year2QStartWeek != "" && year1QEndWeek !== "") {
+            if (dtYear2QStartWeek <= dtYear1QEndWeek || moment(year2QStartWeek).day() != 1) {
+                alert("Please select proper Start Week for 2Q.");
+                return false;
+            }
+        }
+        if (year3QStartWeek != "" && year2QEndWeek !== "") {
+            if (dtYear3QStartWeek <= dtYear2QEndWeek || moment(year3QStartWeek).day() != 1) {
+                alert("Please select proper Start Week for 3Q.");
+                return false;
+            }
+        }
+        if (year4QStartWeek != "" && year3QEndWeek !== "") {
+            if (dtYear4QStartWeek <= dtYear3QEndWeek || moment(year4QStartWeek).day() != 1) {
+                alert("Please select proper Start Week for 4Q.");
+                return false;
+            }
+        }
+        if (year1QEndWeek != "" && year1QStartWeek !== "") {
+            if (dtYear1QEndWeek <= dtYear1QStartWeek || moment(year1QEndWeek).day() != 1) {
+                alert("Please select proper End Week for 1Q.");
+                return false;
+            }
+        }
+        if (year2QEndWeek != "" && year2QStartWeek !== "") {
+            if (dtYear2QEndWeek <= dtYear2QStartWeek || moment(year2QEndWeek).day() != 1) {
+                alert("Please select proper End Week for 2Q.");
+                return false;
+            }
+        }
+        if (year3QEndWeek != "" && year3QStartWeek !== "") {
+            if (dtYear3QEndWeek <= dtYear3QStartWeek || moment(year3QEndWeek).day() != 1) {
+                alert("Please select proper End Week for 3Q.");
+                return false;
+            }
+        }
+        if (year4QEndWeek != "" && year4QStartWeek !== "") {
+            if (dtYear4QEndWeek <= dtYear4QStartWeek || moment(year4QEndWeek).day() != 1) {
+                alert("Please select proper End Week for 4Q.");
+                return false;
+            }
+        }
+    }
+    function SaveBroadcastYear() {
+        if (ValidateFileds() == false)
+            return false;
+        $.ajax({
+            url: "/BroadCastYearManagement/SaveBroadcastYear",
+            data: {
+                Year: $("#ddlYear").val(),
+                Year1QStartWeek: $("#txtYear1QStartWeek").val(),
+                Year1QEndWeek: $("#txtYear1QEndWeek").val(),
+                Year2QStartWeek: $("#txtYear2QStartWeek").val(),
+                Year2QEndWeek: $("#txtYear2QEndWeek").val(),
+                Year3QStartWeek: $("#txtYear3QStartWeek").val(),
+                Year3QEndWeek: $("#txtYear3QEndWeek").val(),
+                Year4QStartWeek: $("#txtYear4QStartWeek").val(),
+                Year4QEndWeek: $("#txtYear4QEndWeek").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                swal(result.responseText);
+                ClearFields();
+                $("#ddlYear").val("0");
+            },
+            error: function (response) {
+                swal(response.text, 'error');
+            }
+        });
+    }
+    function ChangeYear(yr) {        
+        ClearFields();
+        if (yr == "0") {
+            return;
+        }
+        var year = parseInt(yr);
+        $("#lblPrevYear4Q").text("4Q" + (year - 1));
+        $("#lblYear1Q").text("1Q" + year);
+        $("#lblYear2Q").text("2Q" + year);
+        $("#lblYear3Q").text("3Q" + year);
+        $("#lblYear4Q").text("4Q" + year);
+        $.ajax({
+            url: "/BroadCastYearManagement/GetBroadcastYear",
+            data: {
+                Year: year
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var qtrExist = false;
+                $.each(result.result, function (key, value) {                     
+                    if (value.quarterName == "4Q" + (year - 1)) {
+                        $("#lblPrevYear4QStartWeek").text(moment(value.qtrStartDate).format("MM/DD/YYYY"));
+                        $("#lblPrevYear4QEndWeek").text(moment(value.qtrEndDate).add(-6, "days").format("MM/DD/YYYY"));
+                        $("#lblPrevYear4QNoOfWeeks").text(Math.ceil(moment(value.qtrEndDate).diff(moment(value.qtrStartDate), 'days') / 7));
+                        if (result.result.length == 1) {
+                            var year1QStartWeek = "<input class='form-control' id='txtYear1QStartWeek' name='txtYear1QStartWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            var year1QEndWeek = "<input class='form-control' id='txtYear1QEndWeek' name='txtYear1QEndWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            $("#divYear1QStartWeek").html(year1QStartWeek);
+                            $("#divYear1QEndWeek").html(year1QEndWeek);
+                            var year2QStartWeek = "<input class='form-control' id='txtYear2QStartWeek' name='txtYear2QStartWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            var year2QEndWeek = "<input class='form-control' id='txtYear2QEndWeek' name='txtYear2QEndWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            $("#divYear2QStartWeek").html(year2QStartWeek);
+                            $("#divYear2QEndWeek").html(year2QEndWeek);
+                            var year3QStartWeek = "<input class='form-control' id='txtYear3QStartWeek' name='txtYear3QStartWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            var year3QEndWeek = "<input class='form-control' id='txtYear3QEndWeek' name='txtYear3QEndWeek'onchange='javascript: ChangeWeekDate(this.id);'>";
+                            $("#divYear3QStartWeek").html(year3QStartWeek);
+                            $("#divYear3QEndWeek").html(year3QEndWeek);
+                            var year4QStartWeek = "<input class='form-control' id='txtYear4QStartWeek' name='txtYear4QStartWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            var year4QEndWeek = "<input class='form-control' id='txtYear4QEndWeek' name='txtYear4QEndWeek' onchange='javascript: ChangeWeekDate(this.id);'>";
+                            $("#divYear4QStartWeek").html(year4QStartWeek);
+                            $("#divYear4QEndWeek").html(year4QEndWeek);
+                            var btnSave = "<button class='btn btn-alt-primary' id='btnSave' name='btnSave'>Save</button>";
+                            $("#divBtn").html(btnSave);
+
+                        }
+                    }
+                    else if (value.quarterName == "1Q" + year) {
+                        var lblYear1QStartWeek = "<label class='col-form-label' id='lblYear1QStartWeek' name='lblYear1QStartWeek'>" + moment(value.qtrStartDate).format("MM/DD/YYYY") + "</label>";
+                        var lblYear1QEndWeek = "<label class='col-form-label' id='lblYear1QEndWeek' name='lblYear1QEndWeek'>" + moment(value.qtrEndDate).add(-6, "days").format("MM/DD/YYYY") + "</label>";
+                        $("#lblYear1QNoOfWeeks").text(Math.ceil(moment(value.qtrEndDate).diff(moment(value.qtrStartDate), 'days') / 7));
+                        $("#divYear1QStartWeek").html(lblYear1QStartWeek);
+                        $("#divYear1QEndWeek").html(lblYear1QEndWeek);
+                        qtrExist = true;
+                    }
+                    else if (value.quarterName == "2Q" + year) {
+                        var lblYear2QStartWeek = "<label class='col-form-label' id='lblYear2QStartWeek' name='lblYear2QStartWeek'>" + moment(value.qtrStartDate).format("MM/DD/YYYY") + "</label>";
+                        var lblYear2QEndWeek = "<label class='col-form-label' id='lblYear2QEndWeek' name='lblYear2QEndWeek'>" + moment(value.qtrEndDate).add(-6, "days").format("MM/DD/YYYY") + "</label>";
+                        $("#lblYear2QNoOfWeeks").text(Math.ceil(moment(value.qtrEndDate).diff(moment(value.qtrStartDate), 'days') / 7));
+                        $("#divYear2QStartWeek").html(lblYear2QStartWeek);
+                        $("#divYear2QEndWeek").html(lblYear2QEndWeek);
+                        qtrExist = true;
+                    }
+                    else if (value.quarterName == "3Q" + year) {
+                        var lblYear3QStartWeek = "<label class='col-form-label' id='lblYear3QStartWeek' name='lblYear3QStartWeek'>" + moment(value.qtrStartDate).format("MM/DD/YYYY") + "</label>";
+                        var lblYear3QEndWeek = "<label class='col-form-label' id='lblYear3QEndWeek' name='lblYear3QEndWeek'>" + moment(value.qtrEndDate).add(-6, "days").format("MM/DD/YYYY") + "</label>";
+                        $("#lblYear3QNoOfWeeks").text(Math.ceil(moment(value.qtrEndDate).diff(moment(value.qtrStartDate), 'days') / 7));
+                        $("#divYear3QStartWeek").html(lblYear3QStartWeek);
+                        $("#divYear3QEndWeek").html(lblYear3QEndWeek);
+                        qtrExist = true;
+                    }
+                    else if (value.quarterName == "4Q" + year) {
+                        var lblYear4QStartWeek = "<label class='col-form-label' id='lblYear4QStartWeek' name='lblYear4QStartWeek'>" + moment(value.qtrStartDate).format("MM/DD/YYYY") + "</label>";
+                        var lblYear4QEndWeek = "<label class='col-form-label' id='lblYear4QEndWeek' name='lblYear4QEndWeek'>" + moment(value.qtrEndDate).add(-6, "days").format("MM/DD/YYYY") + "</label>";
+                        $("#lblYear4QNoOfWeeks").text(Math.ceil(moment(value.qtrEndDate).diff(moment(value.qtrStartDate), 'days') / 7));
+                        $("#divYear4QStartWeek").html(lblYear4QStartWeek);
+                        $("#divYear4QEndWeek").html(lblYear4QEndWeek);
+                        qtrExist = true;
+                    }                    
+                });
+                if (qtrExist) {
+                    alert("Data for this year already exists. Please contact the Development team if any changes are required.");
+                }
+                $("#txtYear1QStartWeek,#txtYear2QStartWeek,#txtYear3QStartWeek,#txtYear4QStartWeek,#txtYear1QEndWeek,#txtYear2QEndWeek,#txtYear3QEndWeek,#txtYear4QEndWeek")
+                    .datepicker({ daysOfWeekDisabled: "0,2,3,4,5,6" });
+            },
+            error: function (response) {
+                swal(response.text, 'error');
+            }
+        });
+    }
+    function ClearFields() {
+        $("#lblPrevYear4Q").text("4Q");
+        $("#lblYear1Q").text("1Q");
+        $("#lblYear2Q").text("2Q");
+        $("#lblYear3Q").text("3Q");
+        $("#lblYear4Q").text("4Q");
+        $("#lblPrevYear4QStartWeek").text("");
+        $("#lblPrevYear4QEndWeek").text("");
+        $("#lblPrevYear4QNoOfWeeks").text("");
+        $("#divYear1QStartWeek").html("");
+        $("#divYear1QEndWeek").html("");
+        $("#lblYear1QNoOfWeeks").text("");
+        $("#divYear2QStartWeek").html("");
+        $("#divYear2QEndWeek").html("");
+        $("#lblYear2QNoOfWeeks").text("");
+        $("#divYear3QStartWeek").html("");
+        $("#divYear3QEndWeek").html("");
+        $("#lblYear3QNoOfWeeks").text("");
+        $("#divYear4QStartWeek").html("");
+        $("#divYear4QEndWeek").html("");
+        $("#lblYear4QNoOfWeeks").text("");
+        $("#divBtn").html("");
+    }
+    function ChangeWeekDate(id) {
+        if (ValidateFileds() == false) {
+            $("#" + id).val("");
+            return false;
+        }
+        if (id == "txtYear1QStartWeek" || id == "txtYear1QEndWeek") {
+            year1QStartWeek = $("#txtYear1QStartWeek").val();
+            year1QEndWeek = $("#txtYear1QEndWeek").val();            
+            if (year1QStartWeek != "" && year1QEndWeek != "") {
+                $("#lblYear1QNoOfWeeks").text(Math.ceil(moment(year1QEndWeek).add(6, "days").diff(moment(year1QStartWeek), 'days') / 7));
+            }
+            else {
+                $("#lblYear1QNoOfWeeks").text("");
+            }
+        }
+        if (id == "txtYear2QStartWeek" || id == "txtYear2QEndWeek") {
+            year2QStartWeek = $("#txtYear2QStartWeek").val();
+            year2QEndWeek = $("#txtYear2QEndWeek").val();
+            if (year2QStartWeek != "" && year2QEndWeek != "") {
+                $("#lblYear2QNoOfWeeks").text(Math.ceil(moment(year2QEndWeek).add(6, "days").diff(moment(year2QStartWeek), 'days') / 7));                
+            }
+            else {
+                $("#lblYear2QNoOfWeeks").text("");
+            }
+        }
+        if (id == "txtYear3QStartWeek" || id == "txtYear3QEndWeek") {
+            year3QStartWeek = $("#txtYear3QStartWeek").val();
+            year3QEndWeek = $("#txtYear3QEndWeek").val();
+            if (year3QStartWeek != "" && year3QEndWeek != "") {
+                $("#lblYear3QNoOfWeeks").text(Math.ceil(moment(year3QEndWeek).add(6, "days").diff(moment(year3QStartWeek), 'days') / 7));                
+            } else {
+                $("#lblYear3QNoOfWeeks").text("");
+            }
+        }
+        if (id == "txtYear4QStartWeek" || id == "txtYear4QEndWeek") {
+            year4QStartWeek = $("#txtYear4QStartWeek").val();
+            year4QEndWeek = $("#txtYear4QEndWeek").val();            
+            if (year4QStartWeek != "" && year4QEndWeek != "") {
+                $("#lblYear4QNoOfWeeks").text(Math.ceil(moment(year4QEndWeek).add(6, "days").diff(moment(year4QStartWeek), 'days') / 7));                
+            }
+            else {
+                $("#lblYear4QNoOfWeeks").text("");
+            }
+        }
+    }
+
+    window.onbeforeunload = function (e) {
+        if ($("#txtYear1QStartWeek").val() != "" || $("#txtYear1QEndWeek").val() != "" || $("#txtYear2QStartWeek").val() != "" || $("#txtYear2QEndWeek").val() != ""
+            || $("#txtYear3QStartWeek").val() != "" || $("#txtYear3QEndWeek").val() != "" || $("#txtYear4QStartWeek").val() != "" || $("#txtYear4QEndWeek").val() != ""
+        ) {           
+            return "";
+        }
+    }
+   
+
+</script>

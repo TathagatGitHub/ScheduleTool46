@@ -1,0 +1,105 @@
+@model ProposalViewModel
+
+<div class="modal fade" id="modal-export-proposal" tabindex="-1" role="dialog" aria-labelledby="modal-export-proposal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 1440px;">
+        <div class="modal-content">
+            <form id="ExportProposalForm">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Export Proposal/Schedule</h3>
+                        <div class="block-options">
+                            <button type="button" id="btnCloseProcessExportProposal" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="block-content" style="background-color: #f5f6f7;">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="block block-themed">
+                                <div class="form-group row" style="background-color: #f5f6f7;">
+                                    <div class="row" style="width:100%; margin-left: 0px; display:inline-block">
+                                        <div class="col-md-2">                                  
+                                            <div class="" id="selectNetworks">                                                   
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="">
+                                                <h3 class="block-title">Buy Types:</h3>
+                                            </div>                                            
+                                        </div>
+                                        <div class="col-md-7" style="margin-left: -76px;min-width: 900px;">
+                                            <div class="" style="margin-left: 30px;">
+                                                <h3 class="block-title">Demos:</h3>
+                                            </div>
+                                        </div>
+                                        <hr style="position: relative;top: 20px;border: none;height: 1.5px;background: #575757;margin-top: 35px;"/>
+                                    </div>
+                                    <div class="row" style="margin-right: 15px;height:100%; overflow-x: auto;width:100%; margin-left: 0px; display:inline-block">
+                                        <div class="col-md-2" style="min-width: 238px;">                                   
+                                            <div id="divExportProposalNetworks" style="margin-top: 9px;">
+                                            </div>
+                                        </div>                                        
+                                        <div class="col-md-3">                                            
+                                            <div id="divExportProposalBuyType" style="margin-top: 25px;">
+                                            <p><i>Select a network to list available buy types</i></p>
+                                            </div>                                                                                 
+                                        </div>
+                                        <div class="col-md-7" style="margin-left:-40px">
+                                            <div id="divExportProposalDemo" style="margin-top: 25px; min-width:max-content;">
+                                            </div>                                        
+                                        </div>                               
+                                    </div>                                  
+                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="lblProcessExportErrors" style="margin-left: 34px; margin-top: 10px; margin-bottom: 5px; display:none;font-size:100%;"><label><span>Please review the following information or error(s):</span></label></div>
+                    <div id="divProcessExportErrors" class="col-md-12" style="margin-left: 18px;margin-top: 5px; display:none; margin-bottom: 5px;">
+                    <pre style="text-align:left; width:1403px; font-size:100%;height:200px; overflow-x: hidden;">
+                    <div class="row" style="margin-top: -98px;">                            
+                    <div class="col"> 
+                    <div style="margin-left: -337px;">
+                    <label>
+                        <b><u>Errors: Must be resolved</u></b>
+                    </label> 
+                    </div>                    
+                    <div id="processExportErrorDiv" style="margin-left: 2px;margin-top: -78px;">
+
+                    </div>
+                    </div>                    
+                    <div class="col"> 
+                    <div style="margin-left: -347px;">
+                    <label>
+                        <b><u>Info/Warnings: No action needed</u></b>                        
+                    </label>  
+                    </div>                   
+                    <div id="processExportInfoDiv" style="margin-left: -8px;margin-top: -77px;">
+
+                    </div>
+                    </div>                    
+                    </div>
+                    </pre>
+                    </div>
+                </div>
+                <div class="modal-footer">                    
+                    <button type="button" class="btn btn-alt-danger" data-dismiss="modal" id="btnCancelProcessExportProposal">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-alt-success" id="btnProcessExportProposal" disabled onclick="javascript: ProcessExportProposal(_UniqueId);">
+                        <i class="fa fa-check"></i> Export
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script asp-append-version="true" src="~/js/scheduleproposal/ScheduleProposalExport.js"></script>
+
+
+

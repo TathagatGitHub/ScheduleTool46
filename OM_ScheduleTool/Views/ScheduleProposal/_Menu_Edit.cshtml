@@ -1,0 +1,608 @@
+@model ProposalViewModel
+
+@Html.Partial("~/Views/ManageMedia/_ProposalNotes.cshtml", Model)
+@if(Model.ProposalInfo.ScheduleTypeId==1)
+{
+    @Html.Partial("~/Views/ScheduleProposal/_AddNewPropertyProposal.cshtml", Model)
+    @Html.Partial("~/Views/ScheduleProposal/_CustomizeAddProperties.cshtml", Model)
+}
+else
+{
+    @Html.Partial("~/Views/ScheduleProposal/_AddNewProperty.cshtml", Model)
+}
+
+@Html.Partial("~/Views/ScheduleProposal/_CopySpotsRight.cshtml", Model)
+@Html.Partial("~/Views/ScheduleProposal/_CopyToSchedule.cshtml", Model)
+@Html.Partial("~/Views/ScheduleProposal/_RemoveSelected.cshtml", Model)
+@Html.Partial("~/Views/ScheduleProposal/_ExportProposal.cshtml", Model)
+
+<div id="divGroupSave" class="btn-group" role="group" aria-label="btnGroup1">
+    <div id="divSaveProperty"
+         title="Save Changes"
+         data-toggle="popover"
+         data-original-title="Save Changes"
+         data-placement="top"
+         data-content="All changes will be saved.">
+        <button class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                id="btnSaveChanges"
+                name="btnSaveChanges"
+                disabled="disabled"
+                onclick="javascript: SaveScheduleChanges('@Model.ProposalInfo.ScheduleId', '@Model.ProposalInfo.ScheduleName');">
+            <i class="fa fa-save mr-5"></i>
+        </button>
+    </div>
+</div>
+
+<div class="btn-group btn-group" role="group" aria-label="btnGroup3">
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+        <div id="divAddProperty"
+        title="Add Property"
+        data-toggle="popover"
+        data-original-title="Add Property"
+        data-placement="top"
+        data-content="Add a new properties to proposal.">
+            <button tooltip="Add Properties" onclick="return ResetPropData(@Model.ProposalInfo.ScheduleTypeId);"
+            class="btn btn-success"
+            aria-describedby="popover880418"
+            type="button"
+            id="btnAddProperties"
+            name="btnAddProperties"
+                    data-toggle="modal"
+                    data-target="#modal-addnewpropertyProposal">
+                <i class="fa fa-list mr-5"></i>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div id="divAddProperty"
+             title="Add Property"
+             data-toggle="popover"
+             data-original-title="Add Property"
+             data-placement="top"
+             data-content="Add a new properties to proposal.">
+            <button tooltip="Add Properties"
+                    class="btn btn-success"
+                    aria-describedby="popover880418"
+                    type="button"
+                    id="btnAddProperties"
+                    name="btnAddProperties"
+                    data-toggle="modal"
+                    data-target="#modal-addnewproperty">
+                <i class="fa fa-list mr-5"></i>
+            </button>
+        </div>
+    }
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+        <div id="divCopySpotsRight"
+             title="Copy Weekly Spots"
+             data-toggle="popover"
+             data-original-title="Copy Weekly Spots"
+             data-placement="top"
+             data-content="Copy network proposal by week">
+            <button tooltip="Copy Weekly Spots"
+                    class="btn btn-success"
+                    id="btnCopySpots"
+                    aria-describedby="popover880418"
+                    type="button"
+                    disabled="disabled"
+                    data-toggle="modal"
+                    data-target="#modal-copyright">
+                <i class="fa fa-paste mr-5"></i>
+            </button>
+        </div>
+        bool isTempCommStructure = Model.ClientInfo.IsTempCommStructure ?? false;
+        if (isTempCommStructure)
+        {
+        <div id="divCopyToSchedule"
+             title="Copy To Schedule"
+             data-toggle="popover"
+             data-original-title="Copy To Schedule"
+             data-placement="top"
+             data-content="Select networks to be copied to schedule.">
+        <button tooltip="Copy To Schedule"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                disabled="disabled"
+                data-toggle="modal"
+                data-target="#modal-copytoschedule">
+            <i class="fa fa-copy mr-5"></i>
+        </button>
+        </div>                 
+        }
+        else
+        {
+        <div id="divCopyToSchedule"
+             title="Copy To Schedule"
+             data-toggle="popover"
+             data-original-title="Copy To Schedule"
+             data-placement="top"
+             data-content="Select networks to be copied to schedule.">
+        <button tooltip="Copy To Schedule"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                data-toggle="modal"
+                data-target="#modal-copytoschedule">
+            <i class="fa fa-copy mr-5"></i>
+        </button>
+        </div>                      
+        }   
+    }
+    <div id="divRemoveSelected"
+         title="Remove Selected"
+         data-toggle="popover"
+         data-original-title="Remove Selected"
+         data-placement="top"
+         data-content="Select lines to be removed from this proposal.">
+        <button tooltip="Remove Selected"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                data-toggle="modal"
+                data-target="#modal-removeselected">
+            <i class="fa fa-remove mr-5"></i>
+        </button>
+    </div>
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+        <button title="Export"
+                tooltip="Export"
+                class="btn btn-success"
+                aria-describedby="popover880468"
+                type="button"
+                id="btnExportProposal"
+                name="btnExportProposal"
+                data-toggle="modal"
+                data-target="#modal-export-proposal">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+
+    }
+    @if (Model.ProposalInfo.ScheduleTypeId == 2)
+    {
+        <button title="Export"
+                tooltip="Export"
+                class="btn btn-success"                
+                type="button"
+                id="btnExportSchedule"
+                name="btnExportSchedule">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+
+    }
+    <!--
+      <div id="divShowEffExp"
+           title="Show Dates"
+           data-toggle="popover"
+           data-original-title="Show Dates"
+           data-placement="top"
+           data-content="Show/Hide Expiration and Effective Dates">
+          <button tooltip="Show Exp/Eff Dates"
+                  class="btn btn-success"
+                  id="btnPropShowDates">
+              <i class="fa fa-calendar-check-o mr-5"></i>
+          </button>
+      </div>
+      -->
+    <div id="divNotes"
+         title="Add Notes"
+         data-toggle="popover"
+         data-original-title="Add Notes"
+         data-placement="top"
+         data-content="Add notes for this proposal.">
+        <button tooltip="Notes"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                data-toggle="modal"
+                data-target="#modal-notes">
+            <i class="fa fa-comments-o mr-5"></i>
+        </button>
+    </div>
+    <div id="divShowGI"
+         title="Show GI"
+         data-toggle="popover"
+         data-original-title="Show GI"
+         data-placement="top"
+         data-content="Show/Hide GI">
+        <button tooltip="Show GI"
+                class="btn btn-success"
+                id="btnShowGI">
+            <i class="fa fa-money mr-5"></i>
+        </button>
+    </div>
+    @*<div id="divShowSpots"
+             title="Show Spots"
+             data-toggle="popover"
+             data-original-title="Show Spots"
+             data-placement="top"
+             data-content="Show/Hide Weekly Spots">
+            <button tooltip="Show/Hide Weekly Spots"
+                    class="btn btn-success"
+                    id="btnPropShowSpots">
+                <i class="fa fa-eye mr-5"></i>
+            </button>
+        </div>*@
+    <div id="divColumnsReset"
+         title="Reset Table State"
+         data-toggle="popover"
+         data-original-title="Reset Table State"
+         data-placement="top"
+         data-content="This will reset saved state of columns and filters back to default settings.">
+        <button tooltip="Reset Columns"
+                class="btn btn-success"
+                id="btnPropResetColumns">
+            <i class="si si-ban mr-5"></i>
+        </button>
+    </div>
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+            <div id="divFilterPremiere"
+             title="Filter Premiere Properties"
+             data-toggle="popover"
+             data-original-title="Filter Premiere Properties"
+             data-placement="top"
+             data-content="">
+                <button tooltip="Filter Premiere Properties"
+                        class="btn btn-success"
+                        id="btnFilterPremiereProperties" onclick="return ApplyPremeireFilter(this);">
+                    P
+                </button>
+            </div>
+    }
+   
+</div>
+@*@if (Model.ProposalInfo.ScheduleTypeId == 1)
+{
+    <div class="btn-group btn-group" role="group" aria-label="btnGroup5">
+    <div id="divFilterPremiere"
+         title="Filter Premiere Properties"
+         data-toggle="popover"
+         data-original-title="Filter Premiere Properties"
+         data-placement="top"
+         data-content="This will filter the List of Premiere properties if available.">
+        <button tooltip="Filter Premiere Properties"
+                    class="btn btn-success"
+                    id="btnFilterPremiereProperties" onclick="return ApplyPremeireFilter(this);">
+            P
+        </button>
+    </div>
+    </div>
+    }*@
+<div class="btn-group btn-group" role="group" aria-label="btnGroup4">
+    <div id="divLoadMore"
+         title="Load More Rows"
+         data-toggle="popover"
+         data-original-title="Load More Rows"
+         data-placement="top"
+         data-content="Load the next 200 rows for this schedule/proposal.">
+        <button id="btn-example-load-more" class="btn btn-success"><i class="fa fa-plus mr-5"></i></button>
+    </div>
+    <div id="divLoadLess"
+         title="Load Less Rows"
+         data-toggle="popover"
+         data-original-title="Load Less Rows"
+         data-placement="top"
+         data-content="Load the first 200 rows for this schedule/proposal.">
+        <button id="btn-example-load-less" class="btn btn-success"><i class="fa fa-minus mr-5"></i></button>
+    </div>
+    
+    <!--
+    <div>
+        <button type="button"
+                tooltip="Reload data"
+                class="btn btn-success"
+                onclick="javascript: ReloadPage();">
+            <i class="fa fa-refresh mr-5"></i>
+        </button>
+    </div>
+        -->
+</div>
+
+@if (Model.ProposalInfo.ScheduleTypeId == 2)
+{
+    <div class="btn-group" role="group" aria-label="btnGroup5">
+        <div id="divEditActualized"
+             title="Edit Actualized Weeks"
+             data-toggle="popover"
+             data-original-title="Edit Actualized Weeks"
+             data-placement="top"
+             data-content="This will enable editing the spots for Actualized weeks">
+            <button class="btn btn-success"
+                    aria-describedby="popover880418"
+                    type="button"
+                    id="btnEditActualized"
+                    name="btnEditActualized">
+                Edit Actualized
+            </button>
+        </div>
+    </div>
+}
+@if (Model.ProposalInfo.ScheduleTypeId == 1)
+{
+    <div class="btn-group" role="group">
+        <div id="divQuarterlyClientNote"
+             title="Quarterly Client Note"
+             data-toggle="popover"
+             data-original-title="Quarterly Client Note"
+             data-placement="top">
+            <button class="btn btn-success" onclick="GetQuarterlyClientNote(@Model.ProposalInfo.ScheduleId);"                    
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#modal-QuarterlyClientNote">
+                Quarterly Client Note
+            </button>
+        </div>        
+    </div>  
+     <div class="btn-group" role="group">
+          <div id="divUndoWeeklySpotChange"
+                 title="Undo Weekly Spot Change"
+                 data-toggle="popover"
+                 data-original-title="Undo Weekly Spot Change"
+                 data-placement="top"
+         data-content="Undo unsaved weekly spot count (upto 15 changes)">
+            <button id="btnUndoWeeklySpotChange" class="btn btn-success"><i class="fa fa-undo mr-5"></i></button>
+         </div>
+      </div>
+   
+}
+<br />
+
+@if (Model.ProposalInfo.ScheduleTypeId == 1)
+{
+    <div class="modal fade" id="modal-QuarterlyClientNote" role="dialog" aria-labelledby="modal-QuarterlyClientNote" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">@Model.ProposalInfo.ScheduleName</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12" for="txtQuarterlyClientNote">Quarterly Client Note:</label>
+                            <div class="col-md-12">
+                                <textarea class="form-control" id="txtQuarterlyClientNote" name="txtQuarterlyClientNote" rows="5" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" onclick="SaveQuarterlyClientNote(@Model.ProposalInfo.ScheduleId);">
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script language="javascript" type="text/javascript">
+    var ChangeCount = 0;
+    var isSaved = 0;
+    $(document).ready(function () {
+        SetupMenus();
+        
+        $("#btnUndoWeeklySpotChange").on("click", function () {
+          var index=WeeklySpot.length-1;
+          if (index == -1) return;          
+            var id=WeeklySpot[index].split('||')[0];           
+            
+            if ($("#" + id)[0] == undefined){           
+                for(var i=0; i<=WeeklySpot.length-1; i++){
+                    index = WeeklySpot.length - 1 -i;
+                    id=WeeklySpot[index].split('||')[0]
+                        if ($("#" + id)[0] != undefined)
+                        {
+                            break;                            
+                        }
+                }
+            }
+            if ($("#" + id)[0] != undefined){
+                $("#"+id).val(WeeklySpot[index].split('||')[2]);            
+                OnWeeklySpotChange($("#"+WeeklySpot[index].split('||')[0])[0], WeeklySpot[index].split('||')[0].substring(0,5), WeeklySpot[index].split('||')[3], 'btnUndoWeeklySpotChange');
+                WeeklySpot.splice(index,1);                
+            }
+            
+            $("#btnUndoWeeklySpotChange").attr('disabled','disabled');
+            for (var i = 0; i <= WeeklySpot.length-1; i++) {
+                    index = WeeklySpot.length - 1 - i;
+                    id = WeeklySpot[index].split('||')[0]
+                    if ($("#" + id)[0] != undefined) {
+                        $("#btnUndoWeeklySpotChange").removeAttr('disabled');
+                    }
+                }
+        });
+        $("#btnEditActualized").on("click", function () {
+            if ($(this).text().trim() == 'Edit Actualized') {
+                swal({
+                    text: "You are about to enter [EDIT ACTUALIZED WEEKS] mode. ARE YOU SURE YOU WANT TO CONTINUE?",
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then(function (result) { toggleEditActualizeMode(); }, function (dismiss) { });
+            }
+            else if ($(this).text().trim() == 'Exit Edit Actualized') {
+                toggleEditActualizeMode();
+            }
+        });
+        $("#btnExportSchedule").on("click", function () {
+            window.location.href = "/ScheduleProposal/ExportScheduleExcel?ScheduleId=" + _UniqueId + "&Discount=" + $("#DiscountPrice").find(":selected").text().replace('%', ''); 
+        });
+    });
+
+    function SetupMenus() {
+        $.ajax({
+            url: '/ScheduleProposal/GetChangeCount',
+            type: 'POST',
+            data: {
+                scheduleId: _UniqueId,
+            },
+            success: function (result) {
+                if (result.success) {
+                    ChangeCount = result.changeCount;
+                    promptExit(0);
+                    $("#btnSaveChanges").attr("disabled", "disabled");
+                    $("#btnAddProperties").attr("disabled", "disabled");
+                    $("#btnCopyToSchedule").attr("disabled", "disabled");
+                    $("#btnRemoveSelected").attr("disabled", "disabled");
+                    $("#btnExportProposal").attr("disabled", "disabled");
+
+                    if (parseInt(result.changeCount) > 0) {
+                        promptExit(1);
+                        $("#btnSaveChanges").removeAttr("disabled");
+                    }
+                    else {
+                        $("#btnAddProperties").removeAttr("disabled");
+                        $("#btnCopyToSchedule").removeAttr("disabled");
+                        $("#btnExportProposal").removeAttr("disabled");
+
+                        $('.selected').each(function (i, obj) {
+                            // Once one is found that was selected, enable button
+                            $("#btnRemoveSelected").removeAttr("disabled");
+                        });
+                    }
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true,
+                })
+            }
+        });
+    }
+
+    function SaveScheduleChanges(_ScheduleId, _ScheduleName) {
+        var AvailableUEMet = unformatCurrency($("#TotalScheduleAvailableUE").html());
+        var AvailableUE = $("#AvailableUESaved").html();
+        if (parseFloat(AvailableUEMet) < 0) {
+            swal({
+                title: _ScheduleName,
+                text: 'Available Upfront Expansion ' +  AvailableUE +' exceeded.  Please correct error before saving.',
+                type: 'question',
+            });
+        }
+        else {
+
+            swal({
+                title: _ScheduleName,
+                text: 'Are you sure?  All changes will be permanently saved.',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, save it!',
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(
+                function (result) {
+                    $.ajax({
+                        url: "/ScheduleProposal/SaveChanges",
+                        type: 'POST',
+                        data: {
+                            scheduleId: _ScheduleId
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                isSaved = 1;
+                                swal({                                    
+                                    title: 'Success',
+                                    text: result.responseText + '  Click OK to refresh page.',
+                                    type: 'success',
+                                    showCancelButton: false,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'OK',
+                                    preConfirm: function () {
+                                        return new Promise(function (resolve) {
+                                            setTimeout(function () {
+                                                resolve();
+                                            }, 0);
+                                        });
+                                    }
+                                }).then(
+                                    function (result) {
+                                        promptExit(0);
+                                        // Reloading the page should lock it again.
+                                        //window.location.href = "/ScheduleProposal/EditProposal?ProposalId=" + _ScheduleId;
+                                        //window.onunload = null;
+                                        window.location.reload();
+                                    });
+                            }
+                            else {
+                                isSaved = 0;
+                                swal('Error!', result.responseText, 'warning');
+                                return;
+                            }
+
+                        },
+                        error: function (response) {
+                            swal('Error1!', response.responseText, 'warning');
+                            return;
+                        }
+                    })
+                });
+        }
+    }
+
+    function SaveQuarterlyClientNote(ProposalId) {
+        if ($("#txtQuarterlyClientNote").val().trim() == "")
+            return false;        
+        $.ajax({
+            url: "/ScheduleProposal/SaveQuarterlyClientNote",
+            data: {
+                proposalId: ProposalId,
+                note: $("#txtQuarterlyClientNote").val().trim()
+            },
+            type: "POST",
+            success: function (result) {
+                if (result.success) {
+                    swal('', result.responseText, 'success');
+                }
+                else {
+                    swal('', result.responseText, 'warning');
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });
+
+    }
+
+    function GetQuarterlyClientNote(ProposalId) {
+        $.ajax({
+            url: "/ScheduleProposal/GetQuarterlyClientNote",
+            data: {
+                proposalId: ProposalId                
+            },
+            type: "POST",
+            success: function (result) {
+                $("#txtQuarterlyClientNote").val(result.note);
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+    }
+</script>

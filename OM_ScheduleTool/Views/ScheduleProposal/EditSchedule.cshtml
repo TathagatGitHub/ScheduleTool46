@@ -1,0 +1,144 @@
+﻿@model ProposalViewModel
+
+<style type="text/css">
+  /*  div.cb-dropdown-wrap:hover {
+        z-index: 2;
+    }*/
+
+    #top {
+/*        width: 1180px !important*/
+    }
+
+    /*** Top and Bottom Datatable Width adjutment for 13 Weeks display ***/
+    .CanadaTopDTWidth13Wk {
+        max-width: 2800px !important;
+    }
+
+    .CanadaBottomDTWidth13Wk {
+        max-width: 4100px !important;
+    }
+
+    .USTopDTWidth13Wk {
+        max-width: 2700px !important;
+    }
+
+    .USBottomDTWidth13Wk {
+        max-width: 3980px !important;
+    }
+
+    /*** Top and Bottom Datatable Width adjutment for 14 Weeks display ***/
+    .CanadaTopDTWidth14Wk {
+        max-width: 2800px !important;
+    }
+
+    .CanadaBottomDTWidth14Wk {
+        max-width: 4100px !important;
+    }
+
+    .USTopDTWidth14Wk {
+        max-width: 2820px !important;
+    }
+
+    .USBottomDTWidth14Wk {
+        max-width: 4150px !important;
+    }
+</style>
+<script asp-append-version="true" type="text/javascript" src="~/js/check_browser_close.js"></script>
+<link href="~/css/timeout-dialog.css" rel="stylesheet" />
+<script asp-append-version="true" src="~/js/timeout-dialog.js"></script>
+@*<script asp-append-version="true" src="~/js/scheduleproposal/ScheduleProposal.js"></script>*@
+<script asp-append-version="true" src="~/js/scheduleproposal/ScheduleProposalLibrary.js"></script>
+
+<script type="text/javascript">
+    var popupGrossIncome = false;
+    var popupExchangeRates = false;
+    var popupExportProposal = false;
+
+    $(document).ready(function () {
+        reloadParent(1);
+    });
+
+    $(document).on("click", ".btn-success", function (event) {
+        $.get("@Url.Action("AjaxClick", "Home")", function (data) {
+            try {
+                jQuery.timeoutDialog.setupDialogTimer();
+            }
+            catch (err) { }
+        });
+        $.ajax({
+            url: "/UpfrontRemnant/IsSessionActive",
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success === false) {
+                    promptExit(0);
+                    window.location.href = '"~/StatusCode/408"';
+                }
+            },
+            error: function (response) {
+            }
+
+        });
+    });
+
+    //$(window).resize(function () {
+    //    $("#divHeader").width($(window).width()-20);
+    //});
+    $(window).on('unload', function () {
+        try {
+            if (popupGrossIncome && !popupGrossIncome.Closed) {
+                popupGrossIncome.close();
+            }
+            if (popupExchangeRates && !popupExchangeRates.Closed) {
+                popupExchangeRates.close();
+            }
+            if (popupExportProposal && !popupExportProposal.Closed) {
+                popupExportProposal.close();
+            }
+        }
+        catch (err) {
+        }
+    });
+
+</script>
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            @*<div class="col-md-5">*@
+            <div class="col-md-2">
+                @Html.Partial("~/Views/ScheduleProposal/_Header.cshtml", Model)
+            </div>
+            @*<div id="top" class="col-md-7">
+                @Html.Partial("~/Views/ScheduleProposal/_Calculator.cshtml", Model)
+            </div>*@
+
+            @if (Model.ProposalQuarter.Wk14_Date != null)
+            {
+                <div id="top" class="@(Model.ProposalInfo.CountryId == 2 ? "CanadaTopDTWidth14Wk" : "USTopDTWidth14Wk")">
+                    @Html.Partial("~/Views/ScheduleProposal/_Calculator.cshtml", Model)
+                </div>
+            }
+            else
+            {
+                <div id="top" class="@(Model.ProposalInfo.CountryId == 2 ? "CanadaTopDTWidth13Wk" : "USTopDTWidth13Wk")">
+                    @Html.Partial("~/Views/ScheduleProposal/_Calculator.cshtml", Model)
+                </div>
+            }
+        </div>
+        @*@Html.Partial("~/Views/ScheduleProposal/_DataTable_Edit.cshtml", Model)*@
+
+        @if (Model.ProposalQuarter.Wk14_Date != null)
+        {
+            <div id="bottom" class="@(Model.ProposalInfo.CountryId == 2 ? "CanadaBottomDTWidth14Wk" : "USBottomDTWidth14Wk")">
+                @Html.Partial("~/Views/ScheduleProposal/_DataTable_Edit.cshtml", Model)
+            </div>
+        }
+        else
+        {
+            <div id="bottom" class="@(Model.ProposalInfo.CountryId == 2 ? "CanadaBottomDTWidth13Wk" : "USBottomDTWidth13Wk")">
+                @Html.Partial("~/Views/ScheduleProposal/_DataTable_Edit.cshtml", Model)
+            </div>
+        }
+    </div>
+</main>

@@ -1,0 +1,18 @@
+﻿body {
+}
+
+table.dataTable tbody th {
+    padding: 2px 2px !important;
+}
+
+div {
+    margin: 50px;
+}
+
+/* signature & title part */
+.completed-by, .signature, .title, .date {
+    float: left;
+}
+
+
+

@@ -1,0 +1,93 @@
+@model ViewUpfrontsViewModel
+
+<div class="modal fade" id="modal-upfrontdealca" tabindex="-1" role="dialog" aria-labelledby="modal-upfrontdealca" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Update Deal Point Data (CA)</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="block block-themed block-rounded block-bordered">
+                                <div class="block-header">
+                                    <h3 class="block-title">DR Buy Types @Model.PlanYear @Model.NetworkInfo.StdNetName</h3>
+                                </div>
+                                <div class="block-content">
+                                    @*<div class="form-group row">
+                                        <label class="col-12" for="txtBillboardAddedValue"><strong>National Break:</strong></label>
+                                    </div>*@
+                                    <div class="form-group row">
+                                        <label class="col-12" for="txtUpfrontCancellationCA">Upfront Cancellation:</label>
+                                        <div class="col-md-12">
+                                            @if (Model.ViewOnly == true)
+                                            {
+                                              <input type="text" class="form-control" id="txtUpfrontCancellationCA" name="txtUpfrontCancellationCA" readonly>
+                                            }
+                                            else
+                                            {
+                                              <input type="text" class="form-control" id="txtUpfrontCancellationCA" name="txtUpfrontCancellationCA">
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-12" for="txtScatterCancellationCA">Scatter Cancellation:</label>
+                                        <div class="col-md-12">
+                                            @if (Model.ViewOnly == true)
+                                            {
+                                              <input type="text" class="form-control" id="txtScatterCancellationCA" name="txtScatterCancellationCA" readonly>
+                                            }
+                                            else 
+                                            {
+                                             <input type="text" class="form-control" id="txtScatterCancellationCA" name="txtScatterCancellationCA">
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-12" for="txtNetworkSeparationCA">Network Separation Policy:</label>
+                                        <div class="col-md-12">
+                                            @if (Model.ViewOnly == true)
+                                            {
+                                              <input type="text" class="form-control" id="txtNetworkSeparationCA" name="txtNetworkSeparationCA" readonly>
+                                            }
+                                            else
+                                            {
+                                              <input type="text" class="form-control" id="txtNetworkSeparationCA" name="txtNetworkSeparationCA">
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <p>All paid spots are non pre-emptible unless approved by Ocean Media prior to pre-emption.</p>
+                                            <p>No more than 1 spot per program.</p>
+                                            <p id="lblFineLineCA" name="lblFineLineCA"></p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" >
+                    <i class="fa fa-check"></i>Close
+                </button>
+                @if (Model.ViewOnly == false)
+                {
+                    <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnSaveUpfrontDealCA">
+                        <i class="fa fa-check"></i>Save
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

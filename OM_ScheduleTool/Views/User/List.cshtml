@@ -1,0 +1,329 @@
+﻿@model UsersListViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser);
+
+<!-- Main Container -->
+<main id="main-container" style="min-height: 515.1px;">
+
+
+    <!-- Page Content -->
+    <div class="content">
+        <h2 class="content-heading">Active Users <small>List</small></h2>
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" data-target="#divMedia" data-parent="#accordion"><h4 class="panel-title">Media</h4></div>
+                <div class="row panel-collapse collapse show panel-body" id="divMedia">
+                    @foreach (var user in Model.ActiveUsers)
+                    {
+                        // Display Name
+                        string displayname = user.DisplayName;
+
+                        if (displayname == null)
+                        {
+                            continue;
+                        }
+
+                        if (displayname.Length > 20)
+                        {
+                            displayname = displayname.Substring(0, 20) + "...";
+                        }
+
+                        // Account Name
+                        string accountname = user.AccountName;
+                        if (accountname.Length > 30)
+                        {
+                            accountname = accountname.Substring(0, 30);
+                        }
+
+                        // Email
+                        string email = user.EmailAddress;
+                        if (email.Length > 30)
+                        {
+                            email = email.Substring(0, 30) + "...";
+                        }
+
+                        string imageurl = user.ImageUrl;
+
+
+                        // Color
+                        /*
+                        string color = "bg-gd-sun";
+                        if (user.PermissionLevelId == 1)
+                        {
+                            color = "bg-gd-leaf";
+                        }
+                        else if (user.PermissionLevelId == 2)
+                        {
+                            color = "bg-gd-emerald";
+                        }
+                        else if (user.PermissionLevelId == 3)
+                        {
+                            color = "bg-gd-sun";
+                        }
+                        else if (user.PermissionLevelId == 4)
+                        {
+                            color = "bg-gd-dusk";
+                        }
+                        */
+                        string color = user.PermissionLevel.ThemeBackground;
+
+                        string PermissionLevel = user.PermissionLevel.Description;
+
+                        @if ((PermissionLevel.ToLower() == "buyer" || PermissionLevel.ToLower() == "assistant" || PermissionLevel.ToLower() == "admin") && user.Finance == false) 
+                        {
+                            <div class="col-md-6 col-xl-3">
+                                <a class="block text-center"
+                                   asp-controller="User"
+                                   asp-action="Detail"
+                                   asp-route-id="@user.AccountName">
+
+                                    <div class="block-content block-content-full @color">
+                                        <img class="img-avatar img-avatar-thumb" alt="" src="@imageurl">
+                                    </div>
+                                    <div class="block-content block-content-full">
+                                        <div class="font-w600 mb-5">@displayname</div>
+                                        <div class="font-size-sm text-muted">@accountname</div>
+                                    </div>
+                                    <div class="block-content block-content-full block-content-sm bg-body-light">
+                                        <span class="font-w600 font-size-sm text-danger">@PermissionLevel </span>
+                                    </div>
+                                </a>
+                            </div>
+                            }
+
+
+                        }
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" data-target="#divFinance" data-parent="#accordion"><h4 class="panel-title">Finance</h4></div>
+                <div class="row panel-collapse collapse panel-body" id="divFinance">
+                    @foreach (var user in Model.ActiveUsers)
+                    {
+                        // Display Name
+                        string displayname = user.DisplayName;
+
+                        if (displayname == null)
+                        {
+                            continue;
+                        }
+
+                        if (displayname.Length > 20)
+                        {
+                            displayname = displayname.Substring(0, 20) + "...";
+                        }
+
+                        // Account Name
+                        string accountname = user.AccountName;
+                        if (accountname.Length > 30)
+                        {
+                            accountname = accountname.Substring(0, 30);
+                        }
+
+                        string imageurl = user.ImageUrl;
+
+                        string color = user.PermissionLevel.ThemeBackground;
+
+                        string PermissionLevel = user.PermissionLevel.Description;
+
+                        @if (user.Finance == true && (PermissionLevel.ToLower() == "general" || PermissionLevel.ToLower() == "buyer" || PermissionLevel.ToLower() == "assistant" || PermissionLevel.ToLower() == "admin"))
+                        {
+                       
+                        <div class="col-md-6 col-xl-3">
+                            <a class="block text-center"
+                               asp-controller="User"
+                               asp-action="Detail"
+                               asp-route-id="@user.AccountName">
+                                <div class="block-content block-content-full @color">
+                                    <img class="img-avatar img-avatar-thumb" alt="" src="@imageurl">
+                                </div>
+                                <div class="block-content block-content-full">
+                                    <div class="font-w600 mb-5">@displayname</div>
+                                    <div class="font-size-sm text-muted">@accountname</div>
+                                </div>
+                                <div class="block-content block-content-full block-content-sm bg-body-light">
+                                    <span class="font-w600 font-size-sm text-danger">@PermissionLevel (FINANCE)</span>
+                                </div>
+                            </a>
+                        </div>
+                           
+                        }
+                    }
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" data-target="#divGeneral" data-parent="#accordion"><h4 class="panel-title">General</h4></div>
+                <div class="row panel-collapse collapse panel-body" id="divGeneral">
+                    @foreach (var user in Model.ActiveUsers)
+                    {
+                        // Display Name
+                        string displayname = user.DisplayName;
+
+                        if (displayname == null)
+                        {
+                            continue;
+                        }
+
+                        if (displayname.Length > 20)
+                        {
+                            displayname = displayname.Substring(0, 20) + "...";
+                        }
+
+                        // Account Name
+                        string accountname = user.AccountName;
+                        if (accountname.Length > 30)
+                        {
+                            accountname = accountname.Substring(0, 30);
+                        }
+
+                        string imageurl = user.ImageUrl;
+
+                        string color = user.PermissionLevel.ThemeBackground;
+
+                        string PermissionLevel = user.PermissionLevel.Description;
+
+                        @if (PermissionLevel.ToLower() == "general" && user.Finance == false )
+                        {
+
+                            <div class="col-md-6 col-xl-3">
+                                <a class="block text-center"
+                                   asp-controller="User"
+                                   asp-action="Detail"
+                                   asp-route-id="@user.AccountName">
+                                    <div class="block-content block-content-full @color">
+                                        <img class="img-avatar img-avatar-thumb" alt="" src="@imageurl">
+                                    </div>
+                                    <div class="block-content block-content-full">
+                                        <div class="font-w600 mb-5">@displayname</div>
+                                        <div class="font-size-sm text-muted">@accountname</div>
+                                    </div>
+                                    <div class="block-content block-content-full block-content-sm bg-body-light">
+                                        <span class="font-w600 font-size-sm text-danger">@PermissionLevel </span>
+                                    </div>
+                                </a>
+                            </div>
+                      
+                        }
+
+
+                    }
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" data-toggle="collapse" data-target="#divClientManagement" data-parent="#accordion"><h4 class="panel-title">Client Management</h4></div>
+                <div class="row panel-collapse collapse panel-body" id="divClientManagement">
+                    @foreach (var user in Model.ActiveUsers)
+                    {
+                        // Display Name
+                        string displayname = user.DisplayName;
+
+                        if (displayname == null)
+                        {
+                            continue;
+                        }
+
+                        if (displayname.Length > 20)
+                        {
+                            displayname = displayname.Substring(0, 20) + "...";
+                        }
+
+                        // Account Name
+                        string accountname = user.AccountName;
+                        if (accountname.Length > 30)
+                        {
+                            accountname = accountname.Substring(0, 30);
+                        }
+
+                        string imageurl = user.ImageUrl;
+
+                        string color = user.PermissionLevel.ThemeBackground;
+
+                        string PermissionLevel = user.PermissionLevel.Description;
+
+                        @if (PermissionLevel.ToLower() == "client management")
+                        {
+
+                            <div class="col-md-6 col-xl-3">
+                                <a class="block text-center"
+                           asp-controller="User"
+                           asp-action="Detail"
+                           asp-route-id="@user.AccountName">
+                                    <div class="block-content block-content-full @color">
+                                        <img class="img-avatar img-avatar-thumb" alt="" src="@imageurl">
+                                    </div>
+                                    <div class="block-content block-content-full">
+                                        <div class="font-w600 mb-5">@displayname</div>
+                                        <div class="font-size-sm text-muted">@accountname</div>
+                                    </div>
+                                    <div class="block-content block-content-full block-content-sm bg-body-light">
+                                        <span class="font-w600 font-size-sm text-danger">@PermissionLevel </span>
+                                    </div>
+                                </a>
+                            </div>
+
+                        }
+
+
+                    }
+                </div>
+            </div>
+        </div>
+
+        <h2 class="content-heading">Inactive Users <small>List</small></h2>
+        <div class="row">
+            @foreach (var user in Model.InactiveUsers)
+            {
+                // Display Name
+                string displayname = user.DisplayName;
+                if (displayname == null)
+                {
+                    continue;
+                }
+
+                if (displayname.Length > 20)
+                {
+                    displayname = displayname.Substring(0, 20) + "...";
+                }
+
+                // Account Name
+                string accountname = user.AccountName;
+                if (accountname.Length > 30)
+                {
+                    accountname = accountname.Substring(0, 30);
+                }
+
+                // Email
+                string email = user.EmailAddress;
+                if (email.Length > 30)
+                {
+                    email = email.Substring(0, 30) + "...";
+                }
+
+
+                string PermissionLevel = user.PermissionLevel.Description;
+
+                <div class="col-md-6 col-xl-3">
+                    <a class="block block-link-shadow"
+                       asp-controller="User"
+                       asp-action="Detail"
+                       asp-route-id="@user.AccountName">
+                        <div class="block-content block-content-full clearfix">
+                            <div class="float-right">
+                                <img class="img-avatar" alt="" src="~/img/avatars/avatar7.jpg">
+                            </div>
+                            <div class="float-left mt-10">
+                                <div class="font-w600 mb-5">@displayname</div>
+                                <div class="font-size-sm text-muted">@accountname</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+
+            }
+        </div>
+    </div>
+    <!-- END Page Content -->
+
+</main>
+<!-- END Main Container -->

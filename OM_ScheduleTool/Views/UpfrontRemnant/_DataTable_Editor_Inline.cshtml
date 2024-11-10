@@ -1,0 +1,61 @@
+@model ViewUpfrontsViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css ">
+<script src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+<script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+<script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-pageLoadMore/1.0.0/js/dataTables.pageLoadMore.min.js"></script>
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+
+<script src="~/datatable-editor/js/dataTables.editor.min.js"></script>
+<link rel="stylesheet" href="~/datatable-editor/css/editor.dataTables.min.css">
+
+<script src="~/js/upfrontremnant/upfrontremnant_edit_inline.js"></script>
+
+<style type="text/css">
+    body {
+        overflow-y: visible;
+        overflow-x: visible;
+        line-height: 1;
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #ffffff;
+    }
+</style>
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+    });
+</script>
+
+<div class="block block-themed block-rounded">
+    <div class="block-content block-content-full" id="resize_wrapper">
+
+        <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap" id="UpfrontTable" name="UpfrontTable" style="width:95%">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDemoName">DEMO</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

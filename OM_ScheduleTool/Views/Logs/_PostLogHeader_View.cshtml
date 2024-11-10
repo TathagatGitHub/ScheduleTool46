@@ -1,0 +1,222 @@
+@model PostLogViewModel
+<style type="text/css">
+    .border {
+        border-color: black !important;
+        border-width: 2px !important;
+    }
+
+    .pl-55 {
+        padding-left: 55px !important;
+    }
+</style>
+<div class="block block-themed block-rounded">
+    <div class="block-header block-header-default bg-secondary">
+        <h3 class="block-title">POST LOG FOR @Model.PostLog.Schedule.ScheduleName</h3>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+        </div>
+    </div>
+    @{
+    var selectedCountryId = Context.Request.Query["logsSelectedCountryId"];
+    }
+    <div class="block-content">
+        <div class="row gutters-tiny">
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label for="upfront_name">Client Name</label></td>
+                        <td>@Model.PostLog.Schedule.Client.ClientName @(selectedCountryId == "2" ? " (CANADA)" : "") </td>
+                    </tr>
+                    <tr>
+                        <td><label>Week #</label></td>
+                        <td>@Model.PostLog.WeekNbr</td>
+                    </tr>
+                    <tr>
+                        <td><label>Week Date</label></td>
+                        <td id="WeekStartDate">@Model.PostLog.WeekDate.ToString("MM/dd/yyyy")</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label>Last Modified By</label></td>
+                        <td>
+                            @Model.PostLog.UpdatedBy.DisplayName
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Last Modified On</label></td>
+                        <td>@Model.PostLog.UpdateDt</td>
+                    </tr>
+                    <tr>
+                        <td><label>Mode</label></td>
+                        <td>VIEW</td>
+                    </tr>
+                </table>
+            </div>
+            @if (Model.PostLog.ActualizedBy != null)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-3">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td style="width:35%"><label>Last Actualized By</label></td>
+                            <td>
+                                @Model.PostLog.ActualizedBy.DisplayName
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>Last Actualized On</label></td>
+                            <td>@Model.PostLog.Actualize_Date</td>
+                        </tr>
+                    </table>
+                </div>
+            }
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <div class="block-content" style="vertical-align:top">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td class="table-primary text-center">Poor Separation</td>
+                        </tr>
+                        <tr>
+                            <td class="table-danger text-center">Out of Daypart</td>
+                        </tr>
+                        <tr>
+                            <td class="table-success text-center">Unplaced</td>
+                        </tr>
+                    </table>
+                    <br />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <table class="dataTable border compact display" style="width:100%">
+                    <thead>
+                        <tr class="border">
+                            <th class="text-right border"></th>
+                            <th class="text-center"><b>SPOTS</b></th>
+                            <th class="text-center"><b>FULL RATE</b></th>
+                            <th class="text-center"><b>RATE</b></th>
+                            <th class="text-center"><b>IMP</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>CLEARED</b></td>
+                            <td><label id="lblTotalClearedSpots"></label></td>
+                            <td><label id="lblTotalClearedFullRate"></label></td>
+                            <td><label id="lblTotalClearedRate"></label></td>
+                            <td><label id="lblTotalClearedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>UNCLEARED</b></td>
+                            <td><label id="lblTotalUnClearedSpots"></label></td>
+                            <td><label id="lblTotalUnClearedFullRate"></label></td>
+                            <td><label id="lblTotalUnClearedRate"></label></td>
+                            <td><label id="lblTotalUnClearedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>UNPLACED</b></td>
+                            <td><label id="lblTotalUnPlacedSpots"></label></td>
+                            <td><label id="lblTotalUnPlacedFullRate"></label></td>
+                            <td><label id="lblTotalUnPlacedRate"></label></td>
+                            <td><label id="lblTotalUnPlacedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center border">
+                            <td class="text-right border"><b>TOTAL</b></td>
+                            <td><label id="lblTotalSpots"></label></td>
+                            <td><label id="lblTotalFullRate"></label></td>
+                            <td><label id="lblTotalRate"></label></td>
+                            <td><label id="lblTotalIMP"></label></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right border" colspan="1"><b>FILTERING ENABLED</b></td>
+                            <td class="pl-55" colspan="4"><label id="lblFilter" style="font-weight:bold"></label>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="postLogParams" type="hidden" value="@Model.PostLog.PostLogId"
+       data-schedId="@Model.PostLog.SchedId"
+       data-weekNbr="@Model.PostLog.WeekNbr"
+       data-weekDate="@Model.PostLog.WeekDate"
+       data-clientId="@Model.PostLog.Schedule.ClientId" />
+
+<div class="modal hide fade" id="modal-notes" role="dialog" aria-labelledby="modal-notes" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">POST LOG FOR @Model.PostLog.Schedule.ScheduleName</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="tblNotes" name="tblNotes">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:20%">Date</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Creator</th>
+                                        <th class="d-none d-sm-table-cell" style="width:60%">Note</th>                                        
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal hide fade" id="divValidISCIs" role="dialog" aria-labelledby="divValidISCIs" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Valid ISCIs</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="tblValidISCIs" name="tblValidISCIs">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:25%">ISCI</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Date Start</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Date End</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Length</th>
+                                        <th class="d-none d-sm-table-cell" style="width:25%">Media Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

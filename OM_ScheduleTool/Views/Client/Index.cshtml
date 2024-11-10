@@ -1,0 +1,998 @@
+﻿@model ClientViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+
+<script src="~/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+<style type="text/css">
+    .select2-selection__placeholder{
+        color: #444 !important;
+    }
+
+    .clsBold {
+        font-weight: bold;
+    }
+
+    .modal-dialog {
+        min-width: 600px !important;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+
+    var isClientActive = 0;
+
+    $("document").ready(function () {
+        //alert(@Model.LoggedOnUser_Permissions_ClientName.ActionId);
+        $("#txtAddClientName").autoComplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("GetClientNameandAlias","Client")',
+                    data: { "Prefix": request },
+                    type: "post",
+                    success: function (result) {
+                        response($.map(result, function (item) {
+                            return item;
+                        }));
+                    },
+                    error: function (response) {
+                        swal("Error!", response, "error");
+                    }
+                })
+            }
+        });
+        $("#txtAddClientName").on("blur", function () {
+            if ($(this).val() == "")
+                return;
+            $.ajax({
+                url: '@Url.Action("IsClientExist","Client")',
+                data: { "ClientName": $(this).val() },
+                type: "post",
+                success: function (result) {
+                    if (result) {
+                        swal("", "Client already exists. Please select different Client.", "warning");
+                    }
+                },
+                error: function (response) {
+                    swal("Error!", response, "error");
+                }
+            })
+
+        });
+
+        SetApplicationFieldOptions();
+        $("#ddlCountry").on("change", function (e) {
+            GetClients($("#ddlCountry").find(":selected").val(), 0);
+        });
+
+        // Initialize Page
+        // Fill out client
+        GetClients($("#ddlCountry").find(":selected").val(), 0);
+
+        $('#modal-add-client').on('shown.bs.modal', function () {            
+            $("#txtAddClientName").val("");
+            $("#ddlAddClientCountry").val("").select2();
+            $("#checkIsNew")[0].checked = true;
+            $("#ddlContractClientId").val("").select2({placeholder:'Select Parent', allowClear: true, dropdownParent: $("#modal-add-client") });
+            $("#chkParentClient")[0].checked = false;            
+            SetApplicationFieldOptions();            
+        });
+         $('#modal-edit-client').on('shown.bs.modal', function () {   
+             $("#errorEditClientMessage").text("");
+          });
+        
+        $("#ddlContractClientId").on("select2:unselecting", function (e) {
+            var ddlContractClientId= $(this);
+            setTimeout(function () {
+                ddlContractClientId.select2('close');
+            }, 0)
+        });
+
+        $("#ddlContractClientId").on("change", function () {
+            if ($(this).val() != "") {
+                $('#chkParentClient').prop('disabled', true);
+            }
+            else{
+                $('#chkParentClient').prop('disabled', false);
+            }
+        });
+
+        $("#chkParentClient").on("change", function () {
+            if($('#chkParentClient')[0].checked == true){
+                $('#ddlContractClientId').prop('disabled', true);
+            }
+            else{
+                $('#ddlContractClientId').prop('disabled', false);
+            }
+        });
+
+        $("#ddlAddClientCountry").on("change", function () {
+            $.ajax({
+                url: "/Client/GetParentClient/",
+                data: {
+                    countryid: $("#ddlAddClientCountry").find(":selected").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result.length > 0) {
+                        var markup = "<option></option>";
+                        for (var x = 0; x < result.length; x++) {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                        $("#ddlContractClientId").html(markup);
+                    }
+                    else {
+                        $("#ddlContractClientId").html("");
+                    }
+                },
+                error: function (response) {
+                    alert("error : " + response);
+                }
+            });
+
+        });
+    });
+
+    function SetApplicationFieldOptions() {
+
+        var pl = "@Model.LoggedOnUser.PermissionLevel.Description.ToString().ToLower()";
+        var isDigital = "@Model.LoggedOnUser.IsDigital.ToString().ToLower()";
+        var isLocal = "@Model.LoggedOnUser.IsLocal.ToString().ToLower()";
+        var isPodcast = "@Model.LoggedOnUser.IsPodcast.ToString().ToLower()";
+
+        if (pl == "admin") {
+            $("#chkDigital").prop("checked", true);
+            $("#chkLinear").prop("checked", true);
+            $("#chkLocal").prop("checked", true);
+            $("#chkPodcast").prop("checked", true);
+            $("#chkLinear").prop("disabled", false);
+            $("#chkDigital").prop("disabled", false);
+            $("#chkPodcast").prop("disabled", false);
+            $("#chkLocal").prop("disabled", false);
+            $("#chkLinear_EditClient").prop("disabled", false);
+            $("#chkDigital_EditClient").prop("disabled", false);
+            $("#chkPodcast_EditClient").prop("disabled", false);
+            $("#chkLocal_EditClient").prop("disabled", false);
+        }
+        else if (pl == "client management" && isDigital == "true" && isLocal == "false" && isPodcast == "false") {
+            $("#chkDigital").prop("checked", true);
+            $("#chkLinear").prop("checked", false);
+            $("#chkLocal").prop("checked", false);
+            $("#chkPodcast").prop("checked", false);
+            $("#chkDigital").prop("disabled", false);
+            $("#chkLinear").prop("disabled", true);
+            $("#chkLocal").prop("disabled", true);
+            $("#chkPodcast").prop("disabled", true);
+            $("#chkLinear_EditClient").prop("disabled", true);
+            $("#chkDigital_EditClient").prop("disabled", false);
+            $("#chkPodcast_EditClient").prop("disabled", true);
+            $("#chkLocal_EditClient").prop("disabled", true);
+        }
+        else if (pl == "client management" && isDigital == "false" && isLocal == "true" && isPodcast == "false") {
+            $("#chkDigital").prop("checked", false);
+            $("#chkLinear").prop("checked", false);
+            $("#chkLocal").prop("checked", true);
+            $("#chkPodcast").prop("checked", false);;
+            $("#chkDigital").prop("disabled", true);
+            $("#chkLinear").prop("disabled", true)
+            $("#chkLocal").prop("disabled", false);
+            $("#chkPodcast").prop("disabled", true);
+            $("#chkLinear_EditClient").prop("disabled", true);
+            $("#chkDigital_EditClient").prop("disabled", true);
+            $("#chkPodcast_EditClient").prop("disabled", true);
+            $("#chkLocal_EditClient").prop("disabled", false);
+        }
+        else if (pl == "client management" && isDigital == "false" && isLocal == "false" && isPodcast == "true") {
+            $("#chkDigital").prop("checked", false);
+            $("#chkLinear").prop("checked", false);
+            $("#chkLocal").prop("checked", false);
+            $("#chkPodcast").prop("checked", true);
+            $("#chkDigital").prop("disabled", true);
+            $("#chkLinear").prop("disabled", true);
+            $("#chkLocal").prop("disabled", true);
+            $("#chkPodcast").prop("disabled", false);
+            $("#chkLinear_EditClient").prop("disabled", true);
+            $("#chkDigital_EditClient").prop("disabled", true);
+            $("#chkPodcast_EditClient").prop("disabled", false);
+            $("#chkLocal_EditClient").prop("disabled", true);
+        }
+        else if (pl == "buyer") {
+            $("#chkDigital").prop("checked", false);
+            $("#chkLinear").prop("checked", false);
+            $("#chkLocal").prop("checked", false);
+            $("#chkPodcast").prop("checked", false);
+            $("#chkDigital").prop("disabled", true);
+            $("#chkLinear").prop("disabled", true);
+            $("#chkLocal").prop("disabled", true);
+            $("#chkPodcast").prop("disabled", true);
+            $("#chkLinear_EditClient").prop("disabled", false);
+            $("#chkDigital_EditClient").prop("disabled", true);
+            $("#chkPodcast_EditClient").prop("disabled", true);
+            $("#chkLocal_EditClient").prop("disabled", true);
+        }
+        else {
+            $("#chkDigital").prop("checked", false);
+            $("#chkLinear").prop("checked", false);
+            $("#chkLocal").prop("checked", false);
+            $("#chkPodcast").prop("checked", false);
+            $("#chkDigital").prop("disabled", true);
+            $("#chkLinear").prop("disabled", true);
+            $("#chkLocal").prop("disabled", true);
+            $("#chkPodcast").prop("disabled", true);
+            $("#chkLinear_EditClient").prop("disabled", true);
+            $("#chkDigital_EditClient").prop("disabled", true);
+            $("#chkPodcast_EditClient").prop("disabled", true);
+            $("#chkLocal_EditClient").prop("disabled", true);
+        }
+    }
+
+    function GetClients(_countryid, _clientidselected) {
+        var SelectedAliasId = 0;
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlclient").html(procemessage).show();
+        var url = "/Client/GetClientByCountryIdOnClientsPage/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (_clientidselected == 0 && x == 0) {
+                        markup += "<option value=" + result[x].value + " selected>" + result[x].text + "</option>";
+                        SelectedAliasId = result[x].value;
+                    }
+                    else if (result[x].value == _clientidselected) {
+                        markup += "<option value=" + result[x].value + " selected>" + result[x].text + "</option>";
+                        SelectedAliasId = result[x].value;
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                }
+                $("#ddlclient").html(markup).show();
+
+                GetAliases(SelectedAliasId);
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+    function GetAliases(_clientId) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlaliases").html(procemessage).show();
+
+        var url = "/Client/GetAliasesByClientId/";
+
+        if (_clientId > 0) {
+            $("#btnEditClient").removeAttr("hidden");
+            $("#btnAddAlias").removeAttr("hidden");
+        }
+        else {
+            $("#btnEditClient").attr("hidden", "hidden");
+            $("#btnAddAlias").attr("hidden", "hidden");
+        }
+
+        $("#btnDeleteAlias").attr("hidden", "hidden");
+
+        $.ajax({
+            url: url,
+            data: { ClientId: _clientId },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var MainAliasList = "";
+                //alert(JSON.stringify(result));
+                if (result.length == 0) {
+                    MainAliasList += "<option value=0>*** NO ALIASES ***</option>";
+                }
+                else {
+                    for (var x = 0; x < result.length; x++) {
+                        MainAliasList += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                }
+                $("#ddlaliases").html(MainAliasList).show();
+
+                /*
+                var AliasAliasList = "";
+                for (var x = 0; x < result.length; x++) {
+                    AliasAliasList += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                }
+                */
+
+                // Set the headers for Network and Alias list boxes
+                $("#h3-alias").html("Aliases for " + $("#ddlclient").find(":selected").text()).show();
+
+                // Initialize "ADD NETWORK" modl dialog
+                $("#h3-add-alias").html("Client:  " + $("#ddlclient").find(":selected").text() + " (" + $("#ddlCountry").find(":selected").text() + ")").show();
+                $("#ddlaliaslist").html(MainAliasList).show();
+
+                // Initialize "EDIT NETWORK" modal dialog
+                $("#txtEditClientNameCountry").val($("#ddlCountry").find(":selected").text());
+                $("#txtEditClientNameCurrent").val($("#ddlclient").find(":selected").text());
+                $("#txtEditClientName").val("");
+
+                GetClientDetailsById(_clientId);
+            },
+            error: function (response) {
+                swal("error : " + response.responseText);
+            }
+        });
+
+    }
+
+
+    function GetClientDetailsById(_clientId) {
+        var url = "/Client/GetClientById/";
+
+        $.ajax({
+            url: url,
+            data: {
+                ClientId: _clientId
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    isClientActive = result.clientActive;
+                    if (isClientActive) {
+                        $('#chkLinear_EditClient')[0].checked = true;
+                    }
+                    else {
+                        $('#chkLinear_EditClient')[0].checked = false;
+
+                    }
+                    $('#chkDigital_EditClient')[0].checked = result.digital;
+                    $('#chkLocal_EditClient')[0].checked = result.local;
+                    $('#chkPodcast_EditClient')[0].checked = result.podcast;
+                    //return result;
+                }
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+        return false;
+    }
+
+    function ClickAlias(_aliasid) {
+        if (_aliasid > 0) {
+            $("#btnDeleteAlias").removeAttr("hidden");
+        }
+        else {
+            $("#btnDeleteAlias").attr("hidden", "hidden");
+        }
+    }
+
+    function ValidateNewClient(_ClientName, _CountryId) {
+        if (_ClientName == "") {
+            $("#txtAddClientName").addClass("is-invalid");
+        }
+        else {
+            $("#txtAddClientName").removeClass("is-invalid");
+        }
+
+        if (_CountryId == 0) {
+            $("#ddlAddClientCountry").addClass("is-invalid");
+        }
+        else {
+            $("#ddlAddClientCountry").removeClass("is-invalid");
+        }
+
+    }
+
+    function AddNewClient(_ClientName, _CountryId, _IsNew, _ContractClientId, _IsParentClient, _IsDigital, _IsLinear, _IsLocal, _IsPodcast) {
+        $("#btnSaveNewClient").attr('disabled', 'disabled');
+        window.setTimeout(function () { SaveNewClient(_ClientName, _CountryId, _IsNew, _ContractClientId, _IsParentClient, _IsDigital, _IsLinear, _IsLocal, _IsPodcast)
+            $("#btnSaveNewClient").prop("disabled", false);
+        }, 3000);
+
+    }
+
+    function SaveNewClient(_ClientName, _CountryId, _IsNew, _ContractClientId, _IsParentClient, _IsDigital, _IsLinear, _IsLocal, _IsPodcast) {
+        var url = "/Client/SaveNewClient/";
+
+        $.ajax({
+            url: url,
+            data: {
+                ClientName: _ClientName,
+                CountryId: _CountryId,
+                IsNew: _IsNew,
+                ContractClientId: _ContractClientId,
+                IsParentClient: _IsParentClient,
+                IsDigital: _IsDigital,
+                IsLinear: _IsLinear,
+                IsLocal: _IsLocal,
+                IsPodcast: _IsPodcast
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    // Refresh the client listbox
+                    GetClients($("#ddlCountry").val(), result.responseCode);
+
+                    // Reset ADD NEW CLIENT
+                    $("#txtAddClientName").val("");
+                    $("#ddlAddClientCountry").val("").select2();
+                    $("#checkIsNew").checked = false;
+                    $("#ddlContractClientId").html("").select2({ placeholder: 'Select Parent', allowClear: true, dropdownParent: $("#modal-add-client") });
+                    $('#ddlContractClientId').prop('disabled', false);
+                    $("#chkParentClient")[0].checked = false;
+                    $('#chkParentClient').prop('disabled', false);
+                    SetApplicationFieldOptions();
+                    // Reset ADD NEW ALIAS
+                    // Reset DELETE ALIAS
+
+                    $("#txtAddClientName").removeClass("is-invalid");
+
+                    swal({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'Success!',
+                        text: result.responseText,
+                        showConfirmButton: true,
+                        timer: 60000
+                    });
+                }
+                else {
+                    ValidateNewClient(_ClientName, _CountryId);
+                    //swal("error : " + result.responseText);
+                    swal({
+                        position: 'top-end',
+                        type: 'error',
+                        title: 'Error!',
+                        text: result.responseText,
+                        timer: 60000
+                    })
+
+                }
+                //document.getElementById("errorMessage").innerHTML = result.responseText;
+            },
+            error: function (response) {
+                //swal("Error : " + response.responseText);
+                swal({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Error!',
+                    text: response.responseText,
+                    timer: 60000
+                })
+            }
+        });
+
+        return false;
+
+    }
+
+    function EditClient(_ClientId, _NewClientName, _IsLinear, _IsDigital, _IsLocal, _IsPodcast) {
+        var url = "/Client/EditClient/";
+        //alert(_ActiveClient);
+        $.ajax({
+            url: url,
+            data: {
+                ClientId: _ClientId,
+                NewClientName: _NewClientName,
+                IsActiveClient: _IsLinear,
+                IsDigital: _IsDigital,
+                IsLocal: _IsLocal,
+                IsPodcast: _IsPodcast
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    //GetClients($("#ddlCountry").find(":selected").val(), $("#ddlclient").prop('selectedIndex'));
+                    GetClients($("#ddlCountry").find(":selected").val(), $("#ddlclient").find(":selected").val());
+
+                    // Reset EDIT NEW CLIENT
+                    $("#txtEditClientName").val("")
+                    $("#txtEditClientName").removeClass("is-invalid");
+
+                }
+                else {
+                    $("#txtEditClientName").addClass("is-invalid");
+
+                }
+                document.getElementById("errorEditClientMessage").innerHTML = result.responseText;
+                document.getElementById("txtEditClientName").value = "";
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+        return false;
+
+    }
+
+    function AddAlias(_clientid, _aliasname) {
+        var url = "/Client/AddAlias/";
+
+        $.ajax({
+            url: url,
+            data: {
+                ClientId: _clientid,
+                AliasName: _aliasname
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    GetAliases(_clientid);
+                    document.getElementById("txtAddAlias").value = "";
+
+                    swal({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'Success!',
+                        text: result.responseText,
+                        showConfirmButton: true,
+                        timer: 5000
+                    });
+                }
+                else {
+                    swal({
+                        position: 'top-end',
+                        type: 'error',
+                        title: 'Error!',
+                        text: result.responseText,
+                        timer: 5000
+                    })
+                }
+                //document.getElementById("Message").innerHTML = result.responseText;
+
+            },
+            error: function (response) {
+                swal({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Error!',
+                    text: response.responseText,
+                    timer: 5000
+                })
+            }
+        });
+
+        return false;
+
+    }
+
+    function DeleteAlias(_clientid, _aliasid) {
+        var url = "/Client/DeleteAlias/";
+
+        $.ajax({
+            url: url,
+            data: {
+                AliasId: _aliasid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    GetAliases(_clientid);
+                }
+                document.getElementById("Message").innerHTML = result.responseText;
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+        return false;
+
+    }
+
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+
+        <!-- Mega Form -->
+        <!--
+        <h2 class="content-heading"><label class="text-primary">Network Names and Aliases</label></h2>
+        -->
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Client Names and Aliases</h3>
+            </div>
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-firstname">Select Country to List Clients</label>
+                                    @Html.DropDownListFor(m => m.Countries, new SelectList(Model.Countries, "CountryId", "CountryShort"), new { @id = "ddlCountry", @class = "form-control", @onchange = "javascript:GetClients(this.value);" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @if (Model.LoggedOnUser_Permissions_ClientName.ActionId == 1)
+                        {
+                            // No Access.  Do not show
+                        }
+                        else if (Model.LoggedOnUser_Permissions_ClientName.ActionId > 1)
+                        {
+                            // Everybody else should be at least able to view
+                            <div class="col-md-6">
+                                <div class="block-header block-header-default">
+                                    <h3 class="block-title">List of All Client Names</h3>
+                                    <div class="block-options">
+                                        @if (Model.LoggedOnUser_Permissions_ClientName.ActionId == 2)
+                                        {
+                                            // Access/Execute -- Not sure yet what this means but I equate this to view.
+
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_ClientName.ActionId == 3 && Model.LoggedOnUser.PermissionLevelId == 2)
+                                        {
+                                            // View -- Network names are viewable only
+                                            // Edit -- Allow user to add a new network and change the name of an existing one.
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-edit-client" id="btnEditClient" name="btnEditClient" title="Edit Client" hidden>
+                                                <i class="si si-pencil"></i>
+                                            </button>
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_ClientName.ActionId == 4)
+                                        {
+                                            // Edit -- Allow user to add a new network and change the name of an existing one.
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-edit-client" id="btnEditClient" name="btnEditClient" title="Edit Client" hidden>
+                                                <i class="si si-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-add-client" title="Add New Client">
+                                                <i class="si si-plus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick='javascript:GetClients($("#ddlCountry").find(":selected").val(), 0);' title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <select class="form-control" id="ddlclient" name="ddlclient" size="15" onchange="javascript: GetAliases(this.value);"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.LoggedOnUser_Permissions_ClientAlias.ActionId == 1)
+                        {
+                            // No Access.  Do not show
+                        }
+                        else if (Model.LoggedOnUser_Permissions_ClientAlias.ActionId > 1)
+                        {
+                            // Everybody else should be at least able to view
+                            <div class="col-md-6">
+                                <div class="block-header block-header-default">
+                                    <h3 id="h3-alias" name="h3-alias" class="block-title">All Aliases for Selected Network Name</h3>
+                                    <div class="block-options">
+                                        @if (Model.LoggedOnUser_Permissions_ClientAlias.ActionId == 2)
+                                        {
+                                            // Access/Execute -- Not sure yet what this means but I equate this to view.
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_ClientAlias.ActionId == 3)
+                                        {
+                                            // View -- Network names are viewable only
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_ClientAlias.ActionId == 4)
+                                        {
+                                            // Edit -- Allow user to add a new network and change the name of an existing one.
+                                            if (Model.LoggedOnUser.PermissionLevel.Description.ToLower() != "client management")
+                                            {
+                                                <button type="button" class="btn-block-option" title="Delete Alias" id="btnDeleteAlias" name="btnDeleteAlias" onclick='javascript: DeleteAlias($("#ddlclient").find(":selected").val(), $("#ddlaliases").find(":selected").val());' hidden>
+                                                    <i class="fa fa-trash-o"></i>
+                                                </button>
+                                            }
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-add-alias" title="Add New Alias" id="btnAddAlias" name="btnAddAlias" hidden>
+                                                <i class="si si-plus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript: GetAliases(ddlclient.value);" onchange="javascript: GetAliases(ddlclient.value);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <select class="form-control" id="ddlaliases" name="ddlaliases" size="15" onchange="javascript: ClickAlias(this.value);" onclick="javascript: ClickAlias(this.value);"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-alt-primary" onclick="javascript:window.location.href='/Client/ExportToExcel'"><i class="fa fa-file-text mr-5"></i> Export to Excel</button>
+                            @if (Model.LoggedOnUser_Permissions_ClientName.ActionDescription.ToLower() == "edit")
+                            {
+                                <button type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-client"><i class="si si-users mr-5"></i> Add New Client</button>
+                            }
+                            @if (Model.LoggedOnUser_Permissions_ClientAlias.ActionDescription.ToLower() == "edit")
+                            {
+                                <button type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-alias"><i class="fa fa-clone mr-5"></i> Add New Alias</button>
+                            }
+                            <label class="col-form-label text-danger" id="Message" name="Message"></label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- END Mega Form -->
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+<!-- Add New Client -->
+<div class="modal fade" id="modal-add-client" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-fromleft" role="document">
+        <div class="modal-content">
+            <form class="js-validation-bootstrap" name="form_addnewclient" method="post" onsubmit="javascript: return false;">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Add New Client</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 block-content">
+                        <div class="col-md-9">
+                            <div class="form-group row">
+                                <label class="col-12" for="txtClientName">Client Name <span class="text-danger">*</span></label>
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" id="txtAddClientName" name="txtAddClientName" placeholder="Enter client name...">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12 col-form-label" for="val-select2-country">Country<span class="text-danger"> *</span></label>
+                                <div class="col-md-12">
+                                    @Html.DropDownListFor(m => m.Countries, new SelectList(Model.Countries, "CountryId", "CountryShort"), "Please select country ...", new { @id = "ddlAddClientCountry", @class = "js-select2 form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group row mb-20">
+                                <label class="col-12 col-form-label">Select Parent</label>
+                                <div class="col-md-12">
+                                    <select class="js-select2 form-control" id="ddlContractClientId" style="width:100%;" name="ddlContractClientId">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                        <input class="css-control-input" type="checkbox" id="chkParentClient" name="chkParentClient" checked="">
+                                        <span class="css-control-indicator"></span> Parent
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                        <input class="css-control-input" type="checkbox" id="checkIsNew" name="checkIsNew" checked="">
+                                        <span class="css-control-indicator"></span> New Client
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12 col-form-label text-danger" id="errorMessage" name="errorMessage"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 pr-0">
+                            <div class="clsBold mb-2">
+                                Application(s)
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkDigital" name="chkDigital">
+                                    <span class="css-control-indicator"></span> Digital
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkLinear" name="chkLinear">
+                                    <span class="css-control-indicator"></span> Linear
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkLocal" name="chkLocal">
+                                    <span class="css-control-indicator"></span> Local
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkPodcast" name="chkPodcast">
+                                    <span class="css-control-indicator"></span> Podcast
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-alt-success" id="btnSaveNewClient" name="btnSaveNewClient" onclick='javascript: AddNewClient($("#txtAddClientName").val(), $("#ddlAddClientCountry").val(), $("#checkIsNew")[0].checked,$("#ddlContractClientId").val(),$("#chkParentClient")[0].checked,$("#chkDigital")[0].checked,$("#chkLinear")[0].checked,$("#chkLocal")[0].checked,$("#chkPodcast")[0].checked);'>
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END Add New Client -->
+<!-- Edit Client -->
+@using (Html.BeginForm())
+{
+    <div class="modal fade" id="modal-edit-client" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromright" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Client Change Form</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 block-content">
+                        <div class="col-md-9">
+                            <div class="form-group row">
+                                <label class="col-12" for="txtNetworkName">Country</label>
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" id="txtEditClientNameCountry" name="txtEditClientNameCountry" disabled="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12" for="txtNetworkName">Existing Client Name</label>
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" id="txtEditClientNameCurrent" name="txtEditNetworkNameCurrent" disabled="">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-12" for="txtNetworkName">New Client Name</label>
+                                @if (Model.LoggedOnUser_Permissions_ClientName.ActionId == 3)
+                                {
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" id="txtEditClientName" name="txtEditClientName" disabled="" placeholder="Enter new client name ...">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" id="txtEditClientName" name="txtEditClientName" placeholder="Enter new client name ...">
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-12 col-form-label text-danger" id="errorEditClientMessage" name="errorEditClientMessage"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 pr-0">
+                            <div class="clsBold mb-2">
+                                Application(s)
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkDigital_EditClient" name="chkDigital_EditClient">
+                                    <span class="css-control-indicator"></span> Digital
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkLinear_EditClient" name="chkLinear_EditClient">
+                                    <span class="css-control-indicator"></span> Linear
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkLocal_EditClient" name="chkLocal_EditClient">
+                                    <span class="css-control-indicator"></span> Local
+                                </label>
+                            </div>
+                            <div class="mb-2">
+                                <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                    <input class="css-control-input" type="checkbox" id="chkPodcast_EditClient" name="chkPodcast_EditClient">
+                                    <span class="css-control-indicator"></span> Podcast
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" onclick='javascript: EditClient($("#ddlclient").find(":selected").val(), $("#txtEditClientName").val(), $("#chkLinear_EditClient").prop("checked"),$("#chkDigital_EditClient").prop("checked"),$("#chkLocal_EditClient").prop("checked"),$("#chkPodcast_EditClient").prop("checked"));'>
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Edit Client -->
+<!-- Add New Alias -->
+@using (Html.BeginForm())
+{
+    <div class="modal fade" id="modal-add-alias" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromleft" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title" id="h3-add-alias" name="h3-add-alias">Add New Alias</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">New Alias</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtAddAlias" name="txtAddAlias" placeholder="Enter new alias ...">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">Current Alias Name List</label>
+                            <div class="col-md-12">
+                                <select class="form-control" id="ddlaliaslist" name="ddlaliaslist" size="5"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" data-dismiss="modal" onclick='javascript: AddAlias($("#ddlclient").find(":selected").val(), $("#txtAddAlias").val());'>
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Add New Alias -->
+<!-- Add Edit Alias -->
+@using (Html.BeginForm())
+{
+    <div class="modal fade" id="modal-del-alias" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromright" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Edit Alias</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <p>Dolor posuere proin blandit accumsan senectus netus nullam curae, ornare laoreet adipiscing luctus mauris adipiscing pretium eget fermentum, tristique lobortis est ut metus lobortis tortor tincidunt himenaeos habitant quis dictumst proin odio sagittis purus mi, nec taciti vestibulum quis in sit varius lorem sit metus mi.</p>
+                        <p>Dolor posuere proin blandit accumsan senectus netus nullam curae, ornare laoreet adipiscing luctus mauris adipiscing pretium eget fermentum, tristique lobortis est ut metus lobortis tortor tincidunt himenaeos habitant quis dictumst proin odio sagittis purus mi, nec taciti vestibulum quis in sit varius lorem sit metus mi.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" data-dismiss="modal">
+                        <i class="fa fa-check"></i> Perfect
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Edit alias -->

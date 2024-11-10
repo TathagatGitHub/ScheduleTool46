@@ -1,0 +1,159 @@
+@model ViewUpfrontsViewModel
+
+@Html.Partial("~/Views/UpfrontRemnant/_CreateUpfrontByDemo.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_CreateUpfrontByDemoCA.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_UpfrontNotes.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_ExportSelect.cshtml", Model)
+
+<div class="btn-group btn-group" role="group" aria-label="btnGroup3">
+    @*@if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontAddProperty == 1)*@
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.Where(a => a.UpfrontLockedByUserId == Model.LoggedOnUser.UserId).First().CanUpfrontAddProperty == 1)
+    {
+        @Html.Partial("~/Views/ManageMedia/_CreatePropertyModal.cshtml", Model.createNewPropertyViewModel)
+        <div id="divAddProperty"
+             title="Add Property"
+             data-toggle="popover"
+             data-original-title="Add Property"
+             data-placement="top"
+             data-content="New properties/rates will be added to this upfront.">
+            <button tooltip="Create/Add Properties"
+                    class="btn btn-success"
+                    aria-describedby="popover880418"
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#modal-createproperty">
+                <i class="fa fa-list mr-5"></i>
+            </button>
+        </div>
+    }
+    @if (Model.UpfrontPermissions.First().CanUpfrontViewNotes == 1)
+    {
+        <div id="divNotes"
+             title="Notes"
+             data-toggle="popover"
+             data-original-title="Notes"
+             data-placement="top"
+             data-content="Notes for maintaining this @Model.UpfrontInfo.UpfrontType.Description.">
+            <button tooltip="Notes"
+                    class="btn btn-success"
+                    aria-describedby="popover880418"
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#modal-notes">
+                <i class="fa fa-comments-o mr-5"></i>
+            </button>
+        </div>
+    }
+
+    <button title="Update Deal Point Data"
+            tooltip="Update Deal Point Data"
+            class="btn btn-success"
+            aria-describedby="popover880418"
+            type="button"
+            id="btnUpdateDealPointData"
+            name="btnUpdateDealPointData"
+            data-toggle="popover"
+            data-original-title="Update Deal Point Data"
+            data-placement="top"
+            data-content="Configure all information that will be used in the export. "
+            Country="@Model.UpfrontInfo.Network.Country.CountryShort"
+            NetworkName="@Model.UpfrontInfo.Network.StdNetName"
+            NetworkId="@Model.UpfrontInfo.Network.NetworkId"
+            PlanYr="@Model.PlanYear">
+        <i class="fa fa-handshake-o mr-5"></i>
+    </button>
+
+    @if (Model.UpfrontPermissions.First().CanUpfrontExport == 1)
+    {
+        <button title="Export"
+                tooltip="Export"
+                class="btn btn-success"
+                aria-describedby="popover880468"
+                type="button"
+                id="btnExport"
+                name="btnExport"
+                data-toggle="modal"
+                data-target="#modal-exportselect">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+    }
+</div>
+<div class="btn-group btn-group" role="group" aria-label="btnGroupDataTable">
+    <div id="divColumns"
+         title="Column Visibility"
+         data-toggle="popover"
+         data-original-title="Column Visibility"
+         data-placement="top"
+         data-content="Show/Hide Columns">
+        <button tooltip="Show Columns"
+                class="btn btn-success"
+                id="btnPropShowColumns">
+            <i class="fa fa-columns mr-5"></i>
+        </button>
+    </div>    
+    <div id="divFilterReset"
+         title="Reset Filters"
+         data-toggle="popover"
+         data-original-title="Reset Filters"
+         data-placement="top"
+         data-content="This will reset filters back to show all rows.">
+        <button tooltip="Reset Filters"
+                class="btn btn-success"
+                id="btnPropResetFilters">
+            <i class="fa fa-filter mr-5"></i>
+        </button>
+    </div>
+    <div id="divLoadMore">
+        <button id="btn-example-load-more" style="display:none" class="btn btn-alt-success">Load More Rows</button>
+    </div>
+    <div id="divResetState"
+         title="Refresh Table"
+         data-toggle="popover"
+         data-original-title="Refresh Table"
+         data-placement="top"
+         data-content="Refresh table only not the entire page.">
+        <button type="button"
+                id="btnReload"
+                tooltip="Reload data"
+                class="btn btn-success">
+            <i class="fa fa-refresh mr-5"></i>
+        </button>
+    </div>
+</div>
+<br />
+<div class="btn-group btn-group" role="group" id="divColumnVisibility" name="divColumnVisibility" aria-label="btnGroup4" style="display:none">
+    <table class="table-borderless display compact nowrap">
+        <tr>
+            <td colspan="1" align="left">
+                <button class="btn btn-secondary" id="ShowHideButton1" onclick="ShowHideColumn(1, this);">DEMO</button>
+                <button class="btn btn-secondary" id="ShowHideButton2" onclick="ShowHideColumn(2, this);">APPRV</button>
+                <button class="btn btn-secondary" id="ShowHideButton3" onclick="ShowHideColumn(3, this);">Property Name</button>
+                <button class="btn btn-secondary" id="ShowHideButton4" onclick="ShowHideColumn(4, this);">M</button>
+                <button class="btn btn-secondary" id="ShowHideButton5" onclick="ShowHideColumn(5, this);">T</button>
+                <button class="btn btn-secondary" id="ShowHideButton6" onclick="ShowHideColumn(6, this);">W</button>
+                <button class="btn btn-secondary" id="ShowHideButton7" onclick="ShowHideColumn(7, this);">Th</button>
+                <button class="btn btn-secondary" id="ShowHideButton8" onclick="ShowHideColumn(8, this);">F</button>
+                <button class="btn btn-secondary" id="ShowHideButton9" onclick="ShowHideColumn(9, this);">Sa</button>
+                <button class="btn btn-secondary" id="ShowHideButton10" onclick="ShowHideColumn(10, this);">Su</button>
+                <button class="btn btn-secondary" id="ShowHideButton11" onclick="ShowHideColumn(11, this);">Start Time</button>
+                <button class="btn btn-secondary" id="ShowHideButton12" onclick="ShowHideColumn(12, this);">End Time</button>
+                <button class="btn btn-secondary" id="ShowHideButton13" onclick="ShowHideColumn(13, this);">DP</button>
+                <button class="btn btn-secondary" id="ShowHideButton14" onclick="ShowHideColumn(14, this);">OMDP</button>
+                <button class="btn btn-secondary" id="ShowHideButton15" onclick="ShowHideColumn(15, this);">SP Buy</button>
+                <button class="btn btn-secondary" id="ShowHideButton16" onclick="ShowHideColumn(16, this);">Buy Type</button>
+                <button class="btn btn-secondary" id="ShowHideButton17" onclick="ShowHideColumn(17, this);">Len</button>
+                <button class="btn btn-secondary" id="ShowHideButton18" onclick="ShowHideColumn(18, this);">Rate</button>
+                <button class="btn btn-secondary" id="ShowHideButton19" onclick="ShowHideColumn(19, this);">IMP</button>
+                <button class="btn btn-secondary" id="ShowHideButton20" onclick="ShowHideColumn(20, this);">CPM</button>
+                <button class="btn btn-secondary" id="ShowHideButton21" onclick="ShowHideColumn(21, this);">STATUS (DNB)</button>
+                <button class="btn btn-secondary" id="ShowHideButton22" onclick="ShowHideColumn(22, this);">CLIENT NAME</button>
+                <button class="btn btn-secondary" id="ShowHideButton23" onclick="ShowHideColumn(23, this);">REV#</button>
+                <button class="btn btn-secondary" id="ShowHideButton24" onclick="ShowHideColumn(24, this);">REVISED DT</button>
+                <button class="btn btn-secondary" id="ShowHideButton25" onclick="ShowHideColumn(25, this);">EFF DT</button>
+                <button class="btn btn-secondary" id="ShowHideButton26" onclick="ShowHideColumn(26, this);">EXP DT</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+

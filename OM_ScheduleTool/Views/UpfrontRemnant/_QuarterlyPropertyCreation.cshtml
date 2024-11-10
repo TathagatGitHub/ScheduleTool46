@@ -1,0 +1,931 @@
+﻿@*@model ProposalViewModel*@
+@model ViewUpfrontsViewModel
+
+@*@{ 
+
+    string selectedQuarterName = Model.UpfrontInfo.Quarter.QuarterName;
+    int selectedBroadcastQuarterNbr = Model.UpfrontInfo.Quarter.BroadcastQuarterNbr;
+}*@
+
+
+<style type="text/css">
+
+    div.scroll {
+        width: 200px;
+        height: 150px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: left;
+        padding: 20px;
+    }
+
+    /*Overlay Code Style*/
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .overlay-content {
+        position: relative;
+        top: 25%;
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .overlay a {
+        padding: 8px;
+        text-decoration: none;
+        font-size: 36px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+        .overlay a:hover, .overlay a:focus {
+            color: #f1f1f1;
+        }
+
+    .overlay .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 45px;
+        font-size: 60px;
+    }
+    /*Ovelay Loader end here*/
+   /* .loader {
+        position: relative;
+        top: 12em;
+        left: 50em;
+    }
+
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: -0.125em;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: 0.75s linear infinite spinner-border;
+        animation: 0.75s linear infinite spinner-border;
+    }
+
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.2em;
+    }*/
+</style>
+
+<script language="javascript" type="text/javascript">
+    var checkboxSetFlag = false;
+    var gAvailableBuyType = [];
+    var gQuarterName = "";
+
+    function ShowOverlay() {
+        setTimeout(function () {
+            document.getElementById("DivOverLay").style.width = "100%";
+        }, 500);
+    }
+    function HideOverlay() {
+        document.getElementById("DivOverLay").style.width = "0%";
+    }
+
+    $(document).ready(function () {
+        $("#modal-QuarterlyPropertyCreation").draggable();
+        $('#modal-checkQuarterlyPropertyCreation').draggable();
+        //PopulateAvailableProperties();
+        setTimeout(function () {
+            $("#ddlPlanYear").val('');
+        }, 500);
+
+
+
+        $("#buyTypeContainer").prop('disabled', true);
+
+        $('#AddQuarterlyPropertyTable').on('click', 'tbody input.editor-active', function () {
+            console.log('delegated click event-1'); // it is never shown
+            //var cb = $(this);
+            //if (!$(this).prop("checked")) {
+            //    console.log('click event-10');
+            //    cb = $(this).prop('checked');
+            //    console.log(cb);
+            //}
+            //else {
+            //    console.log('click event-11');
+            //    cb = $(this).prop('checked');
+            //    console.log(cb);
+            //}
+
+        });
+
+
+        $('#AddQuarterlyPropertyTable').on('change', 'tbody input.editor-active', function () {
+            console.log('delegated change event-2'); // it is never shown
+            //cb = $(this).prop('checked');
+        });
+
+        $('input[type=checkbox]').on('change', function () {
+            //var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+            //var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+            //rowcollection.each(function (index, elem) {
+            //    var checkbox_value = $(elem).val();
+            //});
+
+        });
+
+
+        $('#quarterlyProperties-select-all').on('click', function(){
+           // Get all rows with search applied
+           var oTable = $('#AddQuarterlyPropertyTable').DataTable();
+           var rows = oTable.rows({ 'search': 'applied' }).nodes();
+           // Check/uncheck checkboxes for all rows in the table
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            EnableAdd();
+        });
+
+        $('#AddQuarterlyPropertyTable tbody').on('change', 'input[type="checkbox"]', function(){
+            if (!$(this).prop("checked")) {
+                console.log('delegated click event-4');
+                $("#quarterlyProperties-select-all").prop("checked", false);
+            }
+        });
+
+        $('#AddQuarterlyPropertyTable tbody').on('click', 'input[type="checkbox"]', function(){
+            checkboxSetFlag = true;
+            console.log('delegated change event-20');
+            var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+            if (totalCheckboxes == numberOfChecked) {
+                $("#quarterlyProperties-select-all").prop("checked", true);
+            }
+        });
+
+        $('#AddQuarterlyPropertyTable').on('click', 'tbody tr', function () {
+            var checkbox = $(this).find("input[type='checkbox']");
+            var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+            console.log('delegated change event-19');
+
+            if (totalCheckboxes == numberOfChecked) {
+                $("#quarterlyProperties-select-all").prop("checked", true);
+            }
+            else {
+                $("#quarterlyProperties-select-all").prop("checked", false);
+            }
+
+            //if (!checkboxSetFlag) {
+            //    if (!checkbox.prop('checked')) {
+            //        console.log('delegated change event-21');
+            //        //checkbox.prop('checked', true);
+            //        numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            //        totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+            //        if (totalCheckboxes == numberOfChecked) {
+            //            $("#quarterlyProperties-select-all").prop("checked", true);
+            //        }
+            //        EnableAdd();
+            //    }
+            //    else {
+            //        //checkbox.prop('checked', false);
+            //        console.log('delegated change event-22');
+            //        $("#quarterlyProperties-select-all").prop("checked", false);
+            //        numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            //        if (numberOfChecked == 0) {
+            //             EnableAdd();
+            //        }
+            //    }
+            //}
+             //checkboxSetFlag = false;
+        });
+
+        $("#ddlPlanYear").change(function () {
+            ClearAllModalFields();
+            PopulateQuarterNames($(this).val());
+            //PopulateAvailableProperties1();
+        });
+
+        $("#ddlQuarterName").change(function () {
+            //setTimeout(function () { PopulateBuyType(); }, 500);
+            $('#AddQuarterlyPropertyTable').DataTable().clear().draw();
+            ClearAllModalFields();
+            PopulateAvailableProperties($(this).val());
+            //PopulateBuyType2();
+        });
+
+
+        $("#ddlDemoName").change(function () {
+            PopulateAvailableProperties();
+        });
+
+        $("#ddlBuyType").change(function () {
+            var table = $('#AddQuarterlyPropertyTable').DataTable();
+            table.column(15).search($(this).val(), true, false).draw();
+        });
+
+
+        $('#btnClose').click(function () {
+            //$('#AddQuarterlyPropertyTable').data('bs.modal', null).remove();
+            //$('#AddQuarterlyPropertyTable').DataTable().clear().draw();
+
+            $("#ddlPlanYear").prop('selectedIndex', 0);
+            $("#ddlQuarterName").prop('selectedIndex', 0);
+            $("#ddlQuarterName").prop('disabled', true);
+
+            ClearAllModalFields();
+            //$('#QuarterlyPropertyCreation').modal('hide');
+            //$('#AddQuarterlyPropertyTable').modal('dispose');
+        });
+
+        $('#btnCloseTop').click(function () {
+            //$('#AddQuarterlyPropertyTable').data('bs.modal', null).remove();
+            //$('#AddQuarterlyPropertyTable').DataTable().clear().draw();
+
+            $("#ddlPlanYear").prop('selectedIndex', 0);
+            $("#ddlQuarterName").prop('selectedIndex', 0);
+            $("#ddlQuarterName").prop('disabled', true);
+
+            ClearAllModalFields();
+            //$('#QuarterlyPropertyCreation').modal('hide');
+            //$('#AddQuarterlyPropertyTable').modal('dispose');
+        });
+    });
+
+
+    $(window).on('shown.bs.modal', function () {
+        //ClearAllModalFields();
+    });
+
+    $(window).on('shown.bs.modal', function () {
+        //ClearAllModalFields();
+    });
+
+    function ClearAllModalFields() {
+        //$("#val-text-propertyname").val("");
+
+        //$('#val-select2-buytype').val(null).trigger('change.select2');
+        //$('#val-select2-daypart').val(null).trigger('change.select2');
+
+        //$("#val-start-time").val("");
+        //$("#val-end-time").val("");
+
+        //$("#chkMonday").prop("checked", false);
+
+        //$("#ddlPlanYear").prop('selectedIndex', 0);
+        //$("#divClient").attr("hidden", "hidden");
+        //$("#chkSPBuy").prop("checked", false);
+        $('#AddQuarterlyPropertyTable').DataTable().clear().draw();
+
+        $("#buyTypeContainer").prop('selectedIndex', 0);
+        $("#buyTypeContainer").prop('disabled', true);
+
+        $("#ddlBuyType").prop('selectedIndex', 0);
+        $("#ddlBuyType").prop('disabled', true);
+
+        $('#cbIncludeRateImpValues').prop("checked", false);
+
+        $.each($("input[name='demoList']:checked"), function () {
+            $(this).prop("checked", false);
+        });
+    }
+
+    function PopulateBuyType2() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlBuyType").html(procemessage).show();
+
+        $("#ddlBuyType").removeAttr('disabled');
+
+        var table = $('#AddQuarterlyPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(15).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlBuyType").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlBuyType").removeAttr('disabled');
+            }
+            else {
+                $("#ddlBuyType").attr('disabled', 'disabled');
+            }
+        }
+
+        PopulateBuyTypesForQuarterAddProperties();
+    }
+
+    function EnableAdd() {
+        $('#btnAdd').attr('disabled', 'disabled');
+        //var rowIndex = $(ele).data('id');
+        var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+       // var data = oTable.row(this).data();
+
+        var selRowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+        console.log(selRowcollection.length);
+        selRowcollection.each(function (index, elem) {
+            $('#btnAdd').removeAttr('disabled');
+        });
+    }
+
+    function CheckAddQuarterlyProperties(IsCreatePropertyRates) {
+        var _RateIds = "";
+        var _selectedDemos = [];
+        var _selectedDemoItems = "";
+        var _copyRateImp = 0;
+        var _proposedBuyTypeId = 0;
+        var _selectedPropertiesCount = 0;
+
+        _proposedBuyTypeId = $("#buyTypeContainer").val();
+
+        //alert("Selected BuyType: " + _proposedBuyTypeId);
+        //alert($("input[type=checkbox][name=cbIncludeRateImpValues]:checked").val());
+
+        if ($('#cbIncludeRateImpValues').is(":checked")) {
+            _copyRateImp = 1;
+        }
+
+        $('#btnAdd').attr('disabled', 'disabled');
+        var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+
+        var allRowscollection = oTable.$(".editor-active", { "page": "all" });
+        var rowsCount = allRowscollection.length;
+
+        $.each($("input[name='demoList']:checked"), function () {
+            _selectedDemos.push($(this).val());
+        });
+
+        _selectedDemoItems = _selectedDemos.join(",");
+        console.log("Selected Demos: " + _selectedDemoItems);
+
+        allRowscollection.each(function (index, elem) {
+
+            if ($(elem).is(':checked')) {
+                var currentRow_value = $(elem).val();
+                var currentRow_rateId = $(elem).attr('id');
+
+                if (_RateIds.length > 0) {
+                    _RateIds = _RateIds + ',';
+                }
+                _RateIds = _RateIds + currentRow_rateId;
+                _selectedPropertiesCount = _selectedPropertiesCount + 1;
+            }
+        });
+
+        var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+
+        if (rowcollection.length > 10) {
+            swal('Wait!', 'Please select upto maximum 10 Properties', 'error');
+            return false;
+        }
+
+        if (_selectedDemos.length == 0) {
+            swal('Wait!', 'Please select Demos to create Properties', 'error');
+            EnableAdd();
+            return false;
+        }
+
+        _RateIds = Array.from(new Set(_RateIds.split(','))).toString();
+        console.log("Selected Rates:" + _RateIds);
+
+        PopulateCheckCreateQTRProperties(_RateIds, _selectedDemoItems, '@Model.UpfrontInfo.Quarter.QuarterName',
+                                        _copyRateImp, _proposedBuyTypeId, '@Model.UpfrontInfo.UpfrontTypeId',
+                                        getParameterByName('upfrontid'), IsCreatePropertyRates);
+
+        if (IsCreatePropertyRates == 0) {
+            try {
+                $("#modal-QuarterlyPropertyCreation").modal('toggle');
+                $('#modal-checkQuarterlyPropertyCreation').modal();
+            }
+            catch (err) {
+                window.location.reload();
+            }
+        }
+        else {
+            $('#modal-checkQuarterlyPropertyCreation').modal('toggle');
+            swal('Success!', 'Properties are created Successfully', 'success');
+            setTimeout(function () { window.location.reload(); }, 3000);
+        }
+
+        return;
+    }
+
+    function PopulateAvailableProperties_2(_SelectedQuaterName) {
+        alert("Calling Quarterly Prop Creation");
+    $.ajax({
+            type: "POST",
+           url: '/UpfrontRemnant/GetQuarterlyAvailableProperties',
+            dataType: "json",
+            cache: false,
+             data: {
+                        QuarterName: _SelectedQuaterName,
+                        BroadcastQuarterNbr: '@Model.UpfrontInfo.Quarter.BroadcastQuarterNbr',
+                        CountryId: '@Model.NetworkInfo.Country.CountryId',
+                        NetworkId: '@Model.NetworkInfo.NetworkId'
+                    },
+            success: function (response) {
+                //console.log( JSON.parse(response));
+                console.log(response);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("An Ajax server error was returned");
+                console.log(XMLHttpRequest);
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        });
+                return false;
+    }
+    function PopulateAvailableProperties(_SelectedQuaterName) {
+        // if ($.fn.DataTable.isDataTable('#AddQuarterlyPropertyTable')) {
+        //    return;
+        //}
+        ShowOverlay();
+        setTimeout(function () {
+            var addnewpropertytable = $('#AddQuarterlyPropertyTable').DataTable({
+                info: false,
+                scrollX: false,
+                scrollY: 400,
+                scrollCollapse: true,
+                paging: false,
+                destroy: true,
+                deferRender: true,
+                processing: true,
+                ordering: true,
+                language: {
+                    infoFiltered: "",
+                    processing: "<i class='fa fa-refresh fa-spin'></i>"
+                },
+                ajax: {
+                    url: '/UpfrontRemnant/GetQuarterlyAvailableProperties',
+                    type: 'POST',
+                    data: {
+                        QuarterName: _SelectedQuaterName,
+                        BroadcastQuarterNbr: '@Model.UpfrontInfo.Quarter.BroadcastQuarterNbr',
+                        CountryId: '@Model.NetworkInfo.Country.CountryId',
+                        NetworkId: '@Model.NetworkInfo.NetworkId'
+                    },
+                    //beforeSend: function (xhr, settings) {
+                    //    ShowOverlay();
+                    //}
+                },
+                "drawCallback": function (settings) {
+        // Here the response
+        var response = settings.json;
+        console.log("DRAWING");
+        console.log(response);
+    },
+                columnDefs: [
+                    {
+                        targets: 0,
+                        data: null,
+                        defaultContent: '',
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row) {
+                            if (type === 'display') {
+                                return '<input type="checkbox" class="editor-active" id="' + data.rateId + '", buyTypeCode="' + data.buyTypeCode + '" onclick="javascript:EnableAdd();">';
+                            }
+                            return data;
+                        },
+                        //className: 'select-checkbox',
+                        width: 10,
+                        orderable: false,
+                        searchable: false,
+                        selectRow: true
+                    },
+                    {
+                        targets: 1,
+                        data: "demoName",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(2000, true),
+                        visible: true
+                    },
+                    {
+                        targets: 2,
+                        data: "propertyName",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(2000, true),
+                        visible: true
+                    },
+                    {
+                        targets: 3,
+                        data: "time",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 4,
+                        data: "dp",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 5,
+                        data: "days",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 6,
+                        data: "spBuy",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 7,
+                        data: "spotLen",
+                        visible: true,
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row, meta) {
+                            if (data === 120) {
+                                return "<span class='badge badge-pill badge-danger'>" + data + "</span>";
+                            }
+                            else if (data === 60) {
+                                return "<span class='badge badge-pill badge-primary'>" + data + "</span>";
+                            }
+                            else if (data === 15) {
+                                return "<span class='badge badge-pill badge-warning'>" + data + "</span>";
+                            }
+                            else {
+                                return "<span class='badge badge-pill badge-success'>" + data + "</span>";
+                            }
+                        }
+                    },
+                    {
+                        targets: 8,
+                        data: "rateAmt",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                        visible: true
+                    },
+                    {
+                        targets: 9,
+                        data: "imp",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                        visible: true
+                    },
+                    {
+                        targets: 10,
+                        data: "cpm",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                        visible: true
+                    },
+                    {
+                        targets: 11,
+                        data: "status",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 12,
+                        data: "clientName",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 13,
+                        data: "effExp",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 14,
+                        data: "revision",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    //{
+                    //    targets: 15,
+                    //    data: "startTimeFormatted",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: false
+                    //},
+                    //{
+                    //    targets: 16,
+                    //    data: "endTimeFormatted",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: false
+                    //},
+                    //{
+                    //    targets: 15,
+                    //    data: "buyTypeDescription",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    {
+                        targets: 15,
+                        data: "buyTypeCode",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 16,
+                        data: "approved",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row, meta) {
+                            if (data === "Approved") {
+                                return "<i class='fa fa-check btn-alt-success'></i>";
+                            }
+                            else {
+                                return "<i class='fa fa-times btn-danger'></i>";
+                            }
+                        },
+                        orderable: false
+                    }
+                    //{
+                    //    targets: 16,
+                    //    data: "buyTypeCode",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: false
+                    //}
+                ],
+                fixedColumns: true,
+                initComplete: function () {
+                    PopulateBuyType2();
+                    HideOverlay();
+                }
+
+            });
+        }, 1500);
+
+        // Filter event handler
+        //$(addnewpropertytable.table().container()).on('change', '#ddlStartTime', function () {
+        //    table
+        //        .column($(this).data('index'))
+        //        .search(this.value)
+        //        .draw();
+        //});
+
+        //$('#AddQuarterlyPropertyTable tbody').on('click', 'tr', function () {
+        //    if ($(this).hasClass('selected')) {
+
+        //    }
+        //});
+
+       $('#AddQuarterlyPropertyTable').on('click', 'tbody input.editor-active', function () {
+            console.log('delegated click event-9'); // it is never shown
+           cb = $(this).prop('checked');
+           checkboxSetFlag = true;
+            console.log(cb)
+       });
+
+    }
+
+    function PopulateDemos1(_CountryId) {
+
+        var url = "/UpfrontRemnant/GetAllDemos";
+        $.ajax({
+            url: url,
+            cache: false,
+            type: "POST",
+            data: {
+                CountryId: _CountryId,
+                PlanYr: '@Model.PlanYear'
+            },
+            success: function (result) {
+                if (result.success) {
+                    console.log(result);
+                    $("#demoContainer").html('');
+                    for (var x = 0; x < result.data.length; x++) {
+                        $('#demoContainer')
+                            //.append(`<input type="checkbox" id="${result.data[x].demographicSettingsId}" name="demoList" value="${result.data[x].demoName}">`)
+                            //.append(`<input type="checkbox" id="${result.data[x].demoName}" name="demoList" value="${result.data[x].demographicSettingsId}">`)
+                            .append(`<input type="checkbox" id="${result.data[x].demographicName}" name="demoList" value="${result.data[x].demographicSettingsId}">`)
+                            .append(`&nbsp;&nbsp;`)
+                            //.append(`<label for="${result.data[x].demoName}">${result.data[x].demoName}</label></div>`)
+                            .append(`<label for="${result.data[x].demographicName}">${result.data[x].demographicName}</label></div>`)
+                            .append(`<br>`);
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating Demos:  ' + response, 'error');
+            }
+        });
+    }
+
+    function PopulateBuyTypesForQuarterAddProperties() {
+
+        var url = "/UpfrontRemnant/GetBuyTypesForQuarterAddProperties";
+        $.ajax({
+            url: url,
+            cache: false,
+            type: "POST",
+            data: {
+                UpfrontTypeId: '@Model.UpfrontInfo.UpfrontTypeId'
+            },
+            success: function (result) {
+                if (result.success) {
+                    console.log(result);
+                    gAvailableBuyType = [];
+                    $("#buyTypeContainer").html('<option value="-1">Select</option>')
+                    for (var x = 0; x < result.data.length; x++) {
+                        if (result.data[x].buyTypeCode != 'UE') {
+                            gAvailableBuyType.push(result.data[x].buyTypeCode);
+                            $('#buyTypeContainer').append('<option value="' + result.data[x].buyTypeId + '">' + result.data[x].buyTypeCode + '</option>')
+                        }
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating PopulateBuyTypesForQuarterAddProperties:  ' + response, 'error');
+            }
+        });
+    }
+
+    function PopulateQuarterNames(_PlanYearId) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlQuarterName").html(procemessage).show();
+
+        var markup = "";
+        var currentYear = new Date().getFullYear();
+        var selectedQuarterName = '@Model.UpfrontInfo.Quarter.BroadcastYr';
+        var selectedBroadcastQuarterNbr = '@Model.UpfrontInfo.Quarter.BroadcastQuarterNbr';
+        var editedURYear = '@Model.PlanYear'
+        markup = "<option value='-1'>Please select ...</option>";
+        //alert(selectedBroadcastQuarterNbr);
+
+        var url = "/UpfrontRemnant/GetQuartersForAddProperty";
+        $.ajax({
+            url: url,
+            data: {
+                PlanYear: _PlanYearId,
+                BroadcastQtrNumber: selectedBroadcastQuarterNbr,
+                EditedURYear: editedURYear
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                if (result.success) {
+                    markup = "<option value='-1'>Please select ...</option>";
+                    for (var x = 0; x < result.data.length; x++) {
+                        markup += "<option value='" + result.data[x] + "'>" + result.data[x] + "</option>";
+                    }
+                }
+                else {
+                    markup = "<option value='0'>No Quarters found</option>";
+                }
+                $("#ddlQuarterName").html(markup).show();
+                $("#ddlQuarterName").removeAttr('disabled');
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating Quarters:  ' + response, 'error');
+            }
+        });
+    }
+
+    function CheckBuyTypeForSelectedProperties() {
+        var isAllValidBuyTypes = true;
+        var _proposedBuyTypeId = $("#buyTypeContainer").val();
+        var oTable = $('#AddQuarterlyPropertyTable').dataTable();
+        var allRowscollection = oTable.$(".editor-active:checked", { "page": "all" });
+        var rowsCount = allRowscollection.length;
+        console.log('Rows Selected = ' + rowsCount);
+
+
+        allRowscollection.each(function (index, elem) {
+            var currentRow_value = $(elem).val();
+            var currentRow_buyTypeId = $(elem).attr('buyTypeCode');
+            if (!gAvailableBuyType.includes(currentRow_buyTypeId)) {
+                isAllValidBuyTypes = false;
+
+            }
+            console.log(currentRow_buyTypeId);
+        });
+
+
+        //if there is invalid buyType and User has selected valid BuyType then proceed else error message
+        if (isAllValidBuyTypes || (!isAllValidBuyTypes && _proposedBuyTypeId != -1)) {
+            CheckAddQuarterlyProperties(false);
+        }
+        else
+        {
+            swal('Wait!', 'One or more selected Properties buytype is not valid. Please select appropriate BuyType', 'error');
+            //$("#buyTypeContainer").removeAttr('disabled');
+            $("#buyTypeContainer").prop('disabled', false);
+            return false;
+        }
+
+        return true;
+    }
+
+
+</script>
+
+<div class="modal fade" id="modal-QuarterlyPropertyCreation" tabindex="-1" role="dialog" aria-labelledby="modal-QuarterlyPropertyCreation" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="min-width: 1500px;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" id="btnCloseTop"  class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="DivOverLay" class="overlay">
+                    <div id="spinner" class="spinner-border " role="status" style="text-align:center;position:absolute;vertical-align:middle;color:blue;height:150px;width:150px;left:50%;top:50%;margin-left:-75px;margin-top:-75px;">
+                        @*<span class="visually-hidden">Loading...</span>*@
+
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row gutters-tiny">
+                        <label class="col-form-label">Year</label>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.PlanYear,
+                                       new List<SelectListItem> {
+                                           new SelectListItem { Value = (Model.PlanYear-1).ToString() , Text = (Model.PlanYear-1).ToString() },
+                                           new SelectListItem { Value = (Model.PlanYear).ToString(), Text = (Model.PlanYear).ToString() }
+                                        },
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlPlanYear" }
+                                    )
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId">
+                        </div>
+
+                        <label class="col-form-label" for="ClientId">Quarter <span class="text-danger">*</span></label>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.UpfrontInfo.Quarter.QuarterName,
+                                         new List<SelectListItem> {
+                                           new SelectListItem { Value = (Model.PlanYear).ToString(), Text = (Model.PlanYear).ToString() }
+                                        },
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlQuarterName", @disabled = "disabled" }
+                                    )
+                        </div>
+
+                        <label class="col-form-label">Filter By BuyType</label>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.BuyTypeAvailable,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlBuyType", @disabled = "disabled" }
+                                    )
+                        </div>
+
+                    </div>
+
+                </div>   
+                <div >
+                    <div class="block-content block-content-full" id="divAvailableProperties">
+                        @{Html.RenderPartial("_QuarterlyPropertyCreation_AvailableProperties", Model);}
+                    </div>
+                    <div>
+                        <label class="col-form-label" id="lblBuyType" style="padding-left: 480px;">
+                            <span class="text-danger">*</span> Buytype selection will be available when selected properties are not valid buytypes for the current Upfront/Remnant.
+                            @*<span class="text-danger">*</span> Only available when selected properties are of not valid buytypes.*@
+                        </label>
+                    </div>
+                    <div class="form-group row">
+                        <div style="padding-left:80px;">
+                            <span id="spanBtnSelect" ></span>
+                            <button type="button" class="btn btn-alt-primary" id="btnSelectDemo" name="btnSelectDemo" onclick="PopulateDemos1(@Model.NetworkInfo.Country.CountryId)">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-check mr-5"></i>Select Demos  <span class="text-danger">*</span>
+                            </button>
+                        </div>
+                        <div>
+                            <label class="col-form-label" style="width:250px;text-align:justify;padding-left:20px;">Demos Available</label>
+                            <div id="demoContainer" class="scroll"></div>
+                        </div>
+
+                        <div id="divBuyTypeContainer" style="width:600px;">
+                            <span class="text-danger">*</span>
+                            <label class="col-form-label">Select BuyType</label>
+                            <select class="col-3" id="buyTypeContainer" style="width:300px;"></select>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cbIncludeRateImpValues" name="cbIncludeRateImpValues" />
+                            <label class="col-form-label">Include Rate and Imps Values (from previous quarter)</label>
+                        </div>
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-alt-secondary" data-dismiss="modal" >Close</button>
+                    @*<button type="button" disabled class="btn btn-alt-success" id="btnAdd" onclick="javascript: AddScheduleLines();">*@
+                        <button type="button" disabled class="btn btn-alt-success" id="btnAdd" onclick="javascript: CheckBuyTypeForSelectedProperties();">
+                            <i class="fa fa-check"></i> Add Selected Properties
+                        </button>
+</div>
+        </div>
+    </div>
+</div>
+

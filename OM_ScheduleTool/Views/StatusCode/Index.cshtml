@@ -1,0 +1,115 @@
+﻿@model StatusCodeViewModel
+
+
+@{
+    if (Model.StatusCode >= 290 && Model.StatusCode < 300)
+    {
+        @Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+    }
+
+    var statusmessage = "";
+    switch (Model.StatusCode)
+    {
+        case 297: // Session timed out -- Child Window
+            statusmessage = "Your session timed out after 8 hours of inactivity.  Please close window.";
+            break;
+
+        case 298:
+            statusmessage = "Under Development";
+            break;
+
+        case 299:
+            statusmessage = "Approval Status";
+            break;
+
+        case 400:
+            statusmessage = "Bad request: The request cannot be fulfilled due to bad syntax";
+            break;
+
+        case 403:
+            statusmessage = "Forbidden";
+            break;
+
+        case 404:
+            statusmessage = "Page not found";
+            break;
+
+        case 408:
+            statusmessage = "Server Timeout Error - This page has timed out due to inactivity. Please close the window.";
+            break;
+
+        case 500:
+            statusmessage = "Internal Server Error - server was unable to finish processing the request";
+            break;
+
+        default:
+            statusmessage = "That’s odd... Something we didn't expect happened";
+
+            break;
+    }
+}
+<!-- Main Container -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+<script language="javascript">
+    $(document).ready(function () {
+        try {
+            var Status = window.opener.$('#edtApprovalStatus').val();
+            var DisplayStatus = Status.split(";");
+            var StatusText = "";
+
+            for (var idx = 0; idx < DisplayStatus.length; idx++) {
+                if (DisplayStatus[idx].length >= 1) {
+                    if (DisplayStatus[idx][0] == 1) {
+                        StatusText += "<p><a class='text-success'><i class='fa fa-check-circle'></i></a> " + DisplayStatus[idx].substring(1) + "</p>";
+                    }
+                    else {
+                        StatusText += "<p><a class='text-danger'><i class='fa fa-times-circle'></i></a> " + DisplayStatus[idx].substring(1) + "</p>";
+                    }
+                }
+            }
+            $("#divApprovalStatus").html(StatusText);
+        }
+        catch (err) {
+            $("#divApprovalStatus").html(err.message);
+        }
+    });
+</script>
+<main id="main-container">
+    <!-- Page Content -->
+    @if (Model.StatusCode != 299)
+    {
+        <div class="hero bg-white">
+            <div class="hero-inner">
+                <div class="content content-full">
+                    <div class="py-30 text-center">
+                        <div class="display-3 text-flat">
+                            <i class="fa fa-times-circle-o"></i> @Model.StatusCode
+                        </div>
+                        <h1 class="h2 font-w700 mt-30 mb-10">@statusmessage</h1>
+                        <h2 class="h3 font-w400 text-muted mb-50">@Model.ErrorMessage</h2>
+                        <a href="/">Back to home page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="block block-themed">
+            <div class="block-header bg-success">
+                <h1 class="block-title">@statusmessage</h1>
+            </div>
+            <div class="block-content" data-toggle="slimscroll" data-height="430px" data-color="#9c9c9c" data-opacity="1" data-always-visible="true">
+                <div id="divApprovalStatus">
+                </div>
+            </div>
+        </div>
+    }
+    <!-- END Page Content -->
+    <script type="text/javascript">
+    function preventBack(){window.history.forward();}
+    setTimeout("preventBack()", 0);
+    window.onunload=function(){null};
+    </script>
+</main>
+<!-- END Main Container -->

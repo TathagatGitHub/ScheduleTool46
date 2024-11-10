@@ -1,0 +1,37 @@
+﻿@model ViewUpfrontsViewModel
+
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+    });
+</script>
+<table class="display compact" id="DRAvailablePropertiesTable" name="DRAvailablePropertiesTable">
+    <thead>
+        <tr>
+            <th class="d-none d-sm-table-cell text-center"><input type="checkbox" name="select_all" value="1" id="drProperties-select-all"></th>
+            <th width="7%" class="d-none d-sm-table-cell text-left">Demo Name</th>
+            <th width="20%" class="d-none d-sm-table-cell text-left">Property Name</th>
+            @*<th width="5%" class="d-none d-sm-table-cell text-center">Time</th>*@
+            <th width="2%" class="d-none d-sm-table-cell text-center">DP</th>
+            <th class="d-none d-sm-table-cell text-center">Days</th>
+            @*<th width="2%" class="d-none d-sm-table-cell text-center">SPBuy</th>*@
+            <th width="2%" class="d-none d-sm-table-cell text-center">Len</th>
+            <th class="d-none d-sm-table-cell text-center">Rate</th>
+            <th class="d-none d-sm-table-cell text-center">Imp</th>
+            <th class="d-none d-sm-table-cell text-center">CPM</th>
+            <th class="d-none d-sm-table-cell text-center">Status</th>
+            <th class="d-none d-sm-table-cell text-center">Client Name</th>
+            @*<th class="d-none d-sm-table-cell text-center">Eff-Exp</th>*@
+            @*<th width="2%" class="d-none d-sm-table-cell text-center">Rev#</th>*@
+            <th class="d-none d-sm-table-cell text-center">StartTime</th>
+            <th class="d-none d-sm-table-cell text-center">EndTime</th>
+            <th width="2%" class="d-none d-sm-table-cell text-center">Buy Type</th>
+            <th class="d-none d-sm-table-cell text-center">Eff DT</th>
+            <th class="d-none d-sm-table-cell text-center">Exp DT</th>
+            @*<th width="2%" class="d-none d-sm-table-cell text-center">Approved</th>*@
+        </tr>
+    </thead>
+</table>
+
+<script asp-append-version="true" src="~/datatable-editor/js/dataTables.editor.min.js"></script>

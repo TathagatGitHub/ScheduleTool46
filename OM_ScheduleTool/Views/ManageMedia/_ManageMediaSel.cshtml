@@ -1,0 +1,132 @@
+@{
+    var SelectionUpfronts = "";
+    var SelectionRemnants = "";
+    var SelectionSchedule = "";
+    var SelectionProposal = "";
+    var SelectionLogs = "";
+    var SelectionPlanning = "";
+    if (Model.CurrentMediaSelection == 1)
+    {
+        SelectionUpfronts = "bg-primary-lighter";
+    }
+    else if (Model.CurrentMediaSelection == 2)
+    {
+        SelectionRemnants = "bg-warning-light";
+    }
+    else if (Model.CurrentMediaSelection == 3)
+    {
+        SelectionSchedule = "bg-danger-light";
+    }
+    else if (Model.CurrentMediaSelection == 4)
+    {
+        SelectionProposal = "bg-success-light";
+    }
+    else if (Model.CurrentMediaSelection == 5)
+    {
+        SelectionLogs = "bg-gray-light";
+    }
+    else if (Model.CurrentMediaSelection == 6)
+    {
+        SelectionPlanning = "bg-primary-lighter";
+    }
+}
+
+<div class="row gutters-tiny js-appear-enabled animated fadeIn" data-toggle="appear">
+    @{
+        string ColWidth = "col-xl-2";
+        @if (Model.CurrentMediaSelection==6)
+        {
+            ColWidth = "col-xl-1";
+            
+        }
+    }
+    <div class="col-6 col-md-4 @ColWidth">
+        <a class="block block-link-shadow text-center" href="~/ManageMedia/Index">
+            <div class="block-content ribbon ribbon-bookmark ribbon-primary ribbon-left @SelectionUpfronts">
+                <div class="ribbon-box">
+                    <i class="fa fa-fw fa-lock"></i>
+                    @Model.UpfrontLockedCount
+                </div>
+                <p class="mt-5">
+                    <i class="fa fa-file-text fa-3x"></i>
+                </p>
+                <p class="font-w600">Upfronts</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 @ColWidth">
+        <a class="block block-link-shadow text-center" href="~/ManageMedia/Remnants">
+            <div class="block-content ribbon ribbon-bookmark ribbon-warning ribbon-left  @SelectionRemnants">
+                <div class="ribbon-box">
+                    <i class="fa fa-fw fa-lock"></i>
+                    @Model.RemnantLockedCount
+                </div>
+                <p class="mt-5">
+                    <i class="fa fa-file-text fa-3x"></i>
+                </p>
+                <p class="font-w600">Remnants</p>
+            </div>
+        </a>
+    </div>
+    @if (Model.CanSeeMediaPlan)
+    {
+        <div class="col-6 col-md-4 @ColWidth">
+            <a class="block block-link-shadow text-center" href="~/ManageMedia/Planning">
+            <div class="block-content ribbon ribbon-bookmark ribbon-success ribbon-left @SelectionPlanning">
+                <p class="mt-5">
+                    <i class="fa fa-book fa-3x"></i>
+                </p>
+                <p class="font-w600">Planning</p>
+            </div>
+        </a>
+    </div>
+    }
+    <div class="col-6 col-md-4 @ColWidth">
+        <a class="block block-link-shadow text-center" href="~/ManageMedia/Proposal">
+            <div class="block-content ribbon ribbon-bookmark ribbon-success ribbon-left @SelectionProposal">
+                <div class="ribbon-box">
+                    <i class="fa fa-fw fa-lock"></i>
+                    @Model.ProposalLockedCount
+                </div>
+                <p class="mt-5">
+                    <i class="fa fa-pencil-square-o fa-3x"></i>
+                </p>
+                <p class="font-w600">Proposals</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 @ColWidth">
+        <a class="block block-link-shadow text-center" href="~/ManageMedia/Schedule">
+            <div class="block-content ribbon ribbon-bookmark ribbon-danger ribbon-left @SelectionSchedule">
+                <div class="ribbon-box">
+                    <i class="fa fa-fw fa-lock"></i>
+                    @Model.ScheduleLockedCount
+                </div>
+                <p class="mt-5">
+                    <i class="fa fa-calendar-check-o fa-3x"></i>
+                </p>
+                <p class="font-w600">Schedules</p>
+            </div>
+        </a>
+    </div>   
+    <div class="col-6 col-md-4 @ColWidth">
+        <a class="block block-link-shadow text-center" href="~/ManageMedia/Logs">
+            <div class="block-content ribbon ribbon-bookmark ribbon-success ribbon-left @SelectionLogs">
+                <p class="mt-5" style="margin-bottom: 15px;">
+                    <i class="si si-list fa-3x"></i>
+                </p>
+                <p class="font-w600">Logs</p>
+            </div>
+        </a>
+    </div>
+    @*<div class="col-6 col-md-4 col-xl-2">
+        <a class="block block-link-shadow text-center" href="javascript:void(0);">
+            <div class="block-content ribbon ribbon-bookmark ribbon-success ribbon-left">
+                <p class="mt-5">
+                    <i class="si si-settings fa-3x"></i>
+                </p>
+                <p class="font-w600">Media Settings</p>
+            </div>
+        </a>
+    </div>*@
+</div>

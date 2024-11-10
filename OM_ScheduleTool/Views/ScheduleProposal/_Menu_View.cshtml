@@ -1,0 +1,153 @@
+@model ProposalViewModel
+
+@Html.Partial("~/Views/ManageMedia/_ProposalNotes.cshtml", Model)
+@Html.Partial("~/Views/ScheduleProposal/_ExportProposal.cshtml", Model)
+
+<div class="btn-group btn-group" role="group" aria-label="btnGroup3">
+    <!--
+    <div id="divShowEffExp"
+         title="Show Dates"
+         data-toggle="popover"
+         data-original-title="Show Dates"
+         data-placement="top"
+         data-content="Show/Hide Expiration and Effective Dates">
+        <button tooltip="Show Exp/Eff Dates"
+                class="btn btn-success"
+                id="btnPropShowDates">
+            <i class="fa fa-calendar-check-o mr-5"></i>
+        </button>
+    </div>
+    -->
+    <div id="divNotes"
+         title="Add Notes"
+         data-toggle="popover"
+         data-original-title="Add Notes"
+         data-placement="top"
+         data-content="Add notes for this proposal.">
+        <button tooltip="Notes"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                data-toggle="modal"
+                data-target="#modal-notes">
+            <i class="fa fa-comments-o mr-5"></i>
+        </button>
+    </div>
+    <div id="divShowGI"
+         title="Show GI"
+         data-toggle="popover"
+         data-original-title="Show GI"
+         data-placement="top"
+         data-content="Show/Hide GI">
+        <button tooltip="Show GI"
+                class="btn btn-success"
+                id="btnShowGI">
+            <i class="fa fa-money mr-5"></i>
+        </button>
+    </div>
+    @*<div id="divShowSpots"
+             title="Show Spots"
+             data-toggle="popover"
+             data-original-title="Show Spots"
+             data-placement="top"
+             data-content="Show/Hide Weekly Spots">
+            <button tooltip="Show/Hide Weekly Spots"
+                    class="btn btn-success"
+                    id="btnPropShowSpots">
+                <i class="fa fa-eye mr-5"></i>
+            </button>
+        </div>*@
+    <div id="divColumnsReset"
+         title="Reset Table State"
+         data-toggle="popover"
+         data-original-title="Reset Table State"
+         data-placement="top"
+         data-content="This will reset saved state of columns and filters back to default settings.">
+        <button tooltip="Reset Columns"
+                class="btn btn-success"
+                id="btnPropResetColumns">
+            <i class="si si-ban mr-5"></i>
+        </button>
+    </div>
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+        <div id="divFilterPremiere"
+             title="Filter Premiere Properties"
+             data-toggle="popover"
+             data-original-title="Filter Premiere Properties"
+             data-placement="top"
+             data-content="">
+            <button tooltip="Filter Premiere Properties"
+                    class="btn btn-success"
+                    id="btnFilterPremiereProperties" onclick="return ApplyPremeireFilter(this);">
+                P
+            </button>
+        </div>
+    }
+    <div class="btn-group btn-group" role="group" aria-label="btnGroup4">
+        <div id="divLoadMore"
+             title="Load More Rows"
+             data-toggle="popover"
+             data-original-title="Load More Rows"
+             data-placement="top"
+             data-content="Load the next 200 rows for this schedule/proposal.">
+            <button id="btn-example-load-more" class="btn btn-success"><i class="fa fa-plus mr-5"></i></button>
+        </div>
+        <div id="divLoadLess"
+             title="Load Less Rows"
+             data-toggle="popover"
+             data-original-title="Load Less Rows"
+             data-placement="top"
+             data-content="Load the first 200 rows for this schedule/proposal.">
+            <button id="btn-example-load-less" class="btn btn-success"><i class="fa fa-minus mr-5"></i></button>
+        </div>        
+    </div>
+
+    @if (Model.ProposalInfo.ScheduleTypeId == 1)
+    {
+        <button title="Export"
+                tooltip="Export"
+                class="btn btn-success"
+                aria-describedby="popover880468"
+                type="button"
+                id="btnExportProposal"
+                name="btnExportProposal"
+                data-toggle="modal"
+                data-target="#modal-export-proposal">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+
+    }
+    @if (Model.ProposalInfo.ScheduleTypeId == 2)
+    {
+        <button title="Export"
+                tooltip="Export"
+                class="btn btn-success"
+                type="button"
+                id="btnExportSchedule"
+                name="btnExportSchedule">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+
+    }
+    <!--
+    <div>
+        <button type="button"
+                tooltip="Reload data"
+                class="btn btn-success"
+                onclick="javascript: ReloadPage();">
+            <i class="fa fa-refresh mr-5"></i>
+        </button>
+    </div>
+        -->
+</div>
+<br />
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#btnExportSchedule").on("click", function () {
+            window.location.href = "/ScheduleProposal/ExportScheduleExcel?ScheduleId=" + _UniqueId + "&Discount=" + $("#DiscountPrice").find(":selected").text().replace('%', '');
+        });
+    });
+</script>

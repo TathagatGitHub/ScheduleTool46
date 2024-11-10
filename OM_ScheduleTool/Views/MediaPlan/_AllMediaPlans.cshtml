@@ -1,0 +1,196 @@
+﻿<style>    
+
+   .btnBTG:focus, .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+</style>
+<div class="modal draggable fade" id="MediaPlanModal" tabindex="-1" role="dialog"
+     aria-labelledby="MediaPlanModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="mediaPlanModalDialogue" role="document" style="max-width: 30%;margin-top:5%">
+        <div class="modal-content" style="height:100%;">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="modal-header block-header bg-primary-dark">
+                    <h3 class="block-title" id="CreateMediaPlanHeading">Create Media Plan</h3>
+                </div>
+                <div class="block-content">
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Media Plan Name*</label>
+                            <input type="text" class="form-control" id="txtMediaPlanName" placeholder="">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Budget Period*</label>
+                            <select class="form-control" id="" placeholder="">
+                                <option>Broadcast</option>
+                                <option>Calendar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Budget*</label>
+                            <input type="text" class="form-control" id="" placeholder="$">
+                        </div>
+                        <div class="form-group col-md-3" display="inline-block">
+                            <label for="" style="font-size: 16px;font-weight: bold;">&nbsp;</label>
+                            <select class="form-control" id="" placeholder="">
+                                <option>Gross</option>
+                                <option>Client Net</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Comm.*</label>
+                            <input type="text" class="form-control" id="" placeholder="">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="" style="font-size: 16px;font-weight: bold;">% :15</label>
+                            <input type="text" class="form-control" id="" placeholder="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Buy Type Group(s)*</label>
+                                <table id="mpBtnGroup" border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnAll" name="btnAll" class="btn btnAll" style="width:95%;border-radius: 25px;" value="all" onclick="return ToggleBTGroupSelection(this,'all');">All</button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnScatter" name="btnScatter" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="upfront" onclick="return ToggleBTGroupSelection(this,'upfront');">Upfront</button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnHighProfile" name="btnHighProfile" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="highprofile" onclick="return ToggleBTGroupSelection(this,'highprofile');">High Profile</button>
+                                         </td>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnScatter" name="btnScatter" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="scatter" onclick="return ToggleBTGroupSelection(this,'scatter');">Scatter</button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnDR" name="btnDR" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="dr" onclick="return ToggleBTGroupSelection(this,'dr');">DR</button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button type="button" id="btnInt" name="btnInt" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="int" onclick="return ToggleBTGroupSelection(this,'int');">Int.</button>
+                                        </td>
+                                    </tr>
+                                </table>                               
+                            </div>
+                         </div>
+                    </div>
+                   
+                    <div class="form-group" id="upfrontNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px; display:none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Upfront Networks</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>ABC</option>
+                                    <option>A&E</option>
+                                    <option>AMC</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Upfront Demo(s)*</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>Adult 25-54</option>
+                                    <option>Men 25-54</option>
+                                    <option>Women 25-54</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group" id="highprofileNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">High Profile Networks</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>ABC</option>
+                                    <option>A&E</option>
+                                    <option>AMC</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">High Profile Demo(s)*</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>Adult 25-54</option>
+                                    <option>Men 25-54</option>
+                                    <option>Women 25-54</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group" id="scatterNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Scatter Networks</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>ABC</option>
+                                    <option>A&E</option>
+                                    <option>AMC</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Scatter Demo(s)*</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>Adult 25-54</option>
+                                    <option>Men 25-54</option>
+                                    <option>Women 25-54</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group" id="drNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">DR Networks</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>ABC</option>
+                                    <option>A&E</option>
+                                    <option>AMC</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">DR Demo(s)*</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>Adult 25-54</option>
+                                    <option>Men 25-54</option>
+                                    <option>Women 25-54</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group" id="intNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Int. Networks</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>ABC</option>
+                                    <option>A&E</option>
+                                    <option>AMC</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Int. Demo(s)*</label>
+                                <select class="form-control" id="" placeholder="">
+                                    <option>Adult 25-54</option>
+                                    <option>Men 25-54</option>
+                                    <option>Women 25-54</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancelMediaPlanPopup" class="btn btn-alt-secondary" onclick="btnCloseMediaPlanPopup();" data-toggle="modal" data-target="#MediaPlanModal" style="margin-right: 500px;">Cancel</button>
+                <button type="button" id="btnSaveMediaPlanPopup" class="btn btn-alt-secondary" onclick="btnSaveMediaPlan();">Save</button>
+                <button type="button" id="btnCreateMediaPlanPopup" class="btn btn-alt-success" onclick="btnSaveAndNextMediaPlan();">Create</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+@model PreLogViewModel
+<style type="text/css">
+    div.cb-dropdown-wrap:hover {
+        z-index: 2;
+    }
+</style>
+<script asp-append-version="true" src="~/js/logs/PreLog.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width()-20);        
+    });  
+    localStorage.removeItem("DataTables_PreLogViewTable_" + getParameterByName('prelogid'));
+</script>
+
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/Logs/_PreLogHeader.cshtml", Model)
+            </div>            
+        </div>
+        @Html.Partial("~/Views/Logs/_PreLogDataTable_View.cshtml", Model)
+    </div>
+</main>
+

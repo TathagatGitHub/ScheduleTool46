@@ -1,0 +1,99 @@
+@model ViewUpfrontsViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css ">
+<script src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+<script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+<script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-pageLoadMore/1.0.0/js/dataTables.pageLoadMore.min.js"></script>
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+
+<script src="~/datatable-editor/js/dataTables.editor.min.js"></script>
+<link rel="stylesheet" href="~/datatable-editor/css/editor.dataTables.min.css">
+
+
+<style type="text/css">
+    body {
+        overflow-y: visible;
+        overflow-x: visible;
+        line-height: 1;
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #ffffff;
+    }
+    .HeaderWeekDayM .cb-dropdown-wrap, .HeaderWeekDayT .cb-dropdown-wrap, .HeaderWeekDayW .cb-dropdown-wrap, .HeaderWeekDayTH .cb-dropdown-wrap,
+    .HeaderWeekDayF .cb-dropdown-wrap, .HeaderWeekDaySA .cb-dropdown-wrap, .HeaderWeekDaySU .cb-dropdown-wrap {
+        width: 35px !important;
+    }      
+</style>
+
+
+<div id="edtApprovalStatus"></div>
+<div class="block block-themed block-rounded">
+    <div class="block-content block-content-full" id="resize_wrapper">
+
+        @Html.Partial("~/Views/UpfrontRemnant/_Menu_Edit.cshtml", Model)
+        <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap" id="UpfrontTable" name="UpfrontTable" style="width:95%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDemoName">DEMO</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderApproved">APPRV</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderPropertyName" style="min-width:350px">PROPERTY NAME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDayM" style="min-width:15px!important">M</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDayT" style="min-width:15px!important">T</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDayW" style="min-width:15px!important">W</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDayTH" style="min-width:15px !important ">Th</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDayF" style="min-width:15px!important">F</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDaySA" style="min-width:15px!important">Sa</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderWeekDaySU" style="min-width:15px!important">Su</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderStartTime">START TIME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderEndTime">END TIME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDP">DP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderOMDP">OMDP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSPBuy">SP Buy</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderBuyType">BUY TYPE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSpotLen">LEN</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderRateAmt">
+                        @(Model.NetworkInfo.Country.CountryId == 2 ? Model.UpfrontInfo.Quarter.QuarterName == "4Q2019" ? "CAD GROSS RATE" : "CAD NET RATE" : "RATE")
+                    </th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderImpression">IMP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderCPM">CPM</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDoNotBuyType">STATUS (DNB)</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderClient">CLIENT NAME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderRevNo">REV #</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderRateRevisedDate">REVISED DT</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderEffectiveDate">EFF DT</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderExpirationDate">EXP DT</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+<script asp-append-version="true" src="~/js/common.js"></script>
+<script asp-append-version="true" src="~/js/upfrontremnant/upfrontdealpointdata.js"></script>
+<script asp-append-version="true" src="~/js/upfrontremnant/upfrontremnant_edit.js"></script>
+<script asp-append-version="true" src="~/js/upfrontremnant/upfrontremnant_edit_save.js"></script>
+<script asp-append-version="true" src="~/js/upfrontremnant/upfrontremnant_edit_reload.js"></script>
+<script asp-append-version="true" src="~/js/upfrontremnant/upfrontremnant.js"></script>
+<script asp-append-version="true" type="text/javascript" src="~/datatable-editor/js/PageLoadMore.js"></script>
+

@@ -1,0 +1,45 @@
+﻿@model HomeDeltaListViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Default Table Style -->
+        <h2 class="content-heading">Delta List</h2>
+        <!-- Bordered Table -->
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Schedule Tool Deltas</h3>
+                <div class="block-options">
+                    <div class="block-options-item">
+                        <code></code>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                <table class="table table-bordered table-vcenter">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Date</th>
+                            <th>Version</th>
+                            <th>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model.DeltaListChanges)
+                        {
+                        <tr>
+                            <th scope="row">@log.CreateDt</th>
+                            <td>@log.Version</td>
+                            <td>@log.Change</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END Bordered Table -->
+    </div>
+</main>

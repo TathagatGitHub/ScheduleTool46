@@ -1,0 +1,543 @@
+﻿@model ViewUpfrontsViewModel
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<style type="text/css">
+    .border-color{
+        border-color:red;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#ProgramChange_UpfrontLineId").val(getParameterByName("UpfrontLineId"));
+    });
+
+    function CalculateCPM() {
+
+        var RateAmt = $('#ProgramChange_Rate_New').val().replace(',', '');
+        var Imp = $('#ProgramChange_Imp_New').val().replace(',', '');
+        var OldCPM = $('#ProgramChange_CPM').val();
+        var NewCPM = 0;
+
+        if (parseFloat(Imp) > 0) {
+            NewCPM = (parseFloat(RateAmt) / parseFloat(Imp)).toFixed(2);
+        }
+
+        var Diff = (parseFloat(OldCPM) - parseFloat(NewCPM)).toFixed(2);
+        if (parseFloat(Diff) > 0.02 || parseFloat(Diff) < -0.02) {
+            $('#ProgramChange_CPM_New').css('border-color', 'red');
+            $("#btnSaveProgramChange").addClass('btn-alt-danger');
+            $("#btnSaveProgramChange").removeClass('btn-alt-success');
+            $("#btnSaveProgramChange").html("Change WITHOUT Auto-Approve");
+            //$("#btnSaveProgramChange").attr("disabled", "disabled");
+        }
+        else {
+            $('#ProgramChange_CPM_New').css('border-color', '');
+            $("#btnSaveProgramChange").addClass('btn-alt-success');
+            $("#btnSaveProgramChange").removeClass('btn-alt-danger');
+            $("#btnSaveProgramChange").html("Change WITH Auto-Approve");
+            //$("#btnSaveProgramChange").removeAttr("disabled");
+        }
+        if ($("#ProgramChange_Approved").val() == "NOT APPROVED") {
+            $("#btnSaveProgramChange").addClass('btn-alt-danger');
+            $("#btnSaveProgramChange").removeClass('btn-alt-success');
+            $("#btnSaveProgramChange").html("Change WITHOUT Auto-Approve");
+        }
+        $('#ProgramChange_CPM_New').val(NewCPM);
+
+
+    }
+
+
+    function SaveProgramChange() {
+
+        $("#val-start-time-pc").removeClass("border-color");
+        $("#val-end-time-pc").removeClass("border-color");
+        var starttime = $("#val-start-time-pc").val().match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/);
+        var st = $("#val-start-time-pc").val().match(/^(0?[1-9]|1[012])(:[0-5]\d) [AaPp][Mm]$/);
+        var error = null;
+        if(!starttime && !st){
+            $("#val-start-time-pc").addClass("border-color");
+            error = false;
+        }
+        var endtime = $("#val-end-time-pc").val().match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/);
+        var et = $("#val-end-time-pc").val().match(/^(0?[1-9]|1[012])(:[0-5]\d) [AaPp][Mm]$/);
+        if(!endtime && !et){
+            $("#val-end-time-pc").addClass("border-color");
+            error = false;
+        }
+        if (error==false) {
+            return false;
+        }
+        var url = "/UpfrontRemnant/GoProgramChange";
+            $.ajax({
+                url: url,
+                data: {
+                    UpfrontLineId: $("#ProgramChange_UpfrontLineId").val(),
+                    ProgramChange_PropertyName: $("#ProgramChange_PropertyName").val(),
+                    ProgramChange_PropertyName_New: $("#ProgramChange_PropertyName_New").val(),
+                    ProgramChange_StartTime_New: $("#val-start-time-pc").val(),
+                    ProgramChange_EndTime_New: $("#val-end-time-pc").val(),
+                    ProgramChange_DayPart_New: $("#ProgramChange_DayPart_New").val(),
+                    ProgramChange_Rate_New: $("#ProgramChange_Rate_New").val().replace(',',''),
+                    ProgramChange_Impressions_New: $("#ProgramChange_Imp_New").val().replace(',', ''),
+                    ProgramChange_EffDt_New: $("#ProgramChange_EffDt_New").val(),
+                    ProgramChange_ExpDt_New: $("#ProgramChange_ExpDt_New").val(),
+                    ProgramChange_Monday: $("#chkMondayNew").is(':checked'),
+                    ProgramChange_Tuesday: $("#chkTuesdayNew").is(':checked'),
+                    ProgramChange_Wednesday: $("#chkWednesdayNew").is(':checked'),
+                    ProgramChange_Thursday: $("#chkThursdayNew").is(':checked'),
+                    ProgramChange_Friday: $("#chkFridayNew").is(':checked'),
+                    ProgramChange_Saturday: $("#chkSaturdayNew").is(':checked'),
+                    ProgramChange_Sunday: $("#chkSundayNew").is(':checked')
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result.success == true) {
+                        swal({
+                            title: 'Success',
+                            text: result.responseText,
+                            type: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'OK',
+                            preConfirm: function () {
+                                return new Promise(function (resolve) {
+                                    setTimeout(function () {
+                                        resolve();
+                                    }, 50);
+                                });
+                            }
+                        }).then(
+                            function (result) {
+                                window.opener.focus();
+                                window.opener.location.reload();
+                                window.close();
+                            });
+                    }
+                    else {
+                        swal('STOP', result.responseText, 'error');
+                    }
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'warning');
+                }
+            });
+    }
+
+    function ChangeStartTime(TextStartTime) {
+        AutoFillTime(TextStartTime);
+    }
+
+    function ChangeEndTime(TextEndTime) {
+        AutoFillTime(TextEndTime);
+    }
+
+    function FillExpirationDates(QuarterName) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ProgramChange_ExpDt_New").html(procemessage).show();
+        var url = "/CreateNewProperty/GetExpirationDates";
+
+        $.ajax({
+            url: url,
+            data: {
+                QtrName: QuarterName,
+                EffectiveDate: $("#ProgramChange_EffDt_New option:selected").text()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (x == result.length-2) {
+                        markup += "<option selected value=" + result[x].text + ">" + result[x].text + "</option>";
+                    }
+                    else {
+                        markup += "<option value=" + result[x].text + ">" + result[x].text + "</option>";
+                    }
+
+                }
+                $("#ProgramChange_ExpDt_New").html(markup).show();
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating Expiration Dates:  ' + response, 'error');
+            }
+        });
+    }
+
+</script>
+
+    <main id="main-container" style="min-height: 629.1px;">
+        <div class="content">
+            <div class="block">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary block-rounded">
+                        <h3 class="block-title">Program Change Form</h3>
+                    </div>
+                    <div class="block-content">
+                            <div class="form-group row gutters-tiny">
+                                <input type="hidden" class="form-control" id="txtPCUpfrontLineId" name="txtPCUpfrontLineId">
+                                <label class="col-8" for="lblNetworkName">Network Name:</label>
+                                <label class="col-4" for="lblApproved">Approved:</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.UpfrontInfo.Network.StdNetName, new { @class = "form-control", @disabled = "disabled", @id = "ProgramChange_NetworkName" })
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.TextBox("Approved", (Model.ProgramChangeUpfrontLine.Rate.Approved == true ? "APPROVED" : "NOT APPROVED"), new { @class = "form-control", @disabled = "disabled", @id = "ProgramChange_Approved" })
+
+                                    <input type="text" class="form-control" id="ProgramChange_UpfrontLineId" name="ProgramChange_UpfrontLineId" hidden>
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <label class="col-3" for="lblQuarter">Quarter:</label>
+                                <label class="col-3" for="lblDemo">Demo:</label>
+                                <label class="col-3" for="lblStatus">Status:</label>
+                                <label class="col-3" for="lblClientName">Client Name:</label>
+
+                                <div class="col-md-3">
+                                    @Html.TextBoxFor(m => m.UpfrontInfo.Quarter.QuarterName, new { @class = "form-control", @disabled = "disabled", @id = "ProgramChange_Quarter" })
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="ProgramChange_Demo" name="ProgramChange_Demo" readonly value="@Model.ProgramChangeUpfrontLine.Rate.DemographicSettingsPerQtr.Demo.DemoName">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="ProgramChange_Status" name="ProgramChange_Status" readonly value="@Model.ProgramChangeUpfrontLine.Rate.DoNotBuyType.Description">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="Client_Name" name="Client_Name" readonly value="@(Model.ProgramChangeUpfrontLine.Rate.MandateClient != null ? Model.ProgramChangeUpfrontLine.Rate.MandateClient.ClientName : "")">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="block-content block-content-full">
+                                    <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                                    <table class="table table-vcenter js-dataTable-programchange" id="ProgramChangeTable" name="ProgramChangeTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="d-none d-sm-table-cell text-center"></th>
+                                                <th class="d-none d-sm-table-cell text-center">Current Settings</th>
+                                                <th class="d-none d-sm-table-cell text-center">New Settings</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Property Name:</td>
+                                                <td class="d-none d-sm-table-cell"><input type="text" class="form-control" id="ProgramChange_PropertyName" name="ProgramChange_PropertyName" readonly value="@Model.ProgramChangeUpfrontLine.Rate.Property.PropertyName"></td>
+                                                <td class="d-none d-sm-table-cell"><input type="text" class="form-control" id="ProgramChange_PropertyName_New" name="ProgramChange_PropertyName_New" value="@Model.ProgramChangeUpfrontLine.Rate.Property.PropertyName"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Days:</td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <table border="0" cellspacing="0" cellpadding="0" style="padding:0px;margin:0px;">
+                                                        <tr class="gutters-tiny">
+                                                            <td align="center">
+                                                                Mon<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Monday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkMonday" name="chkMonday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkMonday" name="chkMonday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Tue<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Tuesday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkTuesday" name="chkTuesday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkTuesday" name="chkTuesday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Wed<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Wednesday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkWednesday" name="chkWednesday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkWednesday" name="chkWednesday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Thu<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Thursday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkThursday" name="chkThursday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkThursday" name="chkThursday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Fri<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Friday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkFriday" name="chkFriday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkFriday" name="chkFriday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Sat<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Saturday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSaturday" name="chkSaturday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSaturday" name="chkSaturday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Sun<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Sunday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSunday" name="chkSunday" checked disabled>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSunday" name="chkSunday" disabled>
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                                        <tr>
+                                                            <td align="center">
+                                                                Mon<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Monday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkMondayNew" name="chkMondayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkMondayNew" name="chkMondayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Tue<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Tuesday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkTuesdayNew" name="chkTuesdayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkTuesdayNew" name="chkTuesdayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Wed<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Wednesday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkWednesdayNew" name="chkWednesdayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkWednesdayNew" name="chkWednesdayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Thu<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Thursday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkThursdayNew" name="chkThursdayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkThursdayNew" name="chkThursdayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Fri<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Friday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkFridayNew" name="chkFridayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkFridayNew" name="chkFridayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Sat<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Saturday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSaturdayNew" name="chkSaturdayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSaturdayNew" name="chkSaturdayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                            <td align="center">
+                                                                Sun<br />
+                                                                <label class="css-control css-control-sm css-control-primary css-switch">
+                                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Property.Sunday == true)
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSundayNew" name="chkSundayNew" checked>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="css-control-input" type="checkbox" id="chkSundayNew" name="chkSundayNew">
+                                                                    }
+                                                                    <span class="css-control-indicator"></span><br />
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Start Time:</td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.Property.StartTime.ToString(@"hh\:mm")" type="text" class="form-control" id="ProgramChange_StartTime" name="ProgramChange_StartTime" disabled></td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <input value="@Model.ProgramChangeUpfrontLine.Rate.Property.StartTime.ToString(@"hh\:mm")" type="text" class="js-autocompletetime form-control" id="val-start-time-pc" name="val-start-time-pc" placeholder="Enter start time ..." onkeyup="javascript: ChangeStartTime(this);">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">End Time:</td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.Property.EndTime.ToString(@"hh\:mm")" type="text" class="form-control" id="ProgramChange_EndTime" name="ProgramChange_EndTime" readonly></td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <input value="@Model.ProgramChangeUpfrontLine.Rate.Property.EndTime.ToString(@"hh\:mm")" type="text" class="js-autocompletetime form-control" id="val-end-time-pc" name="val-end-time-pc" placeholder="Enter end time ..." onkeyup="javascript: ChangeEndTime(this);">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Day Part:</td>
+                                                <td class="d-none d-sm-table-cell"><input value='@(String.Format("{0} ({1})", Model.ProgramChangeUpfrontLine.Rate.Property.DayPart.DayPartCd, Model.ProgramChangeUpfrontLine.Rate.Property.DayPart.DayPartDesc))' type="text" class="form-control" id="ProgramChange_DayPart" name="ProgramChange_DayPart" readonly></td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <select class="form-control" id="ProgramChange_DayPart_New" name="ProgramChange_DayPart_New">
+                                                        <!--<option></option> Required for data-placeholder attribute to work with Select2 plugin -->
+                                                        @foreach (var dp in Model.DPAvailable)
+                                                        {
+                                                            @if (dp.DayPartId == Model.ProgramChangeUpfrontLine.Rate.Property.DayPart.DayPartId)
+                                                            {
+                                                                <option value="@dp.DayPartId" selected>@dp.DayPartCd (@dp.DayPartDesc)</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@dp.DayPartId">@dp.DayPartCd (@dp.DayPartDesc)</option>
+                                                            }
+                                                            
+                                                        }
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Buy Type:</td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.BuyType.BuyTypeCode" type="text" class="form-control" id="ProgramChange_BuyType" name="ProgramChange_BuyType" disabled></td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.BuyType.BuyTypeCode" type="text" class="form-control" id="ProgramChange_BuyType_New" name="ProgramChange_BuyType_New" disabled></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Rate:</td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", Model.ProgramChangeUpfrontLine.Rate.RateAmt)' type="text" class="form-control" id="ProgramChange_Rate" name="ProgramChange_Rate" readonly></td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", Model.ProgramChangeUpfrontLine.Rate.RateAmt)' type="text" class="form-control" id="ProgramChange_Rate_New" name="ProgramChange_Rate_New" onkeyup="javascript: CalculateCPM();"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Impressions:</td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", Model.ProgramChangeUpfrontLine.Rate.Impressions)' type="text" class="form-control" id="ProgramChange_Imp" name="ProgramChange_Imp" readonly></td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", Model.ProgramChangeUpfrontLine.Rate.Impressions)' type="text" class="form-control" id="ProgramChange_Imp_New" name="ProgramChange_Imp_New" onkeyup="javasript: CalculateCPM();"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">CPM:</td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", (Model.ProgramChangeUpfrontLine.Rate.Impressions != 0 ? Model.ProgramChangeUpfrontLine.Rate.RateAmt / Model.ProgramChangeUpfrontLine.Rate.Impressions : 0))' type="text" class="form-control" id="ProgramChange_CPM" name="ProgramChange_CPM" readonly></td>
+                                                <td class="d-none d-sm-table-cell"><input value='@String.Format("{0:n2}", (Model.ProgramChangeUpfrontLine.Rate.Impressions != 0 ? Model.ProgramChangeUpfrontLine.Rate.RateAmt / Model.ProgramChangeUpfrontLine.Rate.Impressions : 0))' type="text" class="form-control" id="ProgramChange_CPM_New" name="ProgramChange_CPM_New" disabled></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Effective Date:</td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.EffectiveDate.ToShortDateString()" type="text" class="form-control" id="ProgramChange_EffDt" name="ProgramChange_EffDt" readonly></td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <select class="form-control" id="ProgramChange_EffDt_New" name="ProgramChange_EffDt_New" onchange="javascript: FillExpirationDates('@Model.UpfrontInfo.Quarter.QuarterName');">
+                                                        <option value="">&nbsp;</option>
+                                                        @for (int idx = 0; idx < Model.EffectiveDatesAvailable.Count(); idx++)
+                                                        {
+                                                            <option value="@Model.EffectiveDatesAvailable[idx].ToShortDateString()">@Model.EffectiveDatesAvailable[idx].ToShortDateString()</option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell">Expiration Date:</td>
+                                                <td class="d-none d-sm-table-cell"><input value="@Model.ProgramChangeUpfrontLine.Rate.ExpirationDate.ToShortDateString()" type="text" class="form-control" id="ProgramChange_ExpDt" name="ProgramChange_ExpDt" readonly></td>
+                                                <td class="d-none d-sm-table-cell">
+                                                    <select class="form-control" id="ProgramChange_ExpDt_New" name="ProgramChange_ExpDt_New"></select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" align="right">
+                                                    <button type="button" class="btn btn-alt-secondary" onclick="javascript: window.close();">Close</button>
+                                                    @if (Model.ProgramChangeUpfrontLine.Rate.Approved == true)
+                                                    {
+                                                        <button type="button" class="btn btn-alt-success" id="btnSaveProgramChange" name="btnSaveProgramChange" onclick="SaveProgramChange();">
+                                                            @Html.Raw("Change WITH Auto-Approve")
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-alt-danger" id="btnSaveProgramChange" name="btnSaveProgramChange" onclick="SaveProgramChange();">
+                                                            @Html.Raw("Change WITHOUT Auto-Approve")
+                                                        </button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+

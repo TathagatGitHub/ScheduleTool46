@@ -1,0 +1,361 @@
+﻿.select-editable {
+    position: relative;
+    background-color: white;
+    border: solid grey 1px;
+    width: 120px;
+    height: 18px;
+}
+
+.select-editable select {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 14px;
+    border: none;
+    width: 120px;
+    margin: 0;
+}
+
+.select-editable input {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100px;
+    padding: 1px;
+    border: none;
+}
+
+.select-editable select:focus, .select-editable input:focus {
+    outline: none;
+}
+
+
+.upfront-120 {
+    background-color: #538dd5 !important;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.upfront-60 {
+    background-color: #66ff66 !important;
+    color: #000000;
+    font-size: 12px;
+}
+
+.upfront-30 {
+    background-color: #538dd5 !important;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.upfront-15 {
+    background-color: #ffff9b !important;
+    color: #000000;
+    font-size: 12px;
+}
+
+.pending-change {
+    color: red;
+}
+
+.upfront-approved {
+    color: #009900;
+}
+
+.upfront-notapproved {
+    color: #000000;
+}
+
+.upfront-spotlen {
+    color: #000000;
+    font-size: 12px;
+}
+
+.upfront-spotlen30 {
+    font-size: 12px;
+}
+
+.upfront-donotbuy {
+    background-color: #99ccff;
+    font-size: 12px;
+}
+
+.upfront-buyatyourrisk {
+    background-color: #ccc0da;
+    font-size: 12px;
+}
+
+.upfront-logactual {
+    background-color: #fcd5b4;
+    font-size: 12px;
+}
+
+.upfront-clientmandate {
+    background-color: #92d050;
+    font-size: 12px;
+}
+
+.upfront-clientspecific {
+    background-color: #c4d79b;
+    font-size: 12px;
+}
+
+.upfront-approvelock {
+    background-color: #d9d9d9;
+    font-size: 12px;
+}
+
+.upfront-change {
+    background-color: #ef5350 !important;
+    color: #ffffff !important;
+    font-size: 12px;
+}
+
+.upfront-filter {
+    background-color: #e74c3c !important;
+    color: #ffffff !important;
+}
+
+.red-if-changed {
+}
+
+.upfront-table {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+
+}
+
+.table-sm-upfront th,
+.table-sm-upfront td {
+    padding: 3px;
+    line-height: 1;
+}
+
+.HeaderType {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+
+.upfront-form-control {
+    display: block;
+    width: 100%;
+    padding: 8px 14px;
+    font-size: 1rem;
+    line-height: 16px;
+    color: #575757;
+    background-color: #fff;
+    background-image: none;
+    background-clip: padding-box;
+    border: 1px solid #dcdfe3;
+    border-radius: 0.25rem;
+    transition: border-color ease-in-out 0.15s;
+}
+
+
+.signature, .title {
+    margin: 50px 10px;
+    border-top: 2px solid #000;
+    width: 75%;
+    text-align: left;
+}
+
+.date {
+    margin: 50px 10px;
+    border-top: 2px solid #000;
+    width: 15%;
+    text-align: left;
+}
+
+ .editableBoxStart {
+    width: 75px;
+    height: 25px;
+}
+
+.timeTextBoxStart {
+    width: 54px;
+    margin-left: -78px;
+    height: 20px;
+    border: none;
+}
+
+.editableBoxEnd {
+    width: 75px;
+    height: 25px;
+}
+
+.timeTextBoxEnd {
+    width: 54px;
+    margin-left: -78px;
+    height: 20px;
+    border: none;
+}
+
+/* Styles for the drop-down. Feel free to change the styles to suit your website. :-) */
+.cb-dropdown-wrap {
+    min-height: 23px;
+    max-height: 23px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid #888;
+    position: absolute;
+    z-index: 1;
+    background-color: #fff;
+    margin-top: 5px;
+}
+
+    .cb-dropdown-wrap:hover {
+        height: auto;
+        min-width: 100px;
+        max-height: 200px; /* At most, around 3/4 visible items. */
+    }
+
+.cb-dropdown {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #888;
+}
+.cb-dropdown li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    .cb-dropdown li label {
+        padding: 3px 0;
+        display: block;
+        position: relative;
+        cursor: pointer;
+        border-bottom: 0px solid #eee;
+    }
+
+        .cb-dropdown li label > input {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 16px;
+        }
+
+        .cb-dropdown li label > span {
+            display: block;
+            margin-left: 3px;
+            margin-right: 10px; /* At least, width of the checkbox. */
+            /*
+            font-family: sans-serif;
+            font-size: 0.8em;
+            */
+            font-weight: normal;
+            text-align: left;
+        }
+
+.factive {
+    background-color: gold /* #c9e2c6 */ !important;
+}
+
+#UpfrontTable th {
+    padding-bottom: 40px;
+    background-position: 85% 8px;
+}
+
+#MyProposalTable th {
+    padding-bottom: 40px;
+    background-position: 85% 8px;
+}
+
+.dt-more-container {
+    text-align: center;
+    margin: 2em 0;
+}
+
+.divLoadMore {
+    text-align: center;
+    margin: 2em 0;
+}
+
+div.dataTables_wrapper div.dataTables_processing {
+    top: 5%;
+}
+
+
+
+/* Added By Shariq H Khan- 2022-08-31 */
+/* CSS for Overlay Popup Starts Here */
+div.scroll {
+    width: 200px;
+    height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align: left;
+    padding: 20px;
+}
+
+/*Overlay Code Style*/
+.overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0, 0.9);
+    overflow-x: hidden;
+    transition: 0.5s;
+    opacity: 0.5;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.overlay a {
+    padding: 8px;
+    text-decoration: none;
+    font-size: 36px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+    .overlay a:hover, .overlay a:focus {
+        color: #f1f1f1;
+    }
+
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+/*Ovelay Loader end here*/
+.loader {
+    position: relative;
+    top: 12em;
+    left: 50em;
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: -0.125em;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: 0.75s linear infinite spinner-border;
+    animation: 0.75s linear infinite spinner-border !important;
+    animation-duration: 1.5s;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/* CSS for Overlay Popup Ends Here */

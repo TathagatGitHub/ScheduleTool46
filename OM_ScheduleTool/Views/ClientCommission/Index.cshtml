@@ -1,0 +1,1330 @@
+@model ClientCommissionViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+<script src="~/js/ClientCommission.js"></script>
+<script language="javascript" type="text/javascript">
+    var urlGetClientByCountryId = '@Url.Action("GetClientByCountryId", "Client")';
+    var urlGetQuarters ='@Url.Action("GetQuarters", "CreateNewProperty")';
+
+    $(document).ready(function () {
+        /******************** Update all weekly rates to currently selected edit box ******/
+        $("#btnApplyToAll").bind("click", function () {
+            if ($("#txtWeek01Rate").attr("disabled") != "disabled") {
+                $("#txtWeek01Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek02Rate").attr("disabled") != "disabled") {
+                $("#txtWeek02Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek03Rate").attr("disabled") != "disabled") {
+                $("#txtWeek03Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek04Rate").attr("disabled") != "disabled") {
+                $("#txtWeek04Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek05Rate").attr("disabled") != "disabled") {
+                $("#txtWeek05Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek06Rate").attr("disabled") != "disabled") {
+                $("#txtWeek06Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek07Rate").attr("disabled") != "disabled") {
+                $("#txtWeek07Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek08Rate").attr("disabled") != "disabled") {
+                $("#txtWeek08Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek09Rate").attr("disabled") != "disabled") {
+                $("#txtWeek09Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek10Rate").attr("disabled") != "disabled") {
+                $("#txtWeek10Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek11Rate").attr("disabled") != "disabled") {
+                $("#txtWeek11Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek12Rate").attr("disabled") != "disabled") {
+                $("#txtWeek12Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek13Rate").attr("disabled") != "disabled") {
+                $("#txtWeek13Rate").val($("#txtRateToAll").val());
+            }
+            if ($("#txtWeek14Rate").attr("disabled") != "disabled") {
+                $("#txtWeek14Rate").val($("#txtRateToAll").val());
+            }
+        });
+
+        /******************** Reset rates back to Initial State *********************/
+
+        /* When Country is Changed, make Client Available  */
+        $("#ddlCountry").change(function () {
+            if ($("#ddlCountry").val() === "") {
+                $("#ddlClient").prop("disabled", true);
+            }
+            else {
+                GetClients($("#ddlCountry").val());
+                $("#ddlClient").removeAttr("disabled");
+            }
+            $("#txtAnniversaryDate").attr("disabled", "disabled");
+            $("#ddlTiered").prop("disabled", true);
+            $("#ddlCommStructure").prop("disabled", true);
+            $("#txtRate").attr("disabled", "disabled");
+            InitializeRates();
+        });
+
+        /* When Client is set, make Rates Available */
+        $("#ddlClient").change(function () {
+            GetClient($("#ddlClient").val());
+            InitializeRates();
+
+            if ($("#ddlClient").val() > 0) {
+                $("#btnSave").removeAttr("disabled");
+            }
+            else {
+                $("#btnSave").attr("disabled", "disabled");
+            }
+        });
+
+        $("#txtAnniversaryDate").change(function () {
+            MarkChanged();
+        });
+
+        $("#ddlTiered").change(function () {
+            MarkChanged();
+        })
+
+        /* Fee is a special case where Weekly Rates cannot be updated and the Comm Rate is set to 0 */
+        var prev_val;
+        $("#ddlCommStructure").focus(function () {
+            prev_val = $(this).val();
+        }).change(function () {
+            swal({
+                title: 'Are you sure?',
+                text: 'You are about to change the fee structure for this client.  Current and previous weekly rates entered will be deleted for this client PERMANENTLY.  Do you want to continue?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d26a5c',
+                confirmButtonText: 'Yes, remove rates!',
+                html: false,
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(
+                function (result) {
+                    $("#btnEditRates").removeAttr("style");                    
+                    if ($("#ddlCommStructure").val() == "GROSS") {
+                        $("#btnEditRates").attr("style", "display: normal;");
+                        SetCommRate($("#ddlClient").val());
+                    }
+                    else if ($("#ddlCommStructure").val() == "NET") {
+                        $("#btnEditRates").attr("style", "display: normal;");
+                        SetCommRate($("#ddlClient").val());
+                    }
+                    else if ($("#ddlCommStructure").val() == "FEE") {
+                        $("#btnEditRates").attr("style", "display: none;");
+                        $("#divEditRates").attr("style", "display: none;");
+                        $("#txtRate").val("0");
+                        $("#txtRate").attr("disabled", "disabled");
+                    }
+
+                    MarkChanged();
+                }, function (dismiss) {
+                    $("#ddlCommStructure").val(prev_val);
+                    $(this).val(prev_val);
+                    // dismiss can be 'cancel', 'overlay', 'esc' or 'timer'
+                }
+                );
+
+        });
+
+
+        $("#btnEditRates").bind("click", function () {
+
+            // toggle
+            if ($("#divEditRates").attr("style") != "display: none;") {
+                ShowRates(0);
+            }
+            else {
+                ShowRates(1);
+
+            }
+        });
+
+        $("#btnExportPostLog").bind("click", function () {
+            location.href = "/ClientCommission/ExportPostLog";
+        });
+
+        $("#btnReset").bind("click", function () {
+            document.getElementById('ddlCountry').selectedIndex = 0;
+            document.getElementById('ddlClient').selectedIndex = 0;
+
+            Initialize();
+            InitializeRates();
+
+            $("#ddlClient").prop("disabled", true);
+            $("#txtAnniversaryDate").attr("disabled", "disabled");
+            $("#ddlTiered").prop("disabled", true);
+            $("#ddlCommStructure").prop("disabled", true);
+            $("#txtRate").attr("disabled", "disabled");
+            $("#btnSave").attr("disabled", "disabled");
+            ShowRates(0);
+            $("#btnEditRates").attr("style", "display: none;");
+            window.onbeforeunload = null;
+        });
+
+    
+        $("#formClientCommission").submit(function (event) {
+            window.onbeforeunload = null;
+        });
+
+
+        $("#ddlPlanYear").change(function () {
+            PopulateQuarter();
+        });
+
+        $("#ddlQuarter").change(function () {
+            PopulateStartWeek();
+            PopulateEndWeek();
+            PopulateCommRates();
+            window.setTimeout(PopulateWeekRates, 2000);
+            MarkChanged();
+        });
+
+        $("#ddlStartWeek").change(function () {
+            PopulateEndWeek();
+            PopulateCommRates();
+            window.setTimeout(PopulateWeekRates, 2000);
+        });
+
+        $("#ddlEndWeek").change(function () {
+            window.setTimeout(PopulateWeekRates, 2000);
+        });
+
+        $("#txtWeek01Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek02Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek03Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek04Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek05Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek06Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek07Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek08Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek09Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek10Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek11Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek12Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek13Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#txtWeek14Rate").change(function () {
+            MarkChanged();
+        });
+
+        $("#btnSave").on("click", function () {            
+            if ($("#ddlCommStructure").val() == "") {
+                swal("", "Select a valid Commission Structure.", "warning");
+                return false;
+            }
+        });
+
+        $("#txtRate").change(function () {
+            $(this).val(parseFloat($(this).val()).toFixed(2));            
+        });
+
+        Initialize();
+        
+    });
+
+    function MarkChanged() {
+        $("#btnExportPostLog").attr("disabled", "disabled");
+        window.onbeforeunload = function () {
+            return "You have unsaved entries.  Do you want to leave without finishing? ";
+        };
+    }
+
+    function ShowRates(show) {
+        $("#txtShowRates").val(show);
+        if (show === 0) {
+        //if ($("#divEditRates").attr("style") != "display: none;") {
+            $("#divEditRates").attr("style", "display: none;");
+        }
+        else {
+            $("#divEditRates").attr("style", "display: normal;");
+        }
+    }
+
+    function Initialize() {
+        if ($("#ddlClient").val() != "" && $("#ddlClient").val() != 0) {
+            // Reload Client
+            GetClient($("#ddlClient").val());
+            $("#ddlCountry").prop("disabled", false);
+            $("#ddlClient").prop("disabled", false);
+            if (@Model.PlanYear != 0) {
+                $("#ddlQuarter").removeAttr("disabled");
+                if (@Model.QuarterId != 0) {
+                    $("#ddlStartWeek").removeAttr("disabled");
+                    $("#ddlEndWeek").removeAttr("disabled");
+                    PopulateStartWeek();
+                    PopulateEndWeek();
+                    window.setTimeout(PopulateWeekRates, 3000);
+                }
+            }
+            $("#btnSave").removeAttr("disabled");
+        }
+        else {
+            // Fresh page
+            if ($("#ddlCountry").val() === "") {
+                $("#ddlClient").prop("disabled", true);
+                $("#txtAnniversaryDate").attr("disabled", "disabled");
+                $("#ddlTiered").prop("disabled", true);
+                $("#ddlCommStructure").prop("disabled", true);
+                $("#txtRate").attr("disabled", "disabled");
+                $("#btnSave").attr("disabled", "disabled");
+            }
+            else if (@Model.CountryId === 0) {
+                $("#ddlCountry").val("");
+                $("#ddlClient").prop("disabled", true);
+                $("#txtAnniversaryDate").attr("disabled", "disabled");
+                $("#ddlTiered").prop("disabled", true);
+                $("#ddlCommStructure").prop("disabled", true);
+                $("#txtRate").attr("disabled", "disabled");
+                $("#btnSave").attr("disabled", "disabled");
+            }
+            else {
+                $("#ddlClient").removeAttr("disabled");
+                $("#txtAnniversaryDate").removeAttr("disabled");
+                $("#ddlTiered").removeAttr("disabled");
+                $("#ddlCommStructure").removeAttr("disabled");
+                $("#txtRate").removeAttr("disabled");
+                $("#btnSave").removeAttr("disabled");
+            }
+            $("#ddlCountry").removeAttr("disabled");
+            var ratestr = "Rate (%)";
+            $("#lblRate").html(ratestr);
+        }
+        ShowRates(@Model.ShowRates);
+        $("#btnExportPostLog").removeAttr("disabled");
+        window.onbeforeunload = null;
+
+    }
+
+    function InitializeRates() {
+        // Hide all Rates
+        $("#divWeek01").attr("style", "display:none;")
+        $("#divWeek02").attr("style", "display:none;")
+        $("#divWeek03").attr("style", "display:none;")
+        $("#divWeek04").attr("style", "display:none;")
+        $("#divWeek05").attr("style", "display:none;")
+        $("#divWeek06").attr("style", "display:none;")
+        $("#divWeek07").attr("style", "display:none;")
+        $("#divWeek08").attr("style", "display:none;")
+        $("#divWeek09").attr("style", "display:none;")
+        $("#divWeek10").attr("style", "display:none;")
+        $("#divWeek11").attr("style", "display:none;")
+        $("#divWeek12").attr("style", "display:none;")
+        $("#divWeek13").attr("style", "display:none;")
+        $("#divWeek14").attr("style", "display:none;")
+
+        $("#ddlPlanYear option:first").attr("selected", "selected");
+        $("#ddlQuarter option:first").attr("selected", "selected");
+        $("#ddlQuarter").attr("disabled", "disabled");
+        $("#ddlStartWeek").empty();
+        $("#ddlStartWeek").attr("disabled", "disabled");
+        $("#ddlEndWeek").empty();
+        $("#ddlEndWeek").attr("disabled", "disabled");
+    }
+
+    function GetClient(_clientid) {
+        var url = "/Client/GetClientById/";
+
+        $.ajax({
+            url: url,
+            data: { clientid: _clientid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var rateformat = result.rate.replace("%", "");
+                rateformat = rateformat.replace(",", "");
+                rateformat = rateformat.replace(".", "");
+                $("#txtAnniversaryDate").val(result.annivDate);
+                $("#ddlTiered").val(result.tiered)
+                if(result.isTempCommStructure)
+                {
+                    $("#ddlCommStructure").val(null);
+                }
+                else
+                {
+                    $("#ddlCommStructure").val(result.commStructure);
+                }               
+                $("#txtRate").val(result.rate);
+
+                if (result.success == true) {
+                    if (result.commStructure == "FEE") {
+                        $("#btnEditRates").attr("style", "display: none;");
+                        $("#txtRate").attr("disabled", "disabled");
+                    }
+                    else {
+                        if (!isNumber(rateformat)) {
+                            $("#txtRate").attr("disabled", "disabled");
+                        }
+                        else {
+                            $("#txtRate").removeAttr("disabled");
+                        }
+
+                        $("#btnEditRates").attr("style", "display: normal;");
+                    }
+
+                    $("#txtAnniversaryDate").removeAttr("disabled");
+                    $("#ddlTiered").removeAttr("disabled");
+                    $("#ddlCommStructure").removeAttr("disabled");
+                }
+                else {
+                    $("#txtAnniversaryDate").attr("disabled", "disabled");
+                    $("#ddlTiered").attr("disabled", "disabled");
+                    $("#ddlCommStructure").attr("disabled", "disabled");
+                    $("#txtRate").attr("disabled", "disabled");
+
+
+                }
+
+            },
+            error: function (response) {
+                alert("error : " + response.responseText);
+            }
+        });
+
+    }
+
+
+    function SetCommRate (_clientid) {
+        var url = "/Client/GetClientById/";
+
+        $.ajax({
+            url: url,
+            data: { clientid: _clientid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                $("#txtRate").val(result.rate);
+
+                if (result.success == false) {
+                    $("#txtRate").removeAttr("disabled");
+                    $("#btnEditRates").attr("style", "display: none;");
+                }
+                else {
+                    if (!isNumber(result.rate.replace("%", ""))) {
+                        $("#txtRate").attr("disabled", "disabled");
+                    }
+                    else {
+                        $("#txtRate").removeAttr("disabled");
+                    }
+                }
+            },
+            error: function (response) {
+                swal({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: response.responseText,
+                })
+            }
+        });
+
+    }
+
+    function PopulateQuarter() {
+        if ($("#ddlPlanYear").val() > 0) {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlQuarter").html(procemessage).show();
+            var url = "/CreateNewProperty/GetQuarters";
+
+            $.ajax({
+                url: url,
+                data: {
+                    Year: $("#ddlPlanYear").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option>Please select ...</option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlQuarter").html(markup).show();
+                },
+                error: function (response, exception) {
+                    var msg = '';
+                    if (response.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (response.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (response.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + response.responseText;
+                    }
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: msg,
+                    })
+                }
+            });
+            $("#ddlQuarter").removeAttr("disabled");
+        }
+        else {
+            $("#dllQuarter").attr("disabled", "disabled");
+        }
+    }
+
+    function PopulateCommRates() {
+        if ($("#ddlQuarter").val() > 0) {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlCommRate").html(procemessage).show();
+            var url = "/ClientCommission/GetCommRateByClientQuarter";
+
+            $.ajax({
+                url: url,
+                data: {
+                    ClientId: $("#ddlClient").val(),
+                    QuarterId: $("#ddlQuarter").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlCommRate").html(markup).show();
+                },
+                error: function (result) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: result.responseText,
+                    })
+                }
+            });
+            $("#ddlStartWeek").removeAttr("disabled");
+        }
+        else {
+            $("#ddlStartWeek").attr("disabled", "disabled");
+        }
+
+
+    }
+
+    function PopulateStartWeek() {
+        if ($("#ddlQuarter").val() > 0) {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlStartWeek").html(procemessage).show();
+            var url = "/ClientCommission/GetStartWeekByQuarter";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QuarterId: $("#ddlQuarter").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlStartWeek").html(markup).show();
+                },
+                error: function (result) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: result.responseText,
+                    })
+                }
+            });
+            $("#ddlStartWeek").removeAttr("disabled");
+        }
+        else {
+            $("#ddlStartWeek").attr("disabled", "disabled");
+        }
+
+
+    }
+
+    function PopulateEndWeek() {
+        if ($("#ddlQuarter").val() > 0) {
+            $("#ddlEndWeek").attr("disabled", "disabled");
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlEndWeek").html(procemessage).show();
+
+            var url = "/ClientCommission/GetStartWeekByQuarter";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QuarterId: $("#ddlQuarter").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    var start = $("#ddlStartWeek").val();
+                    for (var x = 0; x < result.length; x++) {
+                        if (parseInt(result[x].value) >= parseInt(start)) {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                    }
+                    $("#ddlEndWeek").html(markup).show();
+                    $("#ddlEndWeek option:last").attr("selected", "selected");
+                },
+                error: function (result) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: result.responseText,
+                    })
+                }
+            });
+            $("#ddlEndWeek").removeAttr("disabled");
+        }
+        else {
+            $("#ddlEndWeek").attr("disabled", "disabled");
+        }
+
+
+    }
+
+    function PopulateWeekRates() {
+        var start = $("#ddlStartWeek").val();
+        var end = $("#ddlEndWeek").val();
+
+        // Hide all Rates
+        $("#divWeek01").attr("style", "display:none;")
+        $("#divWeek02").attr("style", "display:none;")
+        $("#divWeek03").attr("style", "display:none;")
+        $("#divWeek04").attr("style", "display:none;")
+        $("#divWeek05").attr("style", "display:none;")
+        $("#divWeek06").attr("style", "display:none;")
+        $("#divWeek07").attr("style", "display:none;")
+        $("#divWeek08").attr("style", "display:none;")
+        $("#divWeek09").attr("style", "display:none;")
+        $("#divWeek10").attr("style", "display:none;")
+        $("#divWeek11").attr("style", "display:none;")
+        $("#divWeek12").attr("style", "display:none;")
+        $("#divWeek13").attr("style", "display:none;")
+        $("#divWeek14").attr("style", "display:none;")
+
+
+        // Show only the ones that can be edited
+        $("#ddlStartWeek > option").each(function () {
+            //if (parseInt($(this).val()) >= parseInt(start)) {
+            //    if (end == 0 || parseInt($(this).val()) <= parseInt(end)) {
+                    if ($(this).val() == 1) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek01Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek01Rate").attr("disabled", "disabled");
+                        }
+
+                        $("#txtWeek01Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if (parseInt($(this).val()) == 1) {
+                                $("#txtWeek01Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+
+                        $("#divWeek01").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 2) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek02Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek02Rate").attr("disabled", "disabled");
+                        }
+
+                        $("#txtWeek02Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 2) {
+                                $("#txtWeek02Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek02").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 3) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek03Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek03Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek03Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 3) {
+                                $("#txtWeek03Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek03").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 4) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek04Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek04Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek04Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 4) {
+                                $("#txtWeek04Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek04").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 5) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek05Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek05Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek05Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 5) {
+                                $("#txtWeek05Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek05").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 6) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek06Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek06Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek06Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 6) {
+                                $("#txtWeek06Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek06").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 7) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek07Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek07Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek07Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 7) {
+                                $("#txtWeek07Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek07").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 8) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek08Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek08Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek08Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 8) {
+                                $("#txtWeek08Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek08").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 9) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek09Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek09Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek09Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 9) {
+                                $("#txtWeek09Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek09").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 10) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek10Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek10Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek10Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 10) {
+                                $("#txtWeek10Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek10").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 11) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek11Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek11Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek11Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 11) {
+                                $("#txtWeek11Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek11").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 12 && $(this).text() != "") {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek12Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek12Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek12Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 12) {
+                                $("#txtWeek12Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek12").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 13) {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek13Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek13Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek13Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 13) {
+                                $("#txtWeek13Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek13").attr("style", "display:normal;");
+                    }
+                    if ($(this).val() == 14 && $(this).text() != "") {
+                        if (parseInt($(this).val()) >= parseInt(start) && (end == 0 || parseInt($(this).val()) <= parseInt(end))) {
+                            $("#txtWeek14Rate").removeAttr("disabled");
+                        }
+                        else {
+                            $("#txtWeek14Rate").attr("disabled", "disabled");
+                        }
+                        $("#txtWeek14Date").html($(this).text()).show();
+                        $("#ddlCommRate > option").each(function () {
+                            if ($(this).val() == 14) {
+                                $("#txtWeek14Rate").val(parseFloat($(this).text()));
+                            }
+                        });
+                        $("#divWeek14").attr("style", "display:normal;");
+                    }
+
+            //    }
+
+            //}
+        });
+    }
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Bootstrap Forms Validation -->
+        <h2 class="content-heading">Client Specific Planning</h2>
+
+        @using (Html.BeginForm("Index", "ClientCommission", FormMethod.Post, new { @class = "js-validation-bootstrap", @id = "formClientCommission" }))
+        {
+            @Html.TextBoxFor(m => m.ShowRates,
+                    new { @class = "form-control js-datepicker", @id = "txtShowRates", @hidden="hidden" }
+                )
+
+            <div class="block block-themed">
+                <div class="block-header block-header-default @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                    <h3 class="block-title">Commission Rates</h3>
+                </div>
+                @if (Model.ErrMessage.ResponseText.Length > 0)
+                {
+                    @if (Model.ErrMessage != null && Model.ErrMessage.Success == true)
+                    {
+                        <div class="alert alert-success alert-dismissable" role="alert">
+                            <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h3 class="alert-heading font-size-h4 font-w400">Success</h3>
+                            <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger alert-dismissable" role="alert">
+                            <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h3 class="alert-heading font-size-h4 font-w400">Error</h3>
+                            <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                        </div>
+                    }
+                }
+                <div class="alert alert-info alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="mb-0">Choose country and client name to set commission rate.</p>
+                </div>
+
+                <div class="block-content">
+                    <div class="row justify-content-center py-20">
+                        <div class="col-xl-11">
+                            <div class="form-group row">
+                                <label class="col-4">Country</label>
+                                <label class="col-4 col-form-label" for="ClientId">Client <span class="text-danger">*</span></label>
+                                <label class="col-4">Anniversary</label>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.CountryId,
+                                        new SelectList(Model.Countries, "CountryId", "CountryShort"),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof  = "1", @id="ddlCountry", @disabled="disabled"}
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.ClientId,
+                                        new SelectList(Model.Clients, "ClientId", "ClientName"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id="ddlClient", @disabled="disabled" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.TextBoxFor(m => m.AnniversaryDate,
+                                        new { @class = "form-control js-datepicker", @disabled="disabled", @id="txtAnniversaryDate", @data_week_start="1", @data_autoclose="true", @data_today_highlight = "true", data_date_format="mm/dd/yyyy", placeholder="mm/dd/yyyy" }
+                                    )
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-4">Tiered</label>
+                                <label class="col-4">Commission Structure <span class="text-danger">*</span></label>
+                                <label class="col-4"><span id="lblRate" name="lblRate"></span></label>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.Tiered,
+                                        new SelectList(Model.TieredSels, "Value", "Text"),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlTiered", @disabled="disabled" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.CommStructure,
+                                        new SelectList(Model.CommStructures, "Value", "Text"),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlCommStructure", @disabled = "disabled" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.TextBoxFor(m => m.Rate, new { @class = "form-control", @id = "txtRate", @disabled = "disabled", @placeholder = "0" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="divEditRates" name="divEditRates" class="block" style="display:none">
+                <div id="divEditRatesHeader" name="divEditRatesHeader" class="block-header block-header-default">
+                    <h3 class="block-title">Edit Rates</h3>
+                    <div class="block-options">
+                    </div>
+                </div>
+                <div class="alert alert-info alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="mb-0">This client/quarter's rates vary weekly.  You can further modify the existing rates below.  Start by selecting the quarter you would like to configure.</p>
+                </div>
+                <div id="divEditRatesBody" name="divEditRatesBody" class="block-content">
+                    <div class="row justify-content-center py-20">
+                        <div class="col-xl-11">
+                            <div class="form-group row">
+                                <div class="col-4">
+                                    <div class="form group-row">
+                                        <label class="col-12">Plan Year</label>
+                                        @Html.DropDownListFor(m => m.PlanYear
+                                            , new SelectList(Model.PlanYears, "Text", "Text")
+                                            , "Please select ..."
+                                            , new { @class = "form-control", @size = "1", @id = "ddlPlanYear" }
+                                        )
+                                    </div>
+                                    <div class="form group-row">
+                                        <label class="col-12">Quarter</label>
+                                        @Html.DropDownListFor(m => m.QuarterId,
+                                            new SelectList(Model.Quarters, "QuarterId", "QuarterName"),
+                                            //Enumerable.Empty<SelectListItem>(),
+                                            "Please select ...",
+                                            new { @class = "form-control", @size = "1", @id = "ddlQuarter", @disabled = "disabled" }
+                                    )
+                                    </div>
+                                    <div class="form group-row">
+                                        <label class="col-12">Start Week</label>
+                                        @Html.DropDownListFor(m => m.StartWeek,
+                                        new SelectList(Model.StartWeeks, "Value", "Text"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @size = "1", @id = "ddlStartWeek", @disabled = "disabled" }
+                                    )
+                                    </div>
+                                    <div class="form group-row">
+                                        <label class="col-12">End Week</label>
+                                        @Html.DropDownListFor(m => m.EndWeek,
+                                        new SelectList(Model.EndWeeks, "Value", "Text"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @size = "1", @id = "ddlEndWeek", @disabled = "disabled" }
+                                    )
+                                    </div>
+                                    <div class="form group-row">
+                                        <div class="block mb-0">
+                                            <div class="block-content">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form group-row">
+                                        <div class="block mb-0 bg-body-light">
+                                            <div class="block-content">
+                                                <div class="form-group row gutters-tiny">
+                                                    <label class="col-12">Enter rate for all weeks selected</label>
+                                                    <div class="col-9">
+                                                        <input id="txtRateToAll" name="txtRateToAll" class="form-control" />
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <button type="button" class="btn" id="btnApplyToAll" name="btnApplyToAll">
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 bg-body-light">
+                                    <div class="form-group row" id="divWeek01">
+                                        <div class="col-6">
+                                            <label class="col-6" id="txtWeek01Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week01Rate, new { @class = "form-control", @id = "txtWeek01Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek02" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek02Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week02Rate, new { @class = "form-control", @id = "txtWeek02Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek03">
+                                        <div class="col-6">
+                                            <label class="col-6" id="txtWeek03Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week03Rate, new { @class = "form-control", @id = "txtWeek03Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek04">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek04Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week04Rate, new { @class = "form-control", @id = "txtWeek04Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek05">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek05Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week05Rate, new { @class = "form-control", @id = "txtWeek05Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek06">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek06Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week06Rate, new { @class = "form-control", @id = "txtWeek06Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek07" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek07Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week07Rate, new { @class = "form-control", @id = "txtWeek07Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" style="display:none;">
+                                        @Html.DropDownListFor(m => m.CommRate,
+                                            Enumerable.Empty<SelectListItem>(),
+                                            "Please select ...",
+                                            new { @class = "form-control", @size = "1", @id = "ddlCommRate" }
+                                        )
+                                    </div>
+                                    <div class="form-group row" id="divWeek08" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek08Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week08Rate, new { @class = "form-control", @id = "txtWeek08Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek09" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek09Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week09Rate, new { @class = "form-control", @id = "txtWeek09Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek10" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek10Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week10Rate, new { @class = "form-control", @id = "txtWeek10Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek11" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek11Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week11Rate, new { @class = "form-control", @id = "txtWeek11Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek12" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek12Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week12Rate, new { @class = "form-control", @id = "txtWeek12Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek13" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek13Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week13Rate, new { @class = "form-control", @id = "txtWeek13Rate" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="divWeek14" style="display:none;">
+                                        <div class="col-6">
+                                            <label class="col-12" id="txtWeek14Date"></label>
+                                        </div>
+                                        <div class="col-6">
+                                            @Html.TextBoxFor(m => m.Week14Rate, new { @class = "form-control", @id = "txtWeek14Rate" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="block block-themed">
+                <div class="block-content">
+                    <div class="row justify-content-center py-20">
+                        <div class="col-xl-12">
+                            <div class="form-group row">
+                                <div class="col-lg-12 ml-auto">
+                                    <button type="button" class="btn btn-alt-primary" id="btnEditRates" name="btnEditRates" style="display:none">
+                                        <i class="fa fa-gear mr-5"></i> Edit Rates
+                                    </button>
+                                    <button type="submit" class="btn btn-alt-primary" id="btnSave" name="btnSave" disabled="disabled">
+                                        <i class="fa fa-check mr-5"></i> Save
+                                    </button>
+                                    <button type="button" id="btnReset" name="btnReset" class="btn btn-alt-danger">
+                                        <i class="fa fa-repeat mr-5"></i> Reset
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btnExportPostLog" name="btnExportPostLog">
+                                        <i class="fa fa-repeat mr-5"></i> Export Post Log
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btnClientCommissionExportPopup" name="btnClientCommissionExportPopup" data-toggle="modal" data-target="#modal-ClientCommissionExport" >
+                                        <i class="fa fa-file-text mr-5"></i> Client Commission Export
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="modal-ClientCommissionExport" role="dialog" aria-labelledby="modal-top">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="block block-themed block-transparent mb-0">
+                            <div class="block-header">
+                                <h3 class="block-title">Client Commission Export</h3>
+                                <div class="block-options">
+                                    <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                        <i class="si si-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="block-content">
+                                <div class="container-fluid">
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-offset-1"></div>
+                                        <label class="col-lg-3 col-form-label" for="ddlClientCommissionExport_Country">Country <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7">
+
+                                            @Html.DropDownListFor(m => m.CountryId,
+                                       new SelectList(Model.Countries, "CountryId", "CountryShort"),
+                                       "Please select ...",
+                                       new { @class = "form-control", @sizeof  = "1", @id="ddlClientCommissionExport_Country"}
+                                   )
+
+                                            
+                                        </div>
+                                        <div class="col-lg-offset-1"></div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-offset-1"></div>
+                                        <label class="col-lg-3 col-form-label" for="ddlClientCommissionExport_Client">Client <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7">
+                                            @Html.DropDownListFor(m => m.ClientId,
+                                        new SelectList(Model.Clients, "ClientId", "ClientName"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id= "ddlClientCommissionExport_Client" }
+                                    )
+                                        </div>
+                                        <div class="col-lg-offset-1"></div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-offset-1"></div>
+                                        <label class="col-lg-3 col-form-label" for="ddlClientCommissionExport_PlanYear">Year <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7">
+                                            @Html.DropDownListFor(m => m.PlanYear
+                                                    , new SelectList(Model.PlanYears, "Text", "Value")
+                                                    , "Please select ..."
+                                                    , new
+                                                    {
+                                                        @class = "form-control",
+                                                        @id= "ddlClientCommissionExport_PlanYear"
+                                                    }
+                                            )
+                                        </div>
+                                        <div class="col-lg-offset-1"></div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-offset-1"></div>
+                                        <label class="col-lg-3 col-form-label" for="ddlClientCommissionExport_Quarter">Quarter <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7">
+                                            @Html.DropDownListFor(m => m.PlanYear
+                                                    , new SelectList(Model.PlanYears, "Text", "Value")
+                                                    , "Please select ..."
+                                                    , new
+                                                    {
+                                                        @class = "form-control",
+                                                        @id = "ddlClientCommissionExport_Quarter"
+                                                    }
+                                            )
+                                        </div>
+                                        <div class="col-lg-offset-1"></div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label class="col-12 col-form-label text-danger" id="errorMessage" name="errorMessage"></label>
+                                        </div>                                        
+                                    </div>                                 
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">                            
+                            <button type="button" class="btn btn-primary" id="btnClientCommissionExport">
+                                <i class="fa fa-file-text"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        }
+        <!-- Bootstrap Forms Validation -->
+
+
+
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->

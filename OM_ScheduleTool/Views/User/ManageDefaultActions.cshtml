@@ -1,0 +1,249 @@
+﻿@model ManageDefaultActionsViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <h2 class="content-heading">Manage Default Actions</h2>
+        <div class="row">
+            <div class="col-xl-12">
+                <!-- Bootstrap Contact -->
+                <div class="block block-themed">
+                    <div class="block-content">
+                        <!-- Info Message -->
+                        <div class="alert alert-success @ViewBag.DetailMessageVisible" role="alert">
+                            <p class="mb-0">Saved.</p>
+                        </div>
+                        <!-- End Info Message -->
+
+                        <form asp-action="SaveDefaultActions" method="post" role="form">
+                            <div class="form-group row">
+                                <label class="col-12" for="contact1-subject">&nbsp;</label>
+                                <div class="col-12">
+                                    <table class="js-table-sections table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30px;"></th>
+                                                <th>Feature</th>
+                                                <th class="text-center">General</th>
+                                                <th class="text-center">Low</th>
+                                                <th class="text-center">Mid</th>
+                                                <th class="text-center">Admin</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody class="js-table-sections-header ">
+                                            @foreach (var generalFeature in Model.AppFeatureDefaultActions_General)
+                                            {
+                                                @if (generalFeature.AppFeature.ParentAppFeatureId.HasValue == false)
+                                                {
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            <i class="fa fa-angle-right"></i>
+                                                        </td>
+                                                        <td class="font-w600">@generalFeature.AppFeature.Description</td>
+                                                        <td class="text-center">
+                                                            <select name="@(String.Format("afda_{0}", generalFeature.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                @foreach (var act in Model.Actions)
+                                                                {
+                                                                    @if (generalFeature.Action.ActionId == act.ActionId)
+                                                                    {
+                                                                        <!--<option value="@act.ActionId  " selected>@(act.ActionId == 1? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                        <option value="@act.ActionId" selected>@act.Description</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <!--<option value="@act.ActionId  ">@(act.ActionId == 1 ? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                        <option value="@act.ActionId">@act.Description</option>
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @foreach (var lowFeature in Model.AppFeatureDefaultActions_Low)
+                                                            {
+                                                                if (lowFeature.AppFeature.AppFeatureId == generalFeature.AppFeature.AppFeatureId)
+                                                                {
+                                                                    <select name="@(String.Format("afda_{0}", lowFeature.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                        @foreach (var act in Model.Actions)
+                                                                        {
+                                                                            @if (lowFeature.Action.ActionId == act.ActionId)
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  " selected>@(act.ActionId == 1? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId" selected>@act.Description</option>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  ">@(act.ActionId == 1 ? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId">@act.Description</option>
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @foreach (var midFeature in Model.AppFeatureDefaultActions_Mid)
+                                                            {
+                                                                if (midFeature.AppFeature.AppFeatureId == generalFeature.AppFeature.AppFeatureId)
+                                                                {
+                                                                    <select name="@(String.Format("afda_{0}", midFeature.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                        @foreach (var act in Model.Actions)
+                                                                        {
+                                                                            @if (midFeature.Action.ActionId == act.ActionId)
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  " selected>@(act.ActionId == 1? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId" selected>@act.Description</option>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  ">@(act.ActionId == 1 ? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId">@act.Description</option>
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @foreach (var adminFeature in Model.AppFeatureDefaultActions_Admin)
+                                                            {
+                                                                if (adminFeature.AppFeature.AppFeatureId == generalFeature.AppFeature.AppFeatureId)
+                                                                {
+                                                                    <select name="@(String.Format("afda_{0}", adminFeature.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                        @foreach (var act in Model.Actions)
+                                                                        {
+                                                                            @if (adminFeature.Action.ActionId == act.ActionId)
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  " selected>@(act.ActionId == 1? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId" selected>@act.Description</option>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <!--<option value="@act.ActionId  ">@(act.ActionId == 1 ? "Remove from Dashboard" : "Add to Dashboard")</option>-->
+                                                                                <option value="@act.ActionId">@act.Description</option>
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    // Now find the children of this parent and insert 
+                                                    @foreach (var generalFeatureChildren in Model.AppFeatureDefaultActions_General)
+                                                    {
+                                                        if (generalFeatureChildren.AppFeature.ParentAppFeatureId == generalFeature.AppFeature.AppFeatureId)
+                                                        {
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td class="font-w600 text-success">@generalFeatureChildren.AppFeature.Description</td>
+                                                            <td class="text-center">
+                                                                <select name="@(String.Format("afda_{0}", generalFeatureChildren.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                    @foreach (var act in Model.Actions)
+                                                                    {
+                                                                        @if (generalFeatureChildren.Action.ActionId == act.ActionId)
+                                                                        {
+                                                                            <option value="@act.ActionId" selected>@act.Description</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@act.ActionId">@act.Description</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="text-center">
+                                                                @foreach (var lowFeatureChildren in Model.AppFeatureDefaultActions_Low)
+                                                                {
+                                                                    if (lowFeatureChildren.AppFeature.AppFeatureId == generalFeatureChildren.AppFeature.AppFeatureId)
+                                                                    {
+                                                                        <select name="@(String.Format("afda_{0}", lowFeatureChildren.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                            @foreach (var act in Model.Actions)
+                                                                            {
+                                                                                @if (lowFeatureChildren.Action.ActionId == act.ActionId)
+                                                                                {
+                                                                                    <option value="@act.ActionId" selected>@act.Description</option>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@act.ActionId">@act.Description</option>
+                                                                                }
+                                                                            }
+                                                                        </select>
+                                                                    }
+                                                                }
+                                                            </td>
+                                                            <td class="text-center">
+                                                                @foreach (var midFeatureChildren in Model.AppFeatureDefaultActions_Mid)
+                                                                {
+                                                                    if (midFeatureChildren.AppFeature.AppFeatureId == generalFeatureChildren.AppFeature.AppFeatureId)
+                                                                    {
+                                                                        <select name="@(String.Format("afda_{0}", midFeatureChildren.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                            @foreach (var act in Model.Actions)
+                                                                            {
+                                                                                @if (midFeatureChildren.Action.ActionId == act.ActionId)
+                                                                                {
+                                                                                    <option value="@act.ActionId" selected>@act.Description</option>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@act.ActionId">@act.Description</option>
+                                                                                }
+                                                                            }
+                                                                        </select>
+                                                                    }
+                                                                }
+                                                            </td>
+                                                            <td class="text-center">
+                                                                @foreach (var adminFeatureChildren in Model.AppFeatureDefaultActions_Admin)
+                                                                {
+                                                                    if (adminFeatureChildren.AppFeature.AppFeatureId == generalFeatureChildren.AppFeature.AppFeatureId)
+                                                                    {
+                                                                        <select name="@(String.Format("afda_{0}", adminFeatureChildren.AppFeatureDefaultActionId))" class="form-control" size="1">
+                                                                            @foreach (var act in Model.Actions)
+                                                                            {
+                                                                                @if (adminFeatureChildren.Action.ActionId == act.ActionId)
+                                                                                {
+                                                                                    <option value="@act.ActionId" selected>@act.Description</option>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@act.ActionId">@act.Description</option>
+                                                                                }
+                                                                            }
+                                                                        </select>
+                                                                    }
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                            }
+
+                                                        }
+                                                    }
+                                            }
+                                        </tbody>
+
+                                    </table>                                
+                                </div>
+                            </div>
+                            <!-- END Permissions Table -->
+                            <div class="form-group row @(Model.LoggedOnUser.PermissionLevelId == 1 ? "" : "invisible")">
+                                <div class="col-12">
+                                    <button class="btn btn-alt-primary" type="submit">
+                                        <i class="fa fa-check mr-5"></i> Save 
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <!-- END Bootstrap Contact -->
+            </div>
+        </div>
+    </div>
+</main>

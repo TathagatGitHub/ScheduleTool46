@@ -1,0 +1,113 @@
+@model ViewUpfrontsViewModel
+
+<script language="javascript" type="text/javascript">
+    function PopulateUnapprove() {
+        var ConfirmQuestionText = '';
+        var CountApprove = 0;
+        var CountUnapprove = 0;
+        var markup = "";
+
+        $('.selected').each(function (i, obj) {
+            var table = $('#UpfrontTable').DataTable();
+            var rowData = table.row(this).data();
+            if ($(this).hasClass('upfront-approved')) {
+                CountUnapprove = CountUnapprove + 1;
+                markup += "<tr>";
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.demoName + '</td>'; 
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.propertyName + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + formatTime(new Date(rowData.startTime)) + ' - ' + formatTime(new Date(rowData.endTime)) + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.buyTypeCode + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.spotLen + ((rowData.splitNo === 1 || rowData.splitNo === 2) ? '(' + rowData.splitNo + ')' : '') + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + formatCurrency(rowData.rateAmt) + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.impressions + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.doNotBuyTypeDescription + '</td>';
+                markup += "</tr>";
+            }
+            else {
+                CountApprove = CountApprove + 1;
+            }
+        });
+
+        $("#UnapproveList").html(markup).show();
+
+        if (CountUnapprove == 0) {
+            ConfirmQuestionText = 'No APPROVED properties selected.';
+            swal('Stop', ConfirmQuestionText, 'warning');
+            return;
+        }
+
+        try {
+            $('#modal-unapprovallist').modal();
+        }
+        catch (err) {
+            var notify = $.notify(err.message, {
+                type: 'info',
+                allow_dismiss: true,
+            });
+        }
+
+        if (CountUnapprove == 1) {
+            ConfirmQuestionText = 'The following ' + CountUnapprove + ' property will be unapproved.';
+        }
+        else {
+            ConfirmQuestionText = 'The following ' + CountUnapprove + ' properties will be unapproved.';
+        }
+
+        if (CountApprove == 1) {
+            ConfirmQuestionText = ConfirmQuestionText + '  ' + CountApprove + ' property that was already unapproved is selected.  It will be ignored.';
+        }
+        else if (CountApprove > 1) {
+            ConfirmQuestionText = ConfirmQuestionText + '  There are ' + CountApprove + ' properties that have already been unapproved selected.  Those rows will be ignored.';
+        }
+        $("#UnapproveListHeader").html(ConfirmQuestionText).show();
+    }
+</script>
+
+<div class="modal fade" id="modal-unapprovallist" tabindex="-1" role="dialog" aria-labelledby="modal-unapprovallist" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a id="UnapproveListHeader"></a>
+                        </div>
+                        <div class="block-content block-content-full">
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-striped table-vcenter js-dataTable-simple" id="UnapproveTable" name="UnapproveTable">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell text-center">Demo Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Start - End</th>
+                                        <th class="d-none d-sm-table-cell text-center">BT</th>
+                                        <th class="d-none d-sm-table-cell text-center">Len</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="UnapproveList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button id="btnUnapproveSubmit" type="button" class="btn btn-alt-success" data-dismiss="modal">
+                     Unapprove
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

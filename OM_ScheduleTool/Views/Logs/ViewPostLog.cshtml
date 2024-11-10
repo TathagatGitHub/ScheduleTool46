@@ -1,0 +1,23 @@
+@model PostLogViewModel
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/Logs/_PostLogHeader_View.cshtml", Model)
+            </div>
+        </div>
+        @Html.Partial("~/Views/Logs/_PostLogDataTable_View.cshtml", Model)
+    </div>
+</main>
+
+<script asp-append-version="true" src="~/js/logs/PostLog.js"></script>
+<script asp-append-version="true" src="~/js/logs/PostLog_View.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width() - 20);
+
+        $(document).prop('title', '@Model.PostLog.Schedule.ScheduleName');
+    });
+</script>

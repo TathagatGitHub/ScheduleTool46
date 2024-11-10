@@ -1,0 +1,92 @@
+@*@model IEnumerable<DemoNames>*@
+
+@*<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />*@
+
+<script type="text/javascript">    
+
+    function toggleDemoSelection() {
+        if ($("#ddlDemos").val().length == 0)
+            document.getElementById("spanDemoRequired").style.visibility = "visible";
+        else
+            document.getElementById("spanDemoRequired").style.visibility = "hidden";
+    }
+
+    function Save() {        
+        if ($("#ddlDemos").val().length == 0)
+            document.getElementById("spanDemoRequired").style.visibility = "visible";
+        else {
+            $.ajax({
+                url: "/UpfrontExpansion/Save",
+                data: {
+                    UpfrontId: document.getElementById("hidValues").getAttribute("data-upfront"),
+                    DemographicSettingsId: $("#ddlDemos").val(),
+                    LoggedOnUserId: document.getElementById("hidValues").getAttribute("data-user")
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result > 0) {                        
+                        swal('', 'Expansion has been created!', 'success');
+                        $('#modal-createUpfrontExpansion').modal('hide');
+
+                        //Refresh Remnant screen if it's opened
+                        //var _url = window.location.protocol + "//" + window.location.host + "/UpfrontRemnant/ViewUR?upfrontid=" + result;
+                        //var _isWinOpened = window.open(_url, _url);
+                        //if (_isWinOpened != null) {
+                        //    var elem = _isWinOpened.document.getElementById('btnReload');
+                        //    if (elem != null)
+                        //        elem.click();
+                        //}                        
+                    }
+                    else 
+                        swal('Error!', "Unknown error.  Please retry", 'error');                                            
+                },
+                error: function (response) {
+                    swal('', response.responseText, 'info');
+                }
+            });
+        }
+    }
+</script>
+
+<input id="hidValues" type="hidden" data-upfront="@ViewData["UpfrontId"]" data-user="@ViewData["LoggedOnUserId"]" />
+
+<div class="block block-themed block-transparent mb-0">
+    <div class="block-header bg-primary-dark" style="padding:15px; border-bottom:1px solid #eaecee;">
+        <h5 class="modal-title" style="color:#fff">Create Upfront Expansion For @ViewData["Network"] @ViewData["Quarter"]</h5>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                <i class="si si-close"></i>
+            </button>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row">
+            <label for="Network" class="col-sm-2 col-form-label">Network:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control-plaintext" id="staticNetwork" value="@ViewData["Network"]">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="Quarter" class="col-sm-2 col-form-label">Quarter:</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control-plaintext" id="staticQuarter" value="@ViewData["Quarter"]">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="demo" class="col-sm-2 col-form-label">Demo: <span class="text-danger">*</span></label>
+            <div class="col-sm-10">
+                @Html.DropDownList("ddlDemos", new SelectList((System.Collections.IEnumerable)ViewData["DemoList"], "DemoNamesId", "Description"), "", new { @class = "form-control", @onchange = "javascript:toggleDemoSelection();" })
+                <span id="spanDemoRequired" class="text-danger" style="display:block; margin-top:8px; visibility:hidden">Please select Demo</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal"><i class="fa fa-close mr-5"></i>Cancel</button>
+    <button type="button" class="btn btn-alt-success" onclick="Save();"><i class="fa fa-check mr-5"></i>Save</button>
+</div>
+
+
+
+

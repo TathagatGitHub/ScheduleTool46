@@ -1,0 +1,380 @@
+@model PreLogViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+@*<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">*@
+@*<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>*@
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+@*Mine*@
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" />
+
+
+@*<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+    <script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-pageLoadMore/1.0.0/js/dataTables.pageLoadMore.min.js"></script>*@
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+
+
+<script asp-append-version="true" src="~/js/plugins/excel-sorting-filtering/dist/excel-bootstrap-table-filter-bundle.js"></script>
+<link rel="stylesheet" href="~/js/plugins/excel-sorting-filtering/dist/excel-bootstrap-table-filter-style.css">
+
+<script src="~/js/common.js?v=201904240905"></script>
+
+<style type="text/css">
+    body {
+        overflow-y: visible;
+        overflow-x: visible;
+        line-height: 1;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /*#PreLogViewTable th {
+        padding-bottom: 40px;
+        background-position: 85% 8px;
+    }*/
+    #PreLogViewTable thead th {
+        position: sticky;
+        top: 0px !important;
+        background-color: white;
+        z-index: 1;
+    }
+
+    #PreLogViewTable thead th:after, #PreLogViewTable thead th:before {
+        position: absolute;
+        content: '';
+        left: 0px;
+        width: 100%;
+    }
+
+    #PreLogViewTable thead th:before {
+        top: -1px;
+        border-top: 1px solid #ddd;
+    }
+
+    #PreLogViewTable thead th:after {
+        bottom: -1px;
+        border-bottom: 1px solid black;
+    }
+
+    #PreLogViewTable_wrapper {
+        overflow: auto;
+        height: 835px;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var qtrName = sessionStorage.getItem("PreLogQtrName");
+        var country = getParameterByName('logsSelectedCountryId');
+        if (country == 2) {
+            if (qtrName == "Q4 2019") {
+                $(".HeaderUSDGrossRate").text("USD GROSS RATE");
+            }
+            else {
+                $(".HeaderUSDGrossRate").text("USD NET RATE");
+            }
+        }
+    });
+</script>
+
+<div class="block block-themed block-rounded">
+    <div class="block-content block-content-full" id="resize_wrapper">
+
+        @Html.Partial("~/Views/Logs/_Menu_View.cshtml", Model)
+
+        @*
+        <select id="HeaderNetworks" name="HeaderNetworks" style="display:none">
+            @if (Model.NetworksAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.NetworksAvailable)
+                {
+                    <option value="@item.Value">@item.Value</option>
+                }
+            }
+        </select>
+
+        <select id="HeaderProperties" name="HeaderProperties" style="display:none">
+            @if (Model.PropertiesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.PropertiesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+
+        <select id="HeaderStartTimes" name="HeaderStartTimes" style="display:none">
+            @if (Model.StartTimesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.StartTimesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderEndTimes" name="HeaderEndTimes" style="display:none">
+            @if (Model.EndTimesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.EndTimesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+
+        <select id="HeaderDPs" name="HeaderDPs" style="display:none">
+            @if (Model.DPsAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.DPsAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderOMDPs" name="HeaderOMDPs" style="display:none">
+            @if (Model.OMDPsAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.OMDPsAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderSpotLens" name="HeaderSpotLens" style="display:none">
+            @if (Model.SpotLensAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.SpotLensAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderBuyTypes" name="HeaderBuyTypes" style="display:none">
+            @if (Model.BuyTypesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.BuyTypesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderSpBuys" name="HeaderSpBuys" style="display:none">
+            @if (Model.SpBuysAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.SpBuysAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderFullRateAmts" name="HeaderFullRateAmts" style="display:none">
+            @if (Model.FullRatesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.FullRatesAvailable)
+                {
+                    <option value='@item'>@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+        <select id="HeaderRateAmts" name="HeaderRateAmts" style="display:none">
+            @if (Model.RatesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.RatesAvailable)
+                {
+                    <option value='@item'>@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+        <select id="HeaderUSDGrossRate" name="HeaderUSDGrossRate" style="display:none">
+            @if (Model.USDGrossRateAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.USDGrossRateAvailable)
+                {
+                    <option value="@item">@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+        <select id="HeaderImpressions" name="HeaderImpressions" style="display:none">
+            @if (Model.ImpressionsAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.ImpressionsAvailable)
+                {
+                    <option value='@item'>@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+        <select id="HeaderCPMs" name="HeaderCPMs" style="display:none">
+            @if (Model.CPMAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.CPMAvailable)
+                {
+                    <option value='@item'>@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+
+        <select id="HeaderSpotDates" name="HeaderSpotDates" style="display:none">
+            @if (Model.SpotDatesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.SpotDatesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderSpotTimes" name="HeaderSpotTimes" style="display:none">
+            @if (Model.SpotTimesAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.SpotTimesAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderMediaTypes" name="HeaderMediaTypes" style="display:none">
+            @if (Model.MediaTypeAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.MediaTypeAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderISCIs" name="HeaderISCIs" style="display:none">
+            @if (Model.ISCIAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.ISCIAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderPrograms" name="HeaderPrograms" style="display:none">
+            @if (Model.ProgramAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.ProgramAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderCleareds" name="HeaderCleareds" style="display:none">
+            @if (Model.ClearedAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.ClearedAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderDayParts" name="HeaderDayParts" style="display:none">
+            @if (Model.SpotOMDPsAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.SpotOMDPsAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+        <select id="HeaderCommRates" name="HeaderCommRates" style="display:none">
+            @if (Model.CommRateAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.CommRateAvailable)
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+        </select>
+
+
+        <select id="HeaderCAConvRate" name="HeaderCAConvRate" style="display:none">
+            @if (Model.CAConvRateAvailable != null)
+            {
+                <option value="Select All">Select All</option>
+                @foreach (var item in Model.CAConvRateAvailable)
+                {
+                    <option value="@item">@String.Format("{0:c}", item)</option>
+                }
+            }
+        </select>
+    *@
+
+        <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap" id="PreLogViewTable" name="PreLogViewTable" style="width:95%">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderNetwork">NETWORK</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderProperty">PROPERTY</th>
+                    <th class="d-none d-sm-table-cell text-center">M</th>
+                    <th class="d-none d-sm-table-cell text-center">T</th>
+                    <th class="d-none d-sm-table-cell text-center">W</th>
+                    <th class="d-none d-sm-table-cell text-center">Th</th>
+                    <th class="d-none d-sm-table-cell text-center">F</th>
+                    <th class="d-none d-sm-table-cell text-center">Sa</th>
+                    <th class="d-none d-sm-table-cell text-center">Su</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderStartTime">START TIME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderEndTime">END TIME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDP">DP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderOMDP">OMDP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSpotLen">LEN</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderBuyType">BUY TYPE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSpBuy">SP BUY</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderFullRateAmt">FULL RATE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderRateAmt">RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderUSDGrossRate">USD GROSS RATE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderImpression">IMP</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderCPM">CPM</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSpotDate">SPOT DATE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderSpotTime">SPOT TIME</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderMediaType">MEDIA TYPE</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderISCI">ISCI</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderProgram">PROGRAM</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderCleared">CLEARED</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderDayPart">DAYPART</th>
+                    <th class="d-none d-sm-table-cell text-center HeaderType HeaderCommRate">COMM. RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderCAConvRate">CA CONV. RATE</th>
+                    @*<th style="visibility:hidden"></th>*@
+        </tr>
+        </thead>
+        </table>
+
+    </div>
+</div>

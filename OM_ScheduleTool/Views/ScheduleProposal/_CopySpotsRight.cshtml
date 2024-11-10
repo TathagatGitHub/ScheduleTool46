@@ -1,0 +1,88 @@
+@model ProposalViewModel
+
+
+<div class="modal fade" id="modal-copyright" tabindex="-1">
+    <div class="modal-dialog" style="max-width:400px;" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Copy Network Proposal By Week</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="block block-themed">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="ddlCopyWeek">Copy Week:</label>
+                                    <select name="ddlCopyWeek" class="form-control" id="ddlCopyWeek" size="1"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="block block-themed">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="ddlEndCopyWeek">End Copy Week:</label>
+                                    <select name="ddlEndCopyWeek" class="form-control" id="ddlEndCopyWeek" size="1"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-alt-success" id="btnCopyRight" onclick="javascript: ProcessCopyRight();">
+                    <i class="fa fa-check"></i> Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script asp-append-version="true" src="~/js/scheduleproposal/CopyWeeklySpots.js"></script>
+
+<script language="javascript" type="text/javascript">
+    function PopulateCopyWeek(_ProposalId) {
+        var procemessage = "<option value='0'> Loading demos...</option>";
+        $("#ddlCopyWeek").html(procemessage).show();
+        $("#ddlEndCopyWeek").html(procemessage).show();
+
+        var markup = "";
+        markup += "<option value='1'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk01_Date')) + "</option>";
+        markup += "<option value='2'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk02_Date')) + "</option>";
+        markup += "<option value='3'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk03_Date')) + "</option>";
+        markup += "<option value='4'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk04_Date')) + "</option>";
+        markup += "<option value='5'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk05_Date')) + "</option>";
+        markup += "<option value='6'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk06_Date')) + "</option>";
+        markup += "<option value='7'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk07_Date')) + "</option>";
+        markup += "<option value='8'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk08_Date')) + "</option>";
+        markup += "<option value='9'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk09_Date')) + "</option>";
+        markup += "<option value='10'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk10_Date')) + "</option>";
+        markup += "<option value='11'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk11_Date')) + "</option>";
+        if ('@Model.ProposalQuarter.Wk12_Date' != '') {
+            markup += "<option value='12'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk12_Date')) + "</option>";
+        }
+        if ('@Model.ProposalQuarter.Wk13_Date' != '') {
+            markup += "<option value='13'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk13_Date')) + "</option>";
+        }
+        if ('@Model.ProposalQuarter.Wk14_Date' != '') {
+            markup += "<option value='14'>" + formatDateOnly(new Date('@Model.ProposalQuarter.Wk14_Date')) + "</option>";
+        }
+        $("#ddlCopyWeek").html(markup).show();
+        $("#ddlEndCopyWeek").html(markup).show();
+
+        var myVal = $('#ddlEndCopyWeek option:last').val();
+        $('#ddlEndCopyWeek').val(myVal);
+    }
+</script>
+
+

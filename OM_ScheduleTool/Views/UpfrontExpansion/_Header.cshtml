@@ -1,0 +1,205 @@
+﻿@model UpfrontExpansionViewModel
+
+
+<style>
+    input[type=text].autoWidthInput {
+        display: inline;
+        width: auto;
+        text-align:center;
+    }
+</style>
+
+<script type="text/javascript">    
+
+    $(document).ready(function () {
+
+        $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });
+        $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });
+
+        window.onbeforeunload = function (e) {
+            if (!NoExitPrompt && HeaderValuesChanged()) {
+                //event.preventDefault();                
+                //swal({
+                //    text: "Would you like to save your changes?",
+                //    type: "warning",
+                //    showCancelButton: true,
+                //    confirmButtonText: 'Yes',
+                //    cancelButtonText: "No"
+                //}).then(
+                //    function (result) {
+                //        Save();
+                //    }, function (dismiss) {
+                        
+                //    }
+                //);
+                return "YOU HAVE UNSAVED CHANGES ON THIS PAGE!!!";
+            }
+        };
+
+        $(".quartertabs").on('click', function (event) {            
+            if (HeaderValuesChanged()) {
+                NoExitPrompt = true;
+                event.preventDefault();
+                swal({
+                    text: "Would you like to save your changes?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: "No"
+                }).then(
+                    function (result) {
+                        Save(event.currentTarget.href);
+                    }, function (dismiss) {
+                        window.location = event.currentTarget.href;
+                    }
+                );
+            }            
+        });                           
+    });
+
+    function HeaderValuesChanged() {
+        var TotalUpfrontDollars = $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").val();
+        TotalUpfrontDollars = TotalUpfrontDollars.replace(/\$|,/g, '');        
+
+        var UEDollarsAvailable = $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").val();
+        UEDollarsAvailable = UEDollarsAvailable.replace(/\$|,/g, '');        
+
+        return (@Model.CurrentUpfrontExpansionTracking.TotalUpfrontDollars != TotalUpfrontDollars 
+            || @Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable != UEDollarsAvailable)
+    }
+
+    function Save(navigatetoLink) {
+        $('#CurrentUpfrontExpansionTracking_TotalUpfrontDollars').val($('#CurrentUpfrontExpansionTracking_TotalUpfrontDollars').val().replace(/\$|,/g, ''));
+        $('#CurrentUpfrontExpansionTracking_UEDollarsAvailable').val($('#CurrentUpfrontExpansionTracking_UEDollarsAvailable').val().replace(/\$|,/g, ''));
+        
+        $.ajax({
+            url: "/UpfrontExpansion/SaveHeader",
+            data: {
+                UpfrontId: $("#UpfrontId").val(),
+                UpfrontExpansionTrackingId: $("#UpfrontExpansionTrackingId").val(), 
+                UEDollarsAvailable: $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").val(), 
+                TotalUpfrontDollars: $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").val()                
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {                
+                if (navigatetoLink != null)
+                    window.location = navigatetoLink;
+                else
+                    window.location = "/UpfrontExpansion/Index?upfrontid=" + $("#UpfrontId").val();
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });    
+    }
+</script>
+
+<form id="formManageUpfrontExpansion_Header" asp-action="Index" asp-controller="UpfrontExpansion" method="post" class="js-validation-bootstrap">
+    @Html.HiddenFor(m => m.UpfrontId)
+    @Html.HiddenFor(m => m.UpfrontExpansionTrackingId)
+
+    
+    <div class="block block-themed block-rounded">
+        <div class="block-header block-header-default bg-gd-sea">
+            <h3 class="block-title text-center" style="color:white; font-weight:bolder">
+                @if (Model.CurrentQuarter.UpfrontExpansionNetworkGroup != null && Model.CurrentQuarter.UpfrontExpansionNetworkGroup.Count() > 0)
+                {
+                    foreach (var group in Model.CurrentQuarter.UpfrontExpansionNetworkGroup)
+                    {
+                        @(group.Network.StdNetName.Replace("_", " ") +  (group == Model.CurrentQuarter.UpfrontExpansionNetworkGroup.Last() ? " " + Model.CurrentQuarter.QuarterName + " UPFRONT EXPANSION" : " / "))
+                    }
+                }
+                else
+                {
+                    @(Model.CurrentQuarter.UpfrontInfo.Name.Replace("_", " ") + " EXPANSION")
+                }                
+            </h3>
+            
+            @*<div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+        </div>*@
+        </div>
+        <div class="block-content block-content-full" id="resize_wrapper"> 
+            
+            <table class="table table-vcenter" id="HeaderTable">
+                <thead>
+                    <tr>
+                        <th class="d-none d-sm-table-cell" style="width:10%">TOTALS</th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter1 != null ? Model.Quarter1.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter1" class="quartertabs btn @(Model.Quarter1 != null ? Model.Quarter1.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter1 == null ? "none" : "inline-block")">@(Model.Quarter1 != null ? Model.Quarter1.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter2 != null ? Model.Quarter2.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter2" class="quartertabs btn @(Model.Quarter2 != null ? Model.Quarter2.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter2 == null ? "none" : "inline-block")">@(Model.Quarter2 != null ? Model.Quarter2.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter3 != null ? Model.Quarter3.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter3" class="quartertabs btn @(Model.Quarter3 != null ? Model.Quarter3.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter3 == null ? "none" : "inline-block")">@(Model.Quarter3 != null ? Model.Quarter3.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter4 != null ? Model.Quarter4.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter4" class="quartertabs btn @(Model.Quarter4 != null ? Model.Quarter4.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter4 == null ? "none" : "inline-block")">@(Model.Quarter4 != null ? Model.Quarter4.QuarterName : "")</a></th>
+                        <th class="text-center bold align-middle">Year</th>
+                        <th class="text-center bold align-middle border-0" colspan="2">Usage Tracker</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">Total Upfront</td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val=false } })
+: Html.DisplayFor(m => m.Quarter1.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("c2", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter2.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("c2", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter3.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("c2", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter4.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("c2", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">@(String.Format("{0:c0}", (Model.Quarter1 != null ? Model.Quarter1.TotalQuarterUpfrontDollars : 0) + (Model.Quarter2 != null ? Model.Quarter2.TotalQuarterUpfrontDollars : 0) + (Model.Quarter3 != null ? Model.Quarter3.TotalQuarterUpfrontDollars : 0) + (Model.Quarter4 != null ? Model.Quarter4.TotalQuarterUpfrontDollars : 0)))</td>
+                        <td class="nowrap text-right border-0"><i>Upfront Expansion Funds Used:</i></td>
+                        <td class="border-0 text-right">@String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UEBooked ?? 0))</td>                                
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">Booked Upfront Dollars</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter1 != null ? Model.Quarter1.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter2 != null ? Model.Quarter2.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter3 != null ? Model.Quarter3.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter4 != null ? Model.Quarter4.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@(String.Format("{0:c0}", (Model.Quarter1 != null ? Model.Quarter1.BookedUpfrontDollars : 0) + (Model.Quarter2 != null ? Model.Quarter2.BookedUpfrontDollars : 0) + (Model.Quarter3 != null ? Model.Quarter3.BookedUpfrontDollars : 0) + (Model.Quarter4 != null ? Model.Quarter4.BookedUpfrontDollars : 0)))</td>
+                        <td class="nowrap text-right border-0"><i>Upfront Expansion Funds Remaining:</i></td>
+                        <td class="border-0 text-right">@String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable - Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UEBooked ?? 0))</td>
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">UE Dollars Available</td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter1.UEDollarsAvailable)) : Html.Display(String.Format("c", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter2.UEDollarsAvailable)) : Html.Display(String.Format("c", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter3.UEDollarsAvailable)) : Html.Display(String.Format("c", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter4.UEDollarsAvailable)) : Html.Display(String.Format("c", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">@(String.Format("{0:c0}", (Model.Quarter1 != null ? Model.Quarter1.UEDollarsAvailable : 0) + (Model.Quarter2 != null ? Model.Quarter2.UEDollarsAvailable : 0) + (Model.Quarter3 != null ? Model.Quarter3.UEDollarsAvailable : 0) + (Model.Quarter4 != null ? Model.Quarter4.UEDollarsAvailable : 0)))</td>
+                        
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" style="border-top:none">
+                            <button name="btnSubmit" type="button" formnovalidate="formnovalidate" value="Save" class="btn btn-alt-primary" onclick="NoExitPrompt = true; Save();">Save Changes</button>
+                            &nbsp;&nbsp;<button name="btnCancel" value="Cancel" class="btn btn-alt-primary" type="reset">Cancel</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+                                        
+        </div>
+    </div>
+</form>
+

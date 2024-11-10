@@ -1,0 +1,252 @@
+﻿<style>
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    a {
+        text-decoration: none;
+        color: #379937;
+    }
+
+    body {
+        margin: 40px;
+    }
+
+    .dropdown {
+        position: relative;
+        font-size: 14px;
+        color: #333;
+    }
+
+        .dropdown .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: absolute;
+            top: 30px;
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform 0.1s ease-in-out 0.1s;
+            max-height: 15vh;
+            overflow-y: scroll;
+            z-index: 100;
+        }
+
+        .dropdown .dropdown-option {
+            display: block;
+            /*padding: 8px 12px;*/
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .dropdown .dropdown-label {
+            display: block;
+            height: 34px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+            .dropdown .dropdown-label:before {
+                content: "▼";
+                float: right;
+                color: gray
+            }
+
+        .dropdown.on .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+        }
+
+            .dropdown.on .dropdown-list .dropdown-option {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+
+        .dropdown.on .dropdown-label:before {
+            content: "▼";
+            color: gray
+        }
+
+        .dropdown [type=checkbox] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .mpLongPlanNetwork-Dropdown {
+        position: absolute;
+        display: inline-block;
+    }
+
+    .mpLongPlanNetwork-DropdownContent {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 145px;
+        z-index: 1;
+        margin-top: 32px;
+        margin-left: -125px;
+        border-radius: 3px;
+        text-align: left;
+        color: #5c852c;
+        background-color: #ebf5df;
+        border-color: #ebf5df;
+        height: 34px;
+        font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        font-weight: 500;
+    }
+
+        .mpLongPlanNetwork-DropdownContent a {
+            color: #171717;
+            padding: 8px 14px;
+            text-decoration: none;
+            display: block;
+        }
+
+            .mpLongPlanNetwork-DropdownContent a:hover {
+                background-color: #cde0b6;
+                min-width: 145px;
+                border-radius: 3px;
+                text-align: left;
+                border-color: #ebf5df;
+                height: 34px;
+                font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+                font-weight: 500;
+            }
+
+    .mp-cross-icon {
+        color: #aaa4a4;
+        font-weight: 100;
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+        margin-top: -5px;
+    }
+
+        .mp-cross-icon:hover {
+            color: #a64b4b;
+        }
+
+    .vr {
+        border-left: 1px solid #ddd;
+        padding-left: 5px;
+    }
+
+    .swal2-buttonswrapper {
+        float: right;
+    }
+</style>
+
+<div class="modal draggable fade" id="mpPropertyEditModal" tabindex="-1" role="dialog"
+     aria-labelledby="mpPropertyEditModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="mpPropertyEditDialogue" role="document" style="max-width: 85%;margin-top:5%">
+        <div class="modal-content" style="height:100%;">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="modal-header block-header top-summary-header">
+                    <h3 class="block-title" id="mpPropertyEditHeading" style="font-weight: bold;">Edit Property</h3>
+                </div>
+                <div class="block-content">
+                    <div class="form-row" style="margin-bottom: -14px;">
+                        <div class="form-group col-1">
+                            <label style="font-size: 16px;font-weight: bold;">Year<span style="color:red;display: inline;">*</span></label>
+                            <select id="ddlMpPropertyEditPlanYear" class="form-control" size="1">
+                               
+                            </select>                        
+                        </div>
+                        <div class="form-group col-1">
+                            <label style="font-size: 16px;font-weight: bold;">Quarter<span style="color:red;display: inline;">*</span></label>
+                            <select class="form-control" id="ddlMpPropertyEditQuarter">
+                            </select>
+                            <input type="hidden" id="hdnCurQuarter" value="" />
+                        </div>
+                       
+                        <div class="form-group col-7">
+                            <label style="font-size: 16px;font-weight: bold;">Property<span style="color:red;display: inline;">*</span></label>
+                            <div class="dropdown" data-control="checkbox-dropdown">
+                                <label id="propddlLabelEdit" class="dropdown-label">Select</label>
+                                <div id="ddlMpPropertyEditProp" class="dropdown-list">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-3" style="padding:0!important;">
+                            <table style="float: right;width:80%;" cellspacing="0" cellpadding="0">
+                                <tbody id="tbDayPartLongPlanEdit">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-2">                          
+                            <label for="" style="font-size: 16px;font-weight: bold;">Demographic<span style="color:red;display: inline;">*</span></label>
+                            <select class="form-control" id="ddlMpPropertyEditDemos" placeholder="">
+                            </select>
+                        </div>
+                        <div class="form-group col-1">
+                            <i onclick="return ClearAdjustments('Rates', 'edit');" class="fa fa-close" id="icoRatesEdit" style="position:absolute; right:10px;top:40px;cursor:pointer; display:none;"></i>
+                            <label for="" style="font-size: 16px;font-weight: bold;">Adjust Rates</label>
+                            <input autocomplete="off" onkeydown="return ValidateAdjustmentFormat(event);" onkeyup="ValidateAdjustment(this,'Rates',event, 'edit');" type="text" class="form-control" id="txtAdjustRatesEdit" placeholder="" maxlength="7" onchange="return FormatAdjustmentData(this,'Rates', 'edit');">
+                        </div>
+                        <div class="form-group col-1">
+                            <i class="fa fa-close" onclick="return ClearAdjustments('Imps', 'edit');" id="icoImpsEdit" style="position:absolute; right:10px;top:40px;cursor:pointer; display:none;"></i>
+                            <label for="" style="font-size: 16px;font-weight: bold;">Adjust IMPs<span style="display: inline;padding-left: 5px;"><i class="fa fa-info-circle" style="color: #42a5f5;" title="You may adjust the Rates and/or IMP of the properties shown in the table below. Type in a number preceded by either + or - to indicate an increase or decrease by the percentage entered. To undo your changes, click the 'X'."></i></span></label>
+                            <input autocomplete="off" type="text" class="form-control" onkeydown="return ValidateAdjustmentFormat(event);" onkeyup="ValidateAdjustment(this,'Imps',event, 'edit');" id="txtAdjustImpsEdit" placeholder="" maxlength="7" onchange="return FormatAdjustmentData(this,'Imps', 'edit');">
+                        </div>
+                    </div>
+                 
+                    <div class="form-row" style="max-height:465px; overflow:auto;">
+                        <div class="form-group col-lg-12">
+                            <table class="table" id="tblmpLongPlanNetwork" style="margin:0px!important;">
+                                <thead id="thmpLongPlanNetworkEdit">
+                                </thead>
+                                <tbody id="tbmpLongPlanNetworkEdit">
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer" style="width: 98%;margin-left: 20px;">
+                <div style="width: 100%;">
+                    <button type="button" id="btnCancelmpLongPlanNetworkModal" class="btn btn-alt-secondary mr-auto float-left" style="margin-left: -18px;" onclick="LongPlanEditCancel();">CANCEL</button>
+                    <button type="button" id="btnSaveAddmpLongPlanNetworkModal" class="btn btn-danger mr-auto float-right" style="margin-left: -156px;position: absolute;color:#171717;" onclick="return DeleteMediaPlanPropertyById();">DELETE</button>
+                    <button type="button" id="btnUpdatempLongPlanNetworkModal" class="btn btn-alt-success mr-auto float-right" style="margin-left: -62px;position: absolute;color:#171717;" onclick="return UpdateMediaPlanPropertyById();">UPDATE</button>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

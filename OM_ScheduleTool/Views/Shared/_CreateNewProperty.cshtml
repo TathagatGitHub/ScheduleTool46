@@ -1,0 +1,1938 @@
+@model CreateNewPropertyViewModel
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+
+<style>
+    .css-switch.css-control-sm .css-control-input ~ .css-control-indicator {
+        width: 60px;
+        height: 40px;
+    }
+
+        .css-switch.css-control-sm .css-control-input ~ .css-control-indicator::after {
+            width: 40px;
+            
+        }
+
+    .css-switch .css-control-input:checked ~ .css-control-indicator::after {
+        box-shadow: -2px 0 3px rgba(0, 0, 0, 0.3);
+        /*-webkit-transform: translateX(70%)!important;
+        transform: translateX(70%) !important;*/
+    }
+    .btndow:focus,.btnday:focus, .btndow:hover, .btnday:hover {
+         border:1px solid grey!important;
+         box-shadow:revert-layer;
+    }
+</style>
+
+<script>
+
+    gCountryId = 5;
+    function scrollToEndTime() {
+        console.log("here");
+        var lastOption = $("#val-end-time").find("option[value=10:00 AM]");
+        //Store the selection state
+        var isSelected = lastOption.is(":selected");
+
+        lastOption.attr("selected", true)//This will scroll to the option
+            .attr("selected", isSelected); //Restore the selection state
+    }
+
+    function openDropdown(element) {
+        function down() {
+            var pos = $(this).offset(); // remember position
+            var len = $(this).find("option").length;
+            if (len > 20) {
+                len = 20;
+            }
+
+            $(this).css("position", "absolute");
+            $(this).css("zIndex", 9999);
+            $(this).offset(pos);   // reset position
+            $(this).attr("size", len); // open dropdown
+            $(this).unbind("focus", down);
+            $(this).focus();
+        }
+        function up() {
+            $(this).css("position", "static");
+            $(this).attr("size", "1");  // close dropdown
+            $(this).unbind("change", up);
+            $(this).focus();
+        }
+        element.focus(down).blur(up).focus();
+    }
+
+    function setTwoNumberDecimal(val) {
+        if (val != '') {
+            return parseFloat(val).toFixed(2);
+        }
+        else {
+            return '';
+        }
+    }
+
+    function appendDollarSignToInput(txt) {
+        if (txt != '') {
+            if (!isNaN(txt.replace('$', ''))) {
+                if (txt.indexOf('$') != -1) {
+                    return txt;
+                }
+                else {
+                    return '$' + txt;
+                }
+            }
+            else {
+                return '';
+            }
+        }
+        else {
+            return '';
+        }
+    }
+
+    function verifyInput1(txt) {
+        var res = '';
+        res = txt.replace("$", "");
+        if (!isNaN(res)) {
+            //it's a number
+            return res;
+        }
+        else {
+            return '';
+        }
+        return res;
+    }
+
+    function verifyInput(txt, mask) {
+        var res = '';
+        for (var i = 0; i < txt.length; i++) {
+            var char = parseInt(txt[i]);
+            if (mask.indexOf(char) > -1)
+                res += char;
+        }
+        return res;
+    }
+    function SelectDOW(dowSelType,ctrl)
+    {
+        if($(ctrl).hasClass("btn-primary"))
+        {
+            $(".btndow").removeClass("btn-primary");
+            $(".btnday").removeClass("btn-primary");
+            DOWArray = new Array();
+            $("#chkMonday").prop("checked", false);
+            $("#chkTuesday").prop("checked", false);
+            $("#chkWednesday").prop("checked", false);
+            $("#chkThursday").prop("checked", false);
+            $("#chkFriday").prop("checked", false);
+            $("#chkSaturday").prop("checked", false);
+            $("#chkSunday").prop("checked", false);
+        }
+        else
+        {
+        $(".btndow").removeClass("btn-primary");
+        $(".btndow").removeClass("btn-secondary");
+        $(".btnday").removeClass("btn-primary");
+        $(".btnday").removeClass("btn-secondary");
+        $(ctrl).addClass("btn-primary");
+       // alert(dowSelType);
+        $(".cbdow").prop("checked", false);
+         if (dowSelType.toLowerCase() == "weekdays") {
+            $("#chkMonday").prop("checked", true);
+            $("#chkTuesday").prop("checked", true);
+            $("#chkWednesday").prop("checked", true);
+            $("#chkThursday").prop("checked", true);
+            $("#chkFriday").prop("checked", true); 
+           
+            $("#btnMonday").addClass("btn-primary");
+            $("#btnTuesday").addClass("btn-primary");
+            $("#btnWednesday").addClass("btn-primary");
+            $("#btnThursday").addClass("btn-primary");
+            $("#btnFriday").addClass("btn-primary");
+            DOWArray    = new   Array();
+            DOWArray.push(1);
+            DOWArray.push(2);
+            DOWArray.push(3);
+            DOWArray.push(4);
+            DOWArray.push(5);
+         }
+        else if (dowSelType.toLowerCase() == "weekend") {
+            $("#chkSaturday").prop("checked", true);
+            $("#chkSunday").prop("checked", true);
+            $("#btnSaturday").addClass("btn-primary");
+            $("#btnSunday").addClass("btn-primary");
+            DOWArray = new Array();
+            DOWArray.push(6);
+            DOWArray.push(7);
+        }
+        else
+        {
+            $(".cbdow").prop("checked", true);
+            $(".btnday").addClass("btn-primary");
+            DOWArray = new Array();
+            DOWArray.push(1);
+            DOWArray.push(2);
+            DOWArray.push(3);
+            DOWArray.push(4);
+            DOWArray.push(5);
+            DOWArray.push(6);
+            DOWArray.push(7);
+        }
+        }
+        return false;
+    }
+    
+    function ValidateDOWSelection(ctrl,dayNum) {
+        if (!$(ctrl).hasClass("btn-primary")) {
+            $(ctrl).addClass("btn-primary");
+            if (DOWArray.indexOf(dayNum) === -1) {
+                DOWArray.push(dayNum);
+            }
+            DOWArray.sort();
+            if(dayNum==1)
+            {
+                $("#chkMonday").prop("checked", true);
+            }
+            else if(dayNum==2)
+            {
+                $("#chkTuesday").prop("checked", true);
+            }
+            else if (dayNum == 3) {
+                $("#chkWednesday").prop("checked", true);
+            }
+            else if(dayNum==4)
+            {
+                $("#chkThursday").prop("checked", true);
+            }
+            else if (dayNum == 5) {
+                $("#chkFriday").prop("checked", true);
+            }
+            else if (dayNum == 6) {
+                $("#chkSaturday").prop("checked", true);
+            }
+            else if (dayNum == 7) {
+                $("#chkSunday").prop("checked", true);
+            }
+        }
+        else
+        {
+            $(ctrl).removeClass("btn-primary");
+            if (DOWArray.indexOf(dayNum) > -1) {
+                const index = DOWArray.indexOf(dayNum);
+                if (index > -1) { // only splice array when item is found
+                    DOWArray.splice(index, 1); // 2nd parameter means remove one item only
+                }
+                DOWArray.sort();
+            }
+            if (dayNum == 1) {
+                $("#chkMonday").prop("checked", false);
+            }
+            else if (dayNum == 2) {
+                $("#chkTuesday").prop("checked", false);
+            }
+            else if (dayNum == 3) {
+                $("#chkWednesday").prop("checked", false);
+            }
+            else if (dayNum == 4) {
+                $("#chkThursday").prop("checked", false);
+            }
+            else if (dayNum == 5) {
+                $("#chkFriday").prop("checked", false);
+            }
+            else if (dayNum == 6) {
+                $("#chkSaturday").prop("checked", false);
+            }
+            else if (dayNum == 7) {
+                $("#chkSunday").prop("checked", false);
+            }
+        }
+        $(".btndow").removeClass("btn-primary");
+        if(DOWArray!=null && DOWArray!=undefined && DOWArray.length>0)
+        {
+                if(DOWArray.length==7) //All Selected
+                {
+                $("#btnAll").removeClass("btn-secondary");
+                    $("#btnAll").addClass("btn-primary");
+                }
+                else if(DOWArray.length==2 
+                && DOWArray.indexOf(6) > -1 && DOWArray.indexOf(7) > -1)
+                {
+                $("#btnWeekend").removeClass("btn-secondary");
+                        $("#btnWeekend").addClass("btn-primary");
+                }
+                else if(DOWArray.length==5
+                && DOWArray.indexOf(6) <0 && DOWArray.indexOf(7) <0) {
+
+                $("#btnWeekDays").removeClass("btn-secondary");
+                            $("#btnWeekDays").addClass("btn-primary");
+                    }
+         }
+        return false;
+    }
+</script>
+
+<script language="javascript" type="text/javascript">
+    var DOWArray = new  Array();
+    $(document).ready(function () {
+        PopulateNetworks();
+        PopulateBuyType();
+        PopulateDemoNames();
+        $("#txtNewProperty").val("0");
+        //$('#val-select2-planyear').select2().val('@Model.PlanYearsDefault').trigger('change');
+
+        $('#val-end-time').keyup(function (e) {
+            var mydate = Date.parse("2/6/2019 " + $("#val-end-time").val());
+            console.log(mydate);
+            if (e.keyCode == 38) {
+                if (mydate != "Invalid date") {
+                    var oldDate = new Date(mydate);
+                    var mins = oldDate.getMinutes();
+                    var newDate = oldDate.setMinutes(mins - 30);
+                    $("#val-end-time").val(moment(newDate).format('hh:mm A'));
+                }
+            }
+            else if (e.keyCode == 40) {
+                if (mydate != "Invalid date") {
+                    var oldDate = new Date(mydate);
+                    var mins = oldDate.getMinutes();
+                    var newDate = oldDate.setMinutes(mins + 30);
+                    $("#val-end-time").val(moment(newDate).format('hh:mm A'));
+                }
+            }
+        });
+    });
+
+
+
+
+    function ChangeCountry() {
+        PopulateClients();
+        PopulateNetworks();
+        PopulateBuyType();
+        PopulateDemoNames();
+
+        ValidateControls();
+    }
+
+    function ChangeYear() {
+        PopulateQuarter();
+        PopulateBuyType();
+
+        ValidateControls();
+    }
+
+    function ChangeQuarter() {
+        PopulateDemoNames();
+        PopulateEffectiveDates();
+        PopulateExpirationDates();
+
+        ValidateControls();
+    }
+
+    function ChangeNetwork() {
+        PopulateBuyType();
+        ValidateControls();
+    }
+
+    function ValidateLock() {
+        var _isUpfront = $("#radio-group-plan-type-upfront").is(':checked');
+        $.ajax({
+            url: "/UpfrontRemnant/IsLocked",
+            data: {
+                networkId: $("#val-select2-network").val(),
+                quarterId: $("#val-select2-quarter").val(),
+                upfrontTypeId: (_isUpfront == true ? 2 : 1)
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    swal({
+                        title: "Wait",
+                        text: result.responseText + "  Your changes for this network/quarter will not be saved.",
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'OK',
+                    });
+                }
+            },
+            error: function (result) {
+                swal({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: result.responseText,
+                })
+            }
+        });
+    }
+
+    function ChangePlanType() {
+        PopulateBuyType();
+        ValidateControls();
+    }
+
+    function ChangeClient() {
+        ValidateControls();
+    }
+
+    function ChangeBuyType() {
+        ValidateControls();
+        // Update Demo Settings
+        PopulateDemoNames();
+    }
+
+    function ChangeDayPart() {
+        ValidateControls();
+    }
+
+    function pad(str, max) {
+        str = str.toString();
+        return str.length < max ? pad("0" + str, max) : str;
+    }
+
+    function isValidTime(text) {
+        var comp = text.split('/');
+        var m = parseInt(comp[0], 10);
+        var d = parseInt(comp[1], 10);
+        var y = parseInt(comp[2], 10);
+        var date = new Date(y, m - 1, d);
+        if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function OnChangeStartTime(TextStartTime, TextEndTime) {
+        AutoFillTime(TextStartTime);
+        ValidateControls();
+    }
+
+    function OnChangeEndTime(TextEndTime) {
+        AutoFillTime(TextEndTime);
+        ValidateControls();
+    }
+
+    function ChangeStatus() {
+        PopulateClients();
+        ValidateControls();
+    }
+
+    function ChangeEffectiveDate() {
+        PopulateExpirationDates();
+        ValidateControls();
+    }
+
+    function ChangeExpirationDate() {
+        ValidateControls();
+    }
+
+
+    function CloseWindow() {
+        /*
+        if ($("#txtNewProperty").val() != "0") {
+            swal({
+                title: "Information",
+                text: 'New properties were added.  The upfront/remnant table will be refreshed.',
+                type: 'info',
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'OK',
+                showLoaderOnConfirm: true,
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(
+                function (result) {
+                    window.opener.location.reload();
+                    window.close();
+                });
+        }
+        else {
+            window.close();
+        }
+        */
+        window.close();
+    }
+
+
+    function AddNewProperty() {
+        var donotbuytype = $("#ddlDoNotBuyType").val().split("-");
+        var clientid = 0;
+        if (donotbuytype[1] > 0) {
+            clientid = $("#ddlClient").val();
+            if (clientid <= 0) {
+                swal('Wait ...', 'Please select a client.', 'error');
+                return;
+            }
+        }
+
+        if ($("#chkMonday").is(':checked') == false &&
+            $("#chkTuesday").is(':checked') == false &&
+            $("#chkWednesday").is(':checked') == false &&
+            $("#chkThursday").is(':checked') == false &&
+            $("#chkFriday").is(':checked') == false &&
+            $("#chkSaturday").is(':checked') == false &&
+            $("#chkSunday").is(':checked') == false) {
+            swal('Wait ...', 'Please select at least one day of the week.', 'error');
+            return;
+        }
+
+        var _rateCounts = 0;
+        var _demoSettingsId = 0;
+        var _missingImpMsg = "";
+        var _demoErrMsg = "";
+        var _demoName = "";
+        var _selectedBuyType = $("#val-select2-buytype option:selected").text();
+        $("#DemoTable td:has(input[type='text'])").each(function () {
+            if ($(this).find(":input").attr('id').substring(0, 9) == "text-30R-") {
+                _demoSettingsId = $(this).find(":input").attr('id').substring(9);
+                _demoName = $("#text-DemoName-" + _demoSettingsId).html();
+
+                var _30R = $("#text-30R-" + _demoSettingsId).val();
+                var _Imp = $("#text-Imp-" + _demoSettingsId).val();
+
+                if (_30R != "" && _Imp != "") {
+                    _rateCounts = 1;
+                }
+                if (_30R == "" && _Imp != "") {
+                    _demoErrMsg = _demoErrMsg + "Missing rate for " + _demoName + "<br/>";
+                }
+                if (_30R != "" && _Imp == "") {
+                    _missingImpMsg = _missingImpMsg + "Missing impressions for " + _demoName + "<br/>";
+                }
+                if(_selectedBuyType == "PDR" || _selectedBuyType == "PE"){
+                    _missingImpMsg = '';
+                }
+            }
+        });
+
+        if (_missingImpMsg != "") {
+            _demoErrMsg = _demoErrMsg + _missingImpMsg;
+        }
+
+        if (_demoErrMsg != '') {
+            swal('Wait ...', _demoErrMsg, 'error');
+            return;
+        }
+        if (_rateCounts == 0) {
+            swal('Wait ...', "Please enter at least one demo setting for this property.", 'error');
+            return;
+        }
+
+        swal({
+            title: $("#val-text-propertyname").val(),
+            text: 'You are about to create a new property for ' + $("#val-select2-network option:selected").text() + " to " + $("#val-select2-quarter  option:selected").text() + '.  Are you sure you want to proceeed?',
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, create new property!',
+            showLoaderOnConfirm: true,
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        resolve();
+                    }, 50);
+                });
+            }
+        }).then(
+            function (result) {
+                var url = "/CreateNewProperty/AddNewProperty";
+                var donotbuytype = $("#ddlDoNotBuyType").val().split("-");
+
+                $.ajax({
+                    url: url,
+                    data: {
+                        NetworkId: $("#val-select2-network").val(),
+                        QuarterId: $("#val-select2-quarter").val(),
+                        PropertyName: $("#val-text-propertyname").val(),
+                        DayPartId: $("#val-select2-daypart").val(),
+                        Monday: $("#chkMonday").is(':checked'),
+                        Tuesday: $("#chkTuesday").is(':checked'),
+                        Wednesday: $("#chkWednesday").is(':checked'),
+                        Thursday: $("#chkThursday").is(':checked'),
+                        Friday: $("#chkFriday").is(':checked'),
+                        Saturday: $("#chkSaturday").is(':checked'),
+                        Sunday: $("#chkSunday").is(':checked'),
+                        StartTime: $("#val-start-time").val(),
+                        EndTime: $("#val-end-time").val(),
+                        BuyTypeId: $("#val-select2-buytype").val(),
+                        DoNotBuyTypeId: donotbuytype[0],
+                        MandateClientId: clientid,
+                        Upfront: $("#radio-group-plan-type-upfront").is(':checked'),
+                        SPBuy: $("#chkSPBuy").is(':checked')
+                    },
+                    cache: false,
+                    type: "POST",
+                    success: function (result) {
+                        if (result.success == true) {
+                            //$('#DemoTable td:has(:input)').each(function () {
+                            $("#DemoTable td:has(input[type='text'])").each(function () {
+                                var donotbuytype = $("#ddlDoNotBuyType").val().split("-");
+                                var value = $(this).find(":input").val();
+                                var _buyTypeId = $("#val-select2-buytype").val();
+                                var _doNotBuyTypeId = donotbuytype[0];
+                                var _demoName = "";
+                                var _effectiveDate = $("#val-select2-effectivedate option:selected").text();
+                                var _expirationDate = $("#val-select2-expirationdate option:selected").text();
+                                var _rate = 0;
+                                var _imp = 0;
+                                var _demographicSettingsId = 0;
+                                var _clientid = $("#ddlClient").val();
+                                var _isUpfront = $("#radio-group-plan-type-upfront").is(':checked');
+
+                                //alert("New PropertyID = " + result.propertyId);
+
+                                if ($(this).find(":input").attr('id').substring(0, 9) == "text-30R-") {
+                                    _demographicSettingsId = $(this).find(":input").attr('id').substring(9);
+                                    _demoName = $("#text-DemoName-" + _demographicSettingsId).html();
+                                    _rate = $("#text-30R-" + _demographicSettingsId).val().replace("$", "");
+                                    _imp = $("#text-Imp-" + _demographicSettingsId).val().replace("$", "");
+                                    if (_rate != "" && _imp != "") {
+                                        AddNewPropertyRates(_demoName
+                                            , result.propertyId
+                                            , _demographicSettingsId
+                                            , _buyTypeId
+                                            , _rate.replace("$", "")
+                                            , _imp
+                                            , _doNotBuyTypeId
+                                            , _effectiveDate
+                                            , _expirationDate
+                                            , _clientid
+                                            , _isUpfront
+                                        );
+                                    }
+                                    else {
+                                    }
+                                }
+                            });
+                            if ($("#edtErrorMessage").val() != '') {
+                                // No rates were saved.  Rollback the property successfully created and all other rates ...
+                                // alert(result.propertyId);
+                                swal('Stop', 'Property was NOT created.  ' + $("#edtErrorMessage").val(), 'error');
+                            }
+                            else {
+                                if ($("#isModal") && $("#isModal").val() == "1") {
+                                    // empty form
+                                    ClearAllFieldsModal();
+                                    //window.opener.document.getElementById('btnReload').click();
+                                    window.opener.RefreshTable(false, true, true);
+                                    //window.opener.location.reload();
+                                    $("#txtNewProperty").val("1");
+                                }
+                                else {
+                                    // empty form
+                                    ClearAllFields();
+                                }
+                                $(".cbdow").prop("checked", false);
+                                $(".btndow").removeClass("btn-primary");
+                                $(".btnday").removeClass("btn-primary");
+                                DOWArray = new Array();
+                                swal({
+                                    position: 'top-end',
+                                    type: 'success',
+                                    title: 'Property was successfully created.',
+                                    showConfirmButton: true,
+                                    timer: 5000
+                                });
+                            }
+                        }
+                        else {
+                            swal('Error!', result.responseText, 'error');
+                        }
+
+
+                    },
+                    error: function (response) {
+                        var notify = $.notify(response.responseText, {
+                            type: 'danger',
+                            allow_dismiss: true
+                        });
+                    }
+
+                });
+            }, function (dismiss) {
+                // dismiss can be 'cancel', 'overlay', 'esc' or 'timer'
+            }
+        );
+    }
+
+    function AddNewPropertyRates(demoName
+        , propertyId
+        , demographicSettingsId
+        , buytypeId
+        , rate
+        , imp
+        , doNotBuyTypeId
+        , effectiveDate
+        , expirationDate
+        , mandateClientId
+        , isUpfront
+    ) {
+
+        var url = "/CreateNewProperty/AddNewPropertyRates";
+
+        $.ajax({
+            url: url,
+            data: {
+                DemoName: demoName,
+                PropertyId: propertyId,
+                DemographicSettingsId: demographicSettingsId,
+                BuyTypeId: buytypeId,
+                Rate: rate,
+                Impressions: imp,
+                DoNotBuyTypeId: doNotBuyTypeId,
+                EffectiveDate: effectiveDate,
+                ExpirationDate: expirationDate,
+                MandateClientId: mandateClientId,
+                IsUpfront: isUpfront
+            },
+            cache: false,
+            type: "POST",
+            async: false,
+            success: function (result) {
+                console.log(result);
+                if (result.success == true) {
+                    $("#edtErrorMessage").val('');
+                    var notify = $.notify(result.responseText, {
+                        type: 'success',
+                        allow_dismiss: true
+                    });
+                }
+                else {
+                    $("#edtErrorMessage").val(result.responseText);
+                    var notify = $.notify(result.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true
+                    });
+                }
+            },
+            error: function (response) {
+                $("#edtErrorMessage").val(result.responseText);
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+        });
+    }
+
+    function ClearAllFields() {
+        $("#radio-group-country-us").prop("checked", true);
+        $("#radio-group-country-ca").prop("checked", false);
+        
+        $("#radio-group-plan-type-remnant").prop("checked", false);
+        $("#radio-group-plan-type-upfront").prop("checked", false);
+        
+
+        $('#val-select2-planyear').val(null).trigger('change.select2');
+
+        $("#val-select2-quarter").attr("disabled", "disabled");
+        $("#val-select2-quarter").html("").show();
+
+        //$("#val-select2-network").attr("disabled", "disabled");
+        $("#val-select2-network").html("").show();
+
+        $("#val-text-propertyname").val("");
+
+        $("#val-select2-buytype").attr("disabled", "disabled");
+        $("#val-select2-buytype").html("").show();
+
+        $('#val-select2-daypart').val(null).trigger('change.select2');
+
+        $("#val-start-time").val("");
+        $("#val-end-time").val("");
+
+        $("#chkMonday").prop("checked", false);
+        $("#chkTuesday").prop("checked", false);
+        $("#chkWednesday").prop("checked", false);
+        $("#chkThursday").prop("checked", false);
+        $("#chkFriday").prop("checked", false);
+        $("#chkSaturday").prop("checked", false);
+        $("#chkSunday").prop("checked", false);
+
+        $("#ddlDoNotBuyType").prop('selectedIndex', 0);
+        $("#divClient").attr("hidden", "hidden");
+        $("#val-select2-effectivedate").html("").show();
+        $("#val-select2-expirationdate").html("").show();
+        $("#chkSPBuy").prop("checked", false);
+
+        $(".cbdow").prop("checked", false);
+        $(".btndow").removeClass("btn-primary");
+        $(".btnday").removeClass("btn-primary");
+        DOWArray = new Array();
+
+
+        PopulateDemoNames();
+        PopulateNetworks();
+    }
+
+    function ClearAllFieldsModal() {
+        $("#val-text-propertyname").val("");
+
+        $('#val-select2-buytype').val(null).trigger('change.select2');
+        $('#val-select2-daypart').val(null).trigger('change.select2');
+
+        $("#val-start-time").val("");
+        $("#val-end-time").val("");
+
+        $("#chkMonday").prop("checked", false);
+        $("#chkTuesday").prop("checked", false);
+        $("#chkWednesday").prop("checked", false);
+        $("#chkThursday").prop("checked", false);
+        $("#chkFriday").prop("checked", false);
+        $("#chkSaturday").prop("checked", false);
+        $("#chkSunday").prop("checked", false);
+        
+        $(".cbdow").prop("checked", false);
+        $(".btndow").removeClass("btn-primary");
+        $(".btnday").removeClass("btn-primary");
+        DOWArray= new Array();
+        $("#ddlDoNotBuyType").prop('selectedIndex', 0);
+        $("#divClient").attr("hidden", "hidden");
+        $("#chkSPBuy").prop("checked", false);
+       
+        $(".cbdow").prop("checked", false);
+        $(".btndow").removeClass("btn-primary");
+        $(".btnday").removeClass("btn-primary");
+        DOWArray = new Array();
+
+        PopulateDemoNames();
+    }
+
+    function ValidateControls() {
+        ValidateLock();
+        /*
+        var validated;
+        validated = true;
+
+        if ($("#val-select2-planyear").val() <= 0 ||
+            $("#val-select2-network").val() <= 0 ||
+            ($("#radio-group-plan-type-upfront").is(':checked') == false &&
+                $("#radio-group-plan-type-remnant").is(':checked') == false)) {
+
+            if ($("#val-select2-planyear").val() <= 0) {
+                validated = false;
+            }
+
+            if ($("#val-select2-network").val() <= 0) {
+                validated = false;
+            }
+
+            if ($("#radio-group-plan-type-upfront").is(':checked') == false &&
+                $("#radio-group-plan-type-remnant").is(':checked') == false) {
+                $("#labelPlanType").addClass("text-danger");
+                validated = false;
+            }
+            else {
+                $("#labelPlanType").removeClass("text-danger");
+            }
+
+
+
+        }
+        else
+        {
+            $("#labelNetwork").removeClass("text-danger");
+            $("#labelPlanType").removeClass("text-danger");
+
+            if ($("#val-select2-quarter").val() == 0) {
+                validated = false;
+            }
+
+            if ($("#val-text-propertyname").val() == null ||
+                $("#val-text-propertyname").val() == "") {
+                validated = false;
+            }
+
+            if ($("#val-select2-daypart").val() <= 0) {
+                validated = false;
+            }
+
+            if ($("#val-select2-buytype").val() <= 0) {
+                validated = false;
+            }
+
+            var donotbuytype = $("#ddlDoNotBuyType").val().split("-");
+            // if donotbuytype[0] > 0 that means client is required.
+            if (donotbuytype[0] > 0) {
+                $("#labelDoNotBuyType").removeClass("text-danger");
+            }
+            else {
+                $("#labelDoNotBuyType").addClass("text-danger");
+                validated = false;
+            }
+
+            var clientid = $("#ddlClient").val();
+            if (donotbuytype[1] > 0) {
+                if (clientid > 0) {
+                    $("#labelClient").removeClass("text-danger");
+                }
+                else {
+                    $("#labelClient").addClass("text-danger");
+                    validated = false;
+                }
+            }
+            else {
+                $("#labelClient").removeClass("text-danger");
+            }
+
+            if ($("#val-start-time").val() == $("#val-end-time").val()) {
+                validated = false;
+            }
+            else {
+            }
+
+            if ($("#val-start-time").val() == "") {
+                validated = false;
+            }
+            else {
+            }
+
+            if ($("#val-end-time").val() == "") {
+                validated = false;
+            }
+            else {
+            }
+
+            if ($("#val-select2-effectivedate").val() == 0) {
+                validated = false;
+            }
+
+            if ($("#val-select2-expirationdate").val() == 0) {
+                validated = false;
+            }
+        }
+
+        if (validated == false) {
+            $("#btnAddProperty").attr("disabled", "disabled");
+        }
+        else {
+            $("#btnAddProperty").removeAttr("disabled");
+        }
+        */
+
+        /* MOREWORK:  Make sure a day is selected. */
+    }
+
+    function PopulateQuarter() {
+        if ($("#isModal") && $("#isModal").val() == "1") {
+        }
+        else {
+            if ($("#val-select2-planyear").val() > 0) {
+                $("#val-select2-quarter").removeAttr("disabled");
+
+                var procemessage = "<option value='0'> Please wait...</option>";
+                $("#val-select2-quarter").html(procemessage).show();
+                var url = "/CreateNewProperty/GetQuarters";
+
+                $.ajax({
+                    url: url,
+                    data: {
+                        Year: $("#val-select2-planyear").val()
+                    },
+                    cache: false,
+                    type: "POST",
+                    success: function (result) {
+                        var markup = "<option></option>";
+                        for (var x = 0; x < result.length; x++) {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                        $("#val-select2-quarter").html(markup).show();
+                        //$('#val-select2-quarter').select2().val('@Model.QuarterDefault').trigger('change');
+                    },
+                    error: function (response, exception) {
+                        var msg = '';
+                        if (response.status === 0) {
+                            msg = 'Not connect.\n Verify Network.';
+                        } else if (response.status == 404) {
+                            msg = 'Requested page not found. [404]';
+                        } else if (response.status == 500) {
+                            msg = 'Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = 'Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = 'Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = 'Ajax request aborted.';
+                        } else {
+                            msg = 'Uncaught Error.\n' + response.responseText;
+                        }
+                        swal({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: msg,
+                        })
+                    }
+                });
+            }
+            else {
+                $("#val-select2-quarter").attr("disabled", "disabled");
+            }
+            //$("#text-propertyname").val('');
+        }
+    }
+
+    function PopulateClients() {
+        var res = $("#ddlDoNotBuyType").val().split("-");
+        if (res[1] == "1") {
+            $("#divClient").removeAttr("hidden");
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlClient").html(procemessage).show();
+
+            var url = "/CreateNewProperty/GetClients";
+
+            var MyCountryId = 5;
+            if ($('#radio-group-country-us').is(':checked') == true) {
+                MyCountryId = 5;
+            }
+            else {
+                MyCountryId = 2;
+            }
+
+            $.ajax({
+                url: url,
+                data: {
+                    CountryId: MyCountryId
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option value='0'> Please select </option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlClient").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Clients:  ' + response, 'error');
+                }
+            });
+        }
+        else {
+            $("#divClient").attr("hidden", "hidden");
+        }
+    }
+
+    function PopulateEffectiveDates() {
+        if ($("#val-select2-quarter option:selected").val() > 0) {
+            $("#val-select2-effectivedate").removeAttr("disabled");
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#val-select2-effectivedate").html(procemessage).show();
+            var url = "/CreateNewProperty/GetEffectiveDates";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QtrName: $("#val-select2-quarter option:selected").text()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option></option>";
+                    for (var x = 0; x < result.length; x++) {
+                        if (x == 0) {
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                        else {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                    }
+                    $("#val-select2-effectivedate").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Effective Dates:  ' + response, 'error');
+                }
+            });
+        }
+    }
+
+    function PopulateExpirationDates() {
+        if ($("#val-select2-quarter option:selected").val() > 0) {
+            $("#val-select2-expirationdate").removeAttr("disabled");
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#val-select2-expirationdate").html(procemessage).show();
+            var url = "/CreateNewProperty/GetExpirationDates";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QtrName: $("#val-select2-quarter option:selected").text(),
+                    EffectiveDate: $("#val-select2-effectivedate option:selected").text()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    for (var x = 0; x < result.length; x++) {
+                        if (x == 0) {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                        else {
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+
+                    }
+                    $("#val-select2-expirationdate").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Expiration Dates:  ' + response, 'error');
+                }
+            });
+        }
+    }
+
+    function PopulateNetworks() {
+        if ($("#isModal") && $("#isModal").val() == "1") {
+        }
+        else {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#val-select2-network").html(procemessage).show();
+            var url = "/CreateNewProperty/GetNetworks";
+
+            var MyCountryId = 5;
+            if ($('#radio-group-country-us').is(':checked') == true) {
+                MyCountryId = 5;
+            }
+            else {
+                MyCountryId = 2;
+            }
+
+            $.ajax({
+                url: url,
+                data: {
+                    CountryId: MyCountryId
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    if (result.length == 0) {
+                        if (MyCountryId == 5) {
+                            markup = "<option value='0'>No network assigned (US)</option>";
+                        }
+                        else {
+                            markup = "<option value='0'>No network assigned (CA)</option>";
+                        }
+                    }
+                    else {
+                        markup = "<option></option>";
+                        for (var x = 0; x < result.length; x++) {
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        }
+                    }
+                    $("#val-select2-network").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Networks:  ' + response, 'error');
+                }
+            });
+        }
+    }
+
+    function PopulateBuyType(_networkid, _upfront) {
+        //$("#radio-group-plan-type-upfront").prop("checked", false);
+        //$("#radio-group-plan-type-remnant").prop("checked", false);
+
+        if ($("#val-select2-planyear").val() > 0 &&
+            $("#val-select2-network").val() > 0 &&
+            ($("#radio-group-plan-type-upfront").is(':checked') == true ||
+                $("#radio-group-plan-type-remnant").is(':checked') == true)) {
+
+            $("#val-select2-buytype").removeAttr("disabled");
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#val-select2-buytype").html(procemessage).show();
+            var url = "/CreateNewProperty/GetBuyTypes";
+
+            $.ajax({
+                url: url,
+                data: {
+                    NetworkId: $("#val-select2-network").val(),
+                    Upfront: $("#radio-group-plan-type-upfront").is(':checked')
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option></option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#val-select2-buytype").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Buy Types:  ' + response, 'error');
+                }
+            });
+
+            ValidateControls();
+        }
+        else {
+            $("#val-select2-buytype").attr("disabled", "disabled");
+        }
+
+    }
+
+    function PopulateDemoNames() {
+
+        //$("#divErrorMessage").removeAttr("hidden");
+        var url = "/CreateNewProperty/GetDemoNames/";
+
+
+        var MyCountryId = 5;
+        if ($('#radio-group-country-us').is(':checked') == true) {
+            MyCountryId = 5;
+            gCountryId = 5;
+        }
+        else {
+            MyCountryId = 2;
+            gCountryId = 2;
+        }
+
+        $.ajax({
+            url: url,
+            data: {
+                CountryId: MyCountryId,
+                PlanYr: $("#val-select2-planyear").val(),
+                BuyTypeId: $("#val-select2-buytype").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var headermarkup = "";
+                headermarkup += "<tr>";
+                headermarkup += "<th class='text-center'>Demo Name<div class='min-width-100'></div></th>";
+                headermarkup += "<th class='text-center'>:30 Rate<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "<th class='text-center'>Imp<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "<th class='text-center'>CPM (30)<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "<th class='text-center'>:15 Rate<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "<th class='text-center'>:60 Rate<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "<th class='text-center'>1:20 Rate<br><small class='text-capitalize font-w400 text-muted'></small></th>";
+                headermarkup += "</tr>";
+                $("#demoheader").html(headermarkup).show();
+
+                var markup = "";
+                var masks = "";
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<tr>";
+                    markup += "<td>";
+                    markup += "<label id=\"text-DemoName-" + result[x].demographicSettingsId + "\" name=\"text-DemoName-" + result[x].demographicSettingsId + "\">" + result[x].demographicName + "</label>";
+                    markup += "</td>";
+
+                    if (MyCountryId == 5) {
+                        if ($("#val-select2-buytype").val() == null || $("#val-select2-buytype").val() === 0 || $("#val-select2-buytype").val() === '') {
+                            markup += "<td><input name=\"text-30R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-30R-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=appendDollarSignToInput(this.value, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput(this.value, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput1(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                            markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" onchange=\"this.value=setTwoNumberDecimal(this.value)\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                        }
+                        else {
+                            markup += "<td><input name=\"text-30R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-30R-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=appendDollarSignToInput(this.value, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput(this.value, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" ></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput1(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" ></td>";
+                            markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" onchange=\"this.value=setTwoNumberDecimal(this.value)\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" ></td>";
+                        }
+                    }
+
+                    else {
+                        if ($("#val-select2-buytype").val() == null || $("#val-select2-buytype").val() === 0 || $("#val-select2-buytype").val() === '') {
+                            markup += "<td><input name=\"text-30R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-30R-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=appendDollarSignToInput(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput1(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                            markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" onchange=\"this.value=setTwoNumberDecimal(this.value)\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" disabled></td>";
+                        }
+                        else {
+                            markup += "<td><input name=\"text-30R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-30R-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=appendDollarSignToInput(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"></td>";
+                            //markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" oninput=\"this.value=verifyInput1(this.value)\" onfocusout=\"decimalRoundup(" + result[x].demographicSettingsId + ")\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" ></td>";
+                            markup += "<td><input name=\"text-Imp-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-Imp-" + result[x].demographicSettingsId + "\" type=\"text\" onchange=\"this.value=setTwoNumberDecimal(this.value)\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[x].isZeroRate + ", " + result[x].isZeroImp + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \" ></td>";
+                        }
+                    }
+                    markup += "<td><input name=\"text-CPM-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-CPM-" + result[x].demographicSettingsId + "\" type=\"text\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"  disabled></td>";
+                    markup += "<td><input name=\"text-15R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-15R-" + result[x].demographicSettingsId + "\" type=\"text\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"  disabled></td>";
+                    markup += "<td><input name=\"text-60R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-60R-" + result[x].demographicSettingsId + "\" type=\"text\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"  disabled></td>";
+                    markup += "<td><input name=\"text-120R-" + result[x].demographicSettingsId + "\" class=\"form-control text-center\" id=\"text-120R-" + result[x].demographicSettingsId + "\" type=\"text\" onkeyup=\"javascript: UpdateRates1(" + result[x].demographicSettingsId + ", " + result[x].drType + ", " + result[0].demographicSettingsId + ", '" + $("#val-select2-buytype option:selected").text() + "'); \"  disabled></td>";
+                    markup += "</tr>";
+
+                }
+                $("#demos").html(markup).show();
+                //$("#demomasks").html(masks).show();
+                $("#divErrorMessage").attr("hidden", "hidden");
+                //$("#ErrorMessage").text("Demographic Settings tables not properly set up.");
+            },
+            error: function (response) {
+                $("#divErrorMessage").removeAttr("hidden");
+                $("#ErrorMessage").text(response.statusText);
+            }
+        });
+    }
+
+    function decimalRoundup(_DemographicSettingsId) {
+        var countryId = 5
+        if ($('#radio-group-country-us').is(':checked') == true) {
+            countryId = 5;
+        }
+        else {
+            countryId = 2;
+        }
+
+        if (countryId == 2) {
+            var _30RateValue = $("#text-30R-" + _DemographicSettingsId).val().substring(1);
+            if (_30RateValue.trim() == '') {
+                $("#text-30R-" + _DemographicSettingsId).val('');
+                return;
+            }
+            else {
+                $("#text-30R-" + _DemographicSettingsId).val('$' + Number(_30RateValue).toFixed(2));
+            }
+        }
+
+
+        var _ImpValue = $("#text-Imp-" + _DemographicSettingsId).val().replace("$", "");
+        if (_ImpValue.trim() == '') {
+            $("#text-Imp-" + _DemographicSettingsId).val('');
+            return;
+        }
+        else {
+            $("#text-Imp-" + _DemographicSettingsId).val(Number(_ImpValue).toFixed(2));
+        }
+    }
+
+    function UpdateRates1(_DemographicSettingsId, _DRType, _IsZeroRate, _IsZeroImp, _FirstItemId, _BuyType) {
+
+        var _clearRateFields = (event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 88) ? false : true;
+        var _30R = $("#text-30R-" + _DemographicSettingsId).val().substring(1);
+        var _Imp = $("#text-Imp-" + _DemographicSettingsId).val().replace("$", "");
+        var _CPM = "";
+        var _15R = "";
+        var _60R = "";
+        var _120R = "";
+        var _FirstItemValue = $("#text-30R-" + _FirstItemId).val().substring(1);
+
+        if (_30R == '' && _Imp == '') {
+            $("#text-15R-" + _DemographicSettingsId).val('');
+            $("#text-60R-" + _DemographicSettingsId).val('');
+            $("#text-120R-" + _DemographicSettingsId).val('');
+            $("#text-CPM-" + _DemographicSettingsId).val('');
+            return;
+        }
+
+        if (_FirstItemValue >= 0 && (_BuyType == "PDR" || _BuyType == "PE")) {
+            if (_DemographicSettingsId == _FirstItemId) {
+                $('#demos').find(':input').each(function () {
+                    if ($(this).attr("id") != null &&
+                        $(this).attr("id").length > 9 &&
+                        $(this).attr("id").substring(0, 9) === "text-30R-" &&
+                        $(this).attr("id") !== ("text-30R-" + _FirstItemId) &&
+                        $(this).attr("id") !== ("text-30R-" + _FirstItemId)) {
+                        $(this).val("$" + _FirstItemValue);
+                    }
+
+                });
+            }
+        }
+
+
+        //$("#divErrorMessage").removeAttr("hidden");
+        var url = "/CreateNewProperty/CalculateRates/";
+        var MyCountryId = 5;
+        if ($('#radio-group-country-us').is(':checked') == true) {
+            MyCountryId = 5;
+        }
+        else {
+            MyCountryId = 2;
+        }
+
+        if (_IsZeroRate == true) {
+            _30R = 0;
+        }
+
+        if (_IsZeroImp == true) {
+            _Imp = 0;
+        }
+
+        $.ajax({
+            url: url,
+            data: {
+                RateAmt: _30R,
+                Impressions: _Imp,
+                CountryId: MyCountryId,
+                DRType: _DRType
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                _15R = result.rate15;
+                _60R = result.rate60;
+                _120R = result.rate120;
+                _CPM = result.cpm;
+                //_CPM = result.cpm;
+
+                if (gCountryId == 5) {
+                    $("#text-15R-" + _DemographicSettingsId).val('$' + _15R.toFixed(0));
+                    $("#text-60R-" + _DemographicSettingsId).val('$' + _60R.toFixed(0));
+                    $("#text-120R-" + _DemographicSettingsId).val('$' + _120R.toFixed(0));
+                    $("#text-CPM-" + _DemographicSettingsId).val('$' + _CPM.toFixed(2));
+                    //$("#text-CPM-" + _DemographicSettingsId).val('$' + _CPM);
+                }
+                else {
+                    $("#text-15R-" + _DemographicSettingsId).val('$' + _15R.toFixed(2));
+                    $("#text-60R-" + _DemographicSettingsId).val('$' + _60R.toFixed(2));
+                    $("#text-120R-" + _DemographicSettingsId).val('$' + _120R.toFixed(2));
+                    $("#text-CPM-" + _DemographicSettingsId).val('$' + _CPM.toFixed(2));
+                }
+                if (_clearRateFields && _IsZeroRate == true) {
+                    $("#text-30R-" + _DemographicSettingsId).val('$0');
+                }
+                if (_clearRateFields && _IsZeroImp == true) {
+                    $("#text-Imp-" + _DemographicSettingsId).val('0');
+                }
+                /*
+                if (_FirstItemValue >= 0 && (_BuyType == "PDR" || _BuyType == "PE")) {
+                    $("#text-30R-" + _DemographicSettingsId).val("$" + _FirstItemValue);
+                }
+                */
+
+                if (_BuyType == "PDR" || _BuyType == "PE") {
+                    if (_DemographicSettingsId == _FirstItemId) {
+                        $('#demos').find(':input').each(function () {
+                            if ($(this).attr("id") != null &&
+                                $(this).attr("id").length > 9 &&
+                                $(this).attr("id").substring(0, 9) === "text-15R-" &&
+                                $(this).attr("id") !== ("text-15R-" + _FirstItemId)) {
+                                $(this).val($("#text-15R-" + _FirstItemId).val());
+                            }
+                            else if ($(this).attr("id") != null &&
+                                $(this).attr("id").length > 9 &&
+                                $(this).attr("id").substring(0, 9) === "text-60R-" &&
+                                $(this).attr("id") !== ("text-60R-" + _FirstItemId)) {
+                                $(this).val($("#text-60R-" + _FirstItemId).val());
+                            }
+                            else if ($(this).attr("id") != null &&
+                                $(this).attr("id").length > 9 &&
+                                $(this).attr("id").substring(0, 10) === "text-120R-" &&
+                                $(this).attr("id") !== ("text-120R-" + _FirstItemId)) {
+                                $(this).val($("#text-120R-" + _FirstItemId).val());
+                            }
+
+                        });
+                    }
+                }
+
+
+            },
+            error: function (response) {
+                $("#text-15R-" + _DemographicSettingsId).val(0.00);
+                $("#text-60R-" + _DemographicSettingsId).val(0.00);
+                $("#text-120R-" + _DemographicSettingsId).val(0.00);
+                $("#text-CPM-" + _DemographicSettingsId).val(0.00);
+            }
+        });
+
+    }
+</script>
+
+<!-- Page Content -->
+<div class="content">
+    <div class="row row-deck gutters-tiny">
+        <div class="col-lg-5">
+            <div class="block">
+                <div class="block block-themed">
+                    <div class="block-header bg-primary">
+                        <h3 class="block-title">Create New Property</h3>
+                    </div>
+                    <div class="block-content">
+                        <input type="hidden" id="edtErrorMessage" />
+                        <form class="js-validation-bootstrap" method="post" action="javascript: AddNewProperty();" id="formCreateNewProperty">
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-6">
+                                    <label for="register4-firstname">Country</label>
+                                    <div class="col-12">
+                                        <div class="col-12">
+                                        </div>
+                                        <!-- Default is always US but if a default upfront is passed by parent page, we only show that default. -->
+                                        @if (Model.NetworkDefault != null)
+                                        {
+                                            @if (Model.CountryDefault == 5) /* 5 -- US Country ID */
+                                            {
+                                                <label class="css-control-sm css-control-primary css-radio">
+                                                    <input name="radio-group-country" id="radio-group-country-us" class="css-control-input" type="radio" checked="">
+                                                    <span class="css-control-indicator"></span> US
+                                                </label>
+
+                                                <br />
+                                            }
+                                            else
+                                            {
+                                                <label class="css-control-sm css-control-primary css-radio">
+                                                    <input name="radio-group-country" id="radio-group-country-ca" class="css-control-input" type="radio" checked="">
+                                                    <span class="css-control-indicator"></span> CA
+                                                </label>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control-sm css-control-primary css-radio">
+                                                <input name="radio-group-country" id="radio-group-country-us" class="css-control-input" type="radio" checked="" onclick="javascript: ChangeCountry();">
+                                                <span class="css-control-indicator"></span> US
+                                            </label>
+
+                                            <br />
+                                            <label class="css-control-sm css-control-primary css-radio">
+                                                <input name="radio-group-country" id="radio-group-country-ca" class="css-control-input" type="radio" onclick="javascript: ChangeCountry();">
+                                                <span class="css-control-indicator"></span> CA
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-6 is-invalid" id="divPlanType" name="divPlanType">
+                                    <label name="labelPlanType" id="labelPlanType" for="radio-group-plan-type">Plan Type</label>
+                                    <div class="col-12">
+                                        @if (Model.NetworkDefault != null)
+                                        {
+                                            @if (Model.UpfrontTypeDefault == 2)
+                                            {
+                                                <label class="css-control-sm css-control-primary css-radio">
+                                                    <input name="radio-group-plan-type" class="css-control-input" checked id="radio-group-plan-type-upfront" type="radio" onclick="javascript: ChangePlanType();">
+                                                    <span class="css-control-indicator"></span> Upfront
+                                                </label>
+                                            }
+                                            else
+                                            {
+                                                <label class="css-control-sm css-control-primary css-radio">
+                                                    <input name="radio-group-plan-type" class="css-control-input" checked id="radio-group-plan-type-remnant" type="radio" onclick="javascript: ChangePlanType();">
+                                                    <span class="css-control-indicator"></span> Remnant
+                                                </label>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control-sm css-control-primary css-radio">
+                                                @if (Model.PlanTypeDefault == "2")
+                                                {
+                                                    <input name="radio-group-plan-type" class="css-control-input" checked id="radio-group-plan-type-upfront" type="radio" onclick="javascript: ChangePlanType();">
+                                                }
+                                                else
+                                                {
+                                                    <input name="radio-group-plan-type" class="css-control-input" id="radio-group-plan-type-upfront" type="radio" onclick="javascript: ChangePlanType();">
+                                                }
+                                                <span class="css-control-indicator"></span> Upfront
+                                            </label>
+                                            <br />
+                                            <label class="css-control-sm css-control-primary css-radio">
+                                                @if (Model.PlanTypeDefault == "1")
+                                                {
+                                                    <input name="radio-group-plan-type" class="css-control-input" checked id="radio-group-plan-type-remnant" type="radio" onclick="javascript: ChangePlanType();">
+                                                }
+                                                else
+                                                {
+                                                    <input name="radio-group-plan-type" class="css-control-input" id="radio-group-plan-type-remnant" type="radio" onclick="javascript: ChangePlanType();">
+                                                }
+                                                <span class="css-control-indicator"></span> Remnant
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-6">
+                                    <label for="val-select2-planyear" id="labelPlanYear" name="labelPlanYear" class="col-form-label">Plan Year<span class="text-danger">*</span></label>
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <select name="val-select2-planyear" class="js-select2 form-control" id="val-select2-planyear" style="width:100%;" data-placeholder="Please select ..." onchange="javascript: ChangeYear();">
+                                            <option></option><!-- Required for data-placeholder attribute to work with Select2 plugin -->
+                                            @foreach (var yr in Model.PlanYears)
+                                            {
+                                                <option value="@yr">@yr</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <select name="val-select2-planyear" class="form-control" id="val-select2-planyear" style="width:100%;" data-placeholder="Please select ...">
+                                            <option value="@Model.PlanYearsDefault">@Model.PlanYearsDefault</option>
+                                        </select>
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <label for="val-select2-quarter" id="labelQuarter" name="labelQuarter" class="col-form-label">Quarter<span class="text-danger">*</span></label>
+                                        <select name="val-select2-quarter" class="js-select2 form-control" id="val-select2-quarter" style="width:100%;" data-placeholder="Please select ..." disabled onchange="javascript:ChangeQuarter();"></select>
+                                    }
+                                    else
+                                    {
+                                        <label for="val-select2-quarter" id="labelQuarter" name="labelQuarter" class="col-form-label">Quarter<span class="text-danger">*</span></label>
+                                        <select name="val-select2-quarter" class="form-control" id="val-select2-quarter" style="width:100%;" data-placeholder="Please select ...">
+                                            <option selected value="@Model.QuarterDefault.QuarterId">@Model.QuarterDefault.QuarterName</option>
+                                        </select>
+                                    }
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-6">
+                                    <label for="val-select2-network" id="labelNetwork" name="labelNetwork" class="col-form-label">Network<span class="text-danger">*</span></label>
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <select name="val-select2-network" class="js-select2 form-control" id="val-select2-network" style="width:100%;" data-placeholder="Please select ..." onchange="javascript: ChangeNetwork();"></select>
+                                    }
+                                    else
+                                    {
+                                        <select name="val-select2-network" class="form-control" id="val-select2-network" style="width:100%;" data-placeholder="Please select ...">
+                                            <option selected value="@Model.NetworkDefault.NetworkId">@Model.NetworkDefault.StdNetName</option>
+                                        </select>
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label for="val-text-propertyname" id="labelPropertyName" name="labelPropertyName" class="col-form-label">Property Name<span class="text-danger">*</span></label>
+                                    <input name="val-text-propertyname" class="form-control" id="val-text-propertyname" type="text" onchange="javascript: ValidateControls();">
+                                    <!--
+
+                                    <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                        <input class="css-control-input" type="checkbox">
+                                        <span class="css-control-indicator"></span> Combo Property
+                                    </label>
+                                    -->
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-6">
+                                    <label for="val-select2-buytype" id="labelBuyType" name="labelBuyType" class="col-form-label">Buy Type<span class="text-danger">*</span></label>
+                                    @if (Model.NetworkDefault != null)
+                                    {
+                                        <select name="val-select2-buytype" class="form-control" id="val-select2-buytype" style="width:100%;" data-placeholder="Please select ..." onchange="javascript: ChangeBuyType();"></select>
+                                    }
+                                    else
+                                    {
+                                        <select name="val-select2-buytype" class="js-select2 form-control" id="val-select2-buytype" style="width:100%;" data-placeholder="Please select ..." disabled onchange="javascript: ChangeBuyType();"></select>
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label id="labelDayPart" name="labelDayPart" for="val-select2-daypart" class="col-form-label">Day Part<span class="text-danger">*</span></label>
+                                    <select name="val-select2-daypart" class="form-control" id="val-select2-daypart" style="width:100%;" data-placeholder="Please select..." onchange="javascript: ChangeDayPart();">
+                                        @foreach (var dp in Model.DayParts)
+                                        {
+                                            <option value="@dp.DayPartId">(@dp.DayPartCd) @dp.DayPartDesc</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-12 align-middle">
+                                    <label class="css-control css-control-sm css-control-primary css-checkbox">
+                                        <input class="css-control-input" type="checkbox" id="chkSPBuy" name="chkSPBuy">
+                                        <span class="css-control-indicator"></span> Special Programming
+                                    </label>
+                                </div>
+                            </div>
+                            <hr />
+                             <div class="form-group row gutters-tiny" style="display:flex;">
+                                 <input type="hidden" id="hdnCurDOWSelection" value="" />
+                                 <table style="width:100%" cellspacing="1">
+                                     <tr>
+                                        <td style="width:30%;"><label id="labelStartTime" name="labelStartTime" for="val-start-time" class="col-form-label">Start<span class="text-danger">*</span></label></td>
+                                        <td style="width:30%;"><label id="labelEndTime" style="margin-left: 5px;" name="labelEndTime" for="val-end-time" class="col-form-label">End<span class="text-danger">*</span></label></td>
+                                        <td style="width:12%;"></td>
+                                        <td style="width:12%;"></td>
+                                        <td style="width:6%;"></td>
+                                     </tr>
+                                    <tr>
+                                        <td style="width:30%;">
+                                            <input type="text" class="js-autocompletetime form-control" id="val-start-time" name="val-start-time" placeholder="Enter start time" onkeyup="javascript: OnChangeStartTime(this, $('#val-end-time'));" onfocusout="javascript: OnChangeStartTime(this, $('#val-end-time'));">
+                                        </td>
+                                        <td style="width:30%;">
+                                            <input style="margin-left: 5px;" type="text" class="js-autocompletetime form-control" id="val-end-time" name="val-end-time" placeholder="Enter end time" onkeyup="javascript: OnChangeEndTime(this);" onfocusout="javascript: OnChangeEndTime(this);">
+                                        </td>
+
+                                        <td style="width:12%;">
+                                            <button class="btn btndow" style="margin-left: 10px;" type="button" id="btnWeekDays" name="btnWeekDays" value="WeekDays" onclick="return SelectDOW('weekdays',this);">
+                                                Weekdays
+                                            </button>
+                                        </td>
+                                        <td style="width:12%;">
+                                            <button class="btn btndow" style="margin-left: 5px;" type="button" id="btnWeekend" name="btnWeekend" value="Weekend" onclick="return SelectDOW('weekend',this);">
+                                                Weekend
+                                            </button>
+                                        </td>
+                                        <td style="width:6%;">
+                                            <button class="btn btndow" style="margin-left: 5px;" type="button" id="btnAll" name="btnAll" value="All" onclick="return SelectDOW('all',this);">
+                                                All
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr id="val-start-time-error" class="invalid-feedback animated fadeInDown">
+                                        <td colspan="5">
+                                        <div id="val-end-time-error" style="width:98%!important;" class="invalid-feedback animated fadeInDown">Please enter a valid time.</div>
+                                        </td>
+                                    </tr>
+                                 </table>
+                            </div>
+                            @*<div class="form-group row gutters-tiny">
+                                <div class="col-3">
+                                    <label id="labelStartTime" name="labelStartTime" for="val-start-time" class="col-form-label">Start<span class="text-danger">*</span></label>
+                                    <input type="text" class="js-autocompletetime form-control" id="val-start-time" name="val-start-time" placeholder="Enter start time ..." onkeyup="javascript: OnChangeStartTime(this, $('#val-end-time'));" onfocusout="javascript: OnChangeStartTime(this, $('#val-end-time'));">
+                                </div>
+                                <div class="col-3">
+                                    <label id="labelEndTime" name="labelEndTime" for="val-end-time" class="col-form-label">End<span class="text-danger">*</span></label>
+                                    <input type="text" class="js-autocompletetime form-control" id="val-end-time" name="val-end-time" placeholder="Enter end time ..." onkeyup="javascript: OnChangeEndTime(this);" onfocusout="javascript: OnChangeEndTime(this);">
+                                </div>
+                                <div class="col-6" style="display:none;">
+                                    <div style="display:flex;">
+                                        <button class="btn btn-primary" type="button" id="btnWeekDays" name="btnWeekDays" value="WeekDays"
+                                                style="margin-top:14%;">
+                                            WEEKDAYS
+                                        </button>
+                                        <button class="btn btn-alt-secondary" type="button" id="btnWeekend" name="btnWeekend" value="Weekend"
+                                                style="margin-top:14%;">
+                                            WEEKEND
+                                        </button>
+                                        <button class="btn btn-alt-secondary" type="button" id="btnAll" name="btnAll" value="All"
+                                                style="margin-top:14%;">
+                                            ALL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>*@
+                            <div class="form-group row gutters-tiny">
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td  align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnMonday" name="btnMonday" value="1" onclick="return ValidateDOWSelection(this,1);">
+                                                M
+                                            </button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnTuesday" name="btnTuesday" value="2" onclick="return ValidateDOWSelection(this,2);">
+                                                T
+                                            </button>
+                                        </td>
+                                       <td  align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnWednesday" name="btnWednesday" value="3" onclick="return ValidateDOWSelection(this,3);">
+                                                W
+                                            </button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnThursday" name="btnThursday" value="4" onclick="return ValidateDOWSelection(this,4);">
+                                                Th
+                                            </button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnFriday" name="btnFriday" value="5" onclick="return ValidateDOWSelection(this,5);">
+                                                F
+                                            </button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnSaturday" name="btnSaturday" value="6" onclick="return ValidateDOWSelection(this,6);">
+                                                Sa
+                                            </button>
+                                        </td>
+                                        <td align="left" style="width:14%;">
+                                            <button class="btn btnday" style="width:95%" type="button" id="btnSunday" name="btnSunday" value="7" onclick="return ValidateDOWSelection(this,7);">
+                                                Su
+                                            </button>
+                                        </td>
+                                    </tr>
+                                 </table>
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%" style="display:none;">
+                                    <tr>
+                                        <td align="left" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkMonday" name="chkMonday" onchange="return ValidateDOWSelection(this,1);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="center" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkTuesday" name="chkTuesday" onchange="return ValidateDOWSelection(this,2);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="center" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkWednesday" name="chkWednesday" onchange="return ValidateDOWSelection(this,3);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="center" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkThursday" name="chkThursday" onchange="return ValidateDOWSelection(this,4);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="center" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkFriday" name="chkFriday" onchange="return ValidateDOWSelection(this,5);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="center" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkSaturday" name="chkSaturday" onchange="return ValidateDOWSelection(this,6);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                        <td align="right" style="width:13%;">
+                                            <label class="css-control css-control-sm css-control-primary css-switch" style="width:96%;">
+                                                <input class="css-control-input cbdow" type="checkbox" id="chkSunday" name="chkSunday" onchange="return ValidateDOWSelection(this,7);">
+                                                <span class="css-control-indicator" style="width:96%;"></span><br />
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center">Mon</td>
+                                        <td align="center">Tue</td>
+                                        <td align="center">Wed</td>
+                                        <td align="center">Thu</td>
+                                        <td align="center">Fri</td>
+                                        <td align="center">Sat</td>
+                                        <td align="center">Sun</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <hr />
+                            <div class="form-group row gutters-tiny">
+                                <label class="col-12" for="ddlDoNotBuyType" id="labelDoNotBuyType" name="labelDoNotBuyType">Status</label>
+                                <div class="col-12">
+                                    <div class="input-group">
+                                        <select name="ddlDoNotBuyType" class="form-control" id="ddlDoNotBuyType" onchange="javascript: ChangeStatus();">
+                                            @foreach (var dnb in Model.DoNotBuyTypes)
+                                            {
+                                                string DoNotBuyTypeId = dnb.DoNotBuyTypeId.ToString();
+                                                if (dnb.ClientRequired == true)
+                                                {
+                                                    DoNotBuyTypeId = DoNotBuyTypeId + "-1";
+                                                }
+                                                else
+                                                {
+                                                    DoNotBuyTypeId = DoNotBuyTypeId + "-0";
+
+                                                }
+                                                <option value="@DoNotBuyTypeId">@dnb.Description</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny" id="divClient" name="divClient" hidden>
+                                <label class="col-12" for="ddlClient" id="labelClient" name="labelClient">Client</label>
+                                <div class="col-12">
+                                    <div class="input-group">
+                                        <select name="ddlClient" class="form-control" id="ddlClient" onchange="javascript: ChangeClient();"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row gutters-tiny">
+                                <div class="col-6">
+                                    <label class="col-form-label" for="val-select2-effectivedate" id="labelEffectiveDate" name="labelEffectiveDate">Effective Date<span class="text-danger">*</span></label>
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <select name="val-select2-effectivedate" class="js-select2 form-control"  style="width:100%;"  id="val-select2-effectivedate" onchange="javascript: ChangeEffectiveDate();" disabled data-placeholder="Please select ..."></select>
+                                    }
+                                    else
+                                    {
+                                        <select name="val-select2-effectivedate" class="form-control" style="width:100%" id="val-select2-effectivedate" onchange="javascript: ChangeEffectiveDate();" data-placeholder="Please select ...">
+                                            @for (int idx = 0; idx < Model.EffectiveDates.Count(); idx++)
+                                            {
+                                                if (idx == 0)
+                                                {
+                                                    <option selected value="@Model.EffectiveDates[idx].ToShortDateString()">@Model.EffectiveDates[idx].ToShortDateString()</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@Model.EffectiveDates[idx].ToShortDateString()">@Model.EffectiveDates[idx].ToShortDateString()</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label class="col-form-label" for="val-select2-expirationdate" id="labelExpirationDate" name="labelExpirationDate">Expiration Date<span class="text-danger">*</span></label>
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <select name="val-select2-expirationdate" class="js-select2 form-control" id="val-select2-expirationdate" style="width:100%;" onchange="javascript: ChangeExpirationDate();" disabled data-placeholder="Please select ..."></select>
+                                    }
+                                    else
+                                    {
+                                        <select name="val-select2-expirationdate" class="form-control" style="width:100%" id="val-select2-expirationdate" onchange="javascript: ChangeExpirationDate();" data-placeholder="Please select ...">
+                                            @foreach (var expdt in Model.ExpirationDates)
+                                            {
+                                                <option selected value="@expdt.ToShortDateString()">@expdt.ToShortDateString()</option>
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <input id="txtNewProperty" type="hidden" />
+                                    <button class="btn btn-alt-primary" type="submit" id="btnAddProperty" name="btnAddProperty">
+                                        Add Property
+                                    </button>
+                                    @if (Model.NetworkDefault == null)
+                                    {
+                                        <button class="btn btn-alt-primary" type="button" onclick="javascript: ClearAllFields();">Clear All Fields</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-alt-primary" type="button" onclick="javascript: ClearAllFieldsModal();">Reset</button>
+                                        <button type="button" class="btn btn-alt-primary" data-dismiss="modal" onclick="javascript: CloseWindow();">Close</button>
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="block">
+                <div class="block-content">
+                    <div id="divErrorMessage" name="divErrorMessage" hidden>
+                        <div class="alert alert-danger alert-dismissable" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h3 class="alert-heading font-size-h4 font-w400">Error</h3>
+                            <p class="mb-0"><label id="ErrorMessage" name="ErrorMessage"></label></p>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="DemoTable" name="DemoTable" class="table table-bordered table-hover text-center">
+                            <thead name="demoheader" id="demoheader">
+                            </thead>
+                            <tbody name="demos" id="demos">
+                                <!--
+                                <tr>
+                                    <td colspan="6">
+                                        Available options for <code>*</code>: <code>inline</code> <code>inline-block</code> <code>block</code> <code>table</code> <code>table-cell</code> <code>flex</code> <code>inline-flex</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <code>.d-none</code> <code>.d-sm-*</code>
+                                    </td>
+                                    <td><i class="si si-close text-danger"></i></td>
+                                    <td><i class="si si-check text-success"></i></td>
+                                    <td><i class="si si-check text-success"></i></td>
+                                    <td><i class="si si-check text-success"></i></td>
+                                    <td><i class="si si-check text-success"></i></td>
+                                </tr>
+                                    -->
+                            </tbody>
+                        </table>
+                        <div id="demomasks" name="demomasks"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- END Page Content -->

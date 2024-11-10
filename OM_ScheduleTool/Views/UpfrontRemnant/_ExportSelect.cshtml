@@ -1,0 +1,100 @@
+@model ViewUpfrontsViewModel
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('.chk-buy-type').click(function () {
+            var url = "/UpfrontRemnant/GetUpfrontDemoNamesByBuyTypeId";
+            var chkBuyType = document.getElementsByName('buytype');
+            var chkBuyTypeChecked = [];
+            var bt = '';
+            for (var i = 0; i < chkBuyType.length; i++) {
+                if (chkBuyType[i].checked) {
+                    bt = bt + chkBuyType[i].value + ',';
+                }
+            }
+
+            $.ajax({
+                url: url,
+                data: {
+                    UpfrontId: getParameterByName('upfrontid'),
+                    BuyTypeIds: bt
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "";
+                    if (result.count > 0) {
+                        for (var x = 0; x < result.data.length; x++) {
+                            markup += "<label class=\"custom-control custom-checkbox\">";
+                            markup += "<input name=\"demonames\" class=\"custom-control-input\" id=\"checkbox-demo-" + result.data[x].demographicSettingsId + "\" type=\"checkbox\" checked=\"\" value=\"" + result.data[x].demoName + "\">";
+                            markup += "<span class='custom-control-indicator'></span>";
+                            markup += "<span class='custom-control-description'>" + result.data[x].demoName + "</span>";
+                            markup += "</label>";
+                        }
+                    }
+                    else {
+                        markup = "No demos found for buy types selected."
+
+                    }
+                    $("#divDemoNames").html(markup).show();
+                },
+                error: function (response) {
+                    swal('Ooops ...', 'Error Populating Demo Names:  ' + response, 'error');
+                }
+            });
+        });
+    });
+</script>
+<div class="modal fade" id="modal-exportselect" tabindex="-1" role="dialog" aria-labelledby="modal-exportselect" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Export</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <label class="col-12">Buy Type:</label>
+                        <div class="col-12">
+                            @foreach (var BuyType in Model.BuyTypeAvailable)
+                            {
+                                <label class="custom-control custom-checkbox">
+                                    <input name="buytype" class="custom-control-input chk-buy-type" id="chkbuytype-@BuyType.BuyTypeDescription" type="checkbox" checked="" value="@BuyType.BuyTypeDescription">
+                                    <span class="custom-control-indicator"></span>
+                                    <span class="custom-control-description">@BuyType.BuyTypeDescription</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-12">Demo:</label>
+                        <div class="col-12">
+                            <div id="divDemoNames" class="custom-controls-stacked">
+                                @foreach (var Demo in Model.DemoNamesAvailable)
+                                {
+                                    <label class="custom-control custom-checkbox">
+                                        <input name="demonames" class="custom-control-input" id="checkbox-demo-@Demo.Description" type="checkbox" checked="" value="@Demo.Description">
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">@Demo.Description</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnExportSubmit" name="btnExportSubmit">
+                    <i class="fa fa-check"></i> OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

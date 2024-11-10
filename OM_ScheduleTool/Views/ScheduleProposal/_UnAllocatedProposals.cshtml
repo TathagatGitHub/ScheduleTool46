@@ -1,0 +1,346 @@
+﻿@model ManageMediaViewModel
+@*@{
+
+    string selectedQuarterName = Model.UpfrontInfo.Quarter.QuarterName;
+    int selectedBroadcastQuarterNbr = Model.UpfrontInfo.Quarter.BroadcastQuarterNbr;
+}*@
+
+
+<style type="text/css">
+
+    .swal2-buttonswrapper {
+        float: right;
+    }
+
+        .swal2-buttonswrapper button.swal2-cancel {
+            color: #171717;
+            background-color: #eaecee;
+            border-color: #eaecee;
+        }
+
+            .swal2-buttonswrapper button.swal2-cancel:hover {
+                color: #171717;
+                background-color: #cdd2d7;
+                border-color: #cdd2d7;
+                box-shadow: none;
+            }
+
+    .swal2-confirm {
+        float: right;
+    }
+
+    .swal2-cancel {
+        float: right;
+    }
+
+    div.scroll {
+        width: 200px;
+        height: 150px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: left;
+        padding: 20px;
+    }
+
+    /*Overlay Code Style*/
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .overlay-content {
+        position: relative;
+        top: 25%;
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .overlay a {
+        padding: 8px;
+        text-decoration: none;
+        font-size: 36px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+        .overlay a:hover, .overlay a:focus {
+            color: #f1f1f1;
+        }
+
+    .overlay .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 45px;
+        font-size: 60px;
+    }
+
+    table.dataTable.compact thead th, table.dataTable.compact thead td {
+        padding: 2px !important;
+    }
+
+    table thead th, table thead td {
+        padding: 2px !important;
+    }
+
+    .table-bordered > thead > tr > th, .table-bordered > thead > tr > td {
+        border-bottom-width: 0px !important;
+    }
+    /*#SingleMatchedProposals thead th:nth-child(2),
+           #SingleMatchedProposals thead td:nth-child(2) {
+            width: 1500px !important;
+        }*/
+    #UnAllocatedProposalsTable th:nth-child(0)
+    #ArchivedProposalTable th:nth-child(0) {
+        width: 30px;
+    }
+
+    td:nth-child(1)
+    #tblTotal th,
+    #tblTotal td {
+        width: 100px;
+        padding: 3px;
+        font-size: 14px;
+    }
+
+    .active-tab {
+        box-shadow: inset 0 -2px #42a5f5;
+    }
+
+    table.dataTable thead .sorting,
+    table.dataTable thead .sorting_asc,
+    table.dataTable thead .sorting_desc {
+        background: none;
+    }
+
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+            display: none !important;
+        }
+
+        table.dataTable thead .sorting i.fa-sort-asc,
+        table.dataTable thead .sorting i.fa-sort-desc {
+            display: none;
+        }
+
+        table.dataTable thead .sorting_asc i.fa-sort,
+        table.dataTable thead .sorting_asc i.fa-sort-desc {
+            display: none;
+        }
+
+        table.dataTable thead .sorting_desc i.fa-sort,
+        table.dataTable thead .sorting_desc i.fa-sort-asc {
+            display: none;
+        }
+
+    .importTable td:nth-child(0)
+    .importTable td:nth-child(1) {
+        min-width: 450px !important;
+    }
+    /* Ensure that the demo table scrolls */
+    #UnAllocatedProposalsTable th, #UnAllocatedProposalsTabletd {
+        white-space: nowrap;
+    }
+
+    #ArchivedProposalTable th, #ArchivedProposalTable {
+        white-space: nowrap;
+    }
+
+
+
+    #UnAllocatedProposalsTable_wrapper {
+        margin: 0 auto;
+    }
+
+    #ArchivedProposalTable_wrapper {
+        margin: 0 auto;
+    }
+
+    #UnAllocatedProposalsTable tbody tr {
+        max-height: 20px !important;
+    }
+
+    #ArchivedProposalTable tbody tr {
+        max-height: 20px !important;
+    }
+
+    #UnAllocatedProposalsTable tbody tr td {
+        max-height: 20px !important;
+    }
+
+    #ArchivedProposalTable tbody tr td {
+        max-height: 20px !important;
+    }
+
+    #modal-UnAllocatedProposals .block-content {
+        padding: 0px 10px 0px 10px;
+    }
+
+    .add {
+        background-color: #d3e9b8 !important;
+    }
+
+    .replace {
+        background-color: #D7FFBC !important;
+    }
+
+    .ignore {
+        background-color: #ffffff !important;
+    }
+</style>
+
+<div class="modal fade" id="modal-UnAllocatedProposals" tabindex="-1" role="dialog" aria-labelledby="modal-UnAllocatedProposals" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 72%;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="HeadingData"></h3>
+                    <div class="block-options">
+                        <button type="button" id="btnDRCloseTop" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="DivOverLayPopoup" class="overlay" style="display: none; width: 100%!important;z-index:10000000;">
+                    <div style="text-align:center;position:absolute;vertical-align:middle;color:blue;height:150px;width:150px;left:50%;top:50%;margin-left:-75px;margin-top:-75px;">
+                        <img src="~/img/loadingImg.gif" style="height:60px;width:60px;" />
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row gutters-tiny">
+                        <ul id="UlUnAllocatedProposals" class="nav nav-tabs nav-tabs-alt js-tabs-enabled" data-toggle="tabs" role="tablist">
+                            <li class="nav-item">
+                                <a style="color:#575757;" class="active-tab" name="all" id="all" onclick="ShowUnAllocatedProposals(this,1)">Current Proposals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a style="color:#575757" name="archived" id="archived" onclick="CheckArchivedUnAllocationProposals(this)">Archived</a>
+                            </li>
+                            <li class="nav-item">
+                                <a style="color:#575757" name="processed" id="processed" onclick="CheckProcessedProposals(this)">Processed</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active fixTabs" id="divUnAllocatedNetworksSection" role="tabpanel" aria-labelledby="home-tab" style="width:99%; position:relative;margin-top: -15px;">
+                        <div class="block-content block-content-full" id="divUnAllocatedNetworks"
+                             name="divUnAllocatedNetworks">
+                            <div class="row gutters-tiny" id="divNetwork" style="display:none;">
+                                <label class="col-form-label">Network</label>
+                                <div class="col-2">
+                                    <select id="ddlNetworksUnallocated" onchange="FilterUnAllocatedProposals();">
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="justify-content: center;" class="row " id="divUnallocatedTableParent">
+                                <table class="table display" cellspacing="0" cellpadding="0" id="UnAllocatedProposalsTable" name="UnAllocatedProposalsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">NETWORK <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DEAL <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">RECEIVED DATE/TIME <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">SPOTS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DOLLARS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">IMP <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">CPM <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center exportingdata">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyUnAllocatedProposals">
+                                        <tr>
+                                            <td colspan="8" class="text-center">Loading data Please wait....</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade fixTabs" id="divArvhivedProposalSection" role="tabpanel" aria-labelledby="home-tab" style="width:99%; position:relative;margin-top: -15px;">
+                        <div class="block-content block-content-full" id="divArchivedProposals"
+                             name="divArchivedProposals">
+                            <div class="row gutters-tiny" style="display:none;">
+                                <label class="col-form-label">Network</label>
+                                <div class="col-2">
+                                    <select id="ddlNetworksArchived" onchange="FilterArchivedProposals();">
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="justify-content: center;" class="row">
+                                <table class="table display" cellspacing="0" cellpadding="0" id="ArchivedProposalTable" name="ArchivedProposalTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">NETWORK <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DEAL <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">RECEIVED DATE/TIME <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">SPOTS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DOLLARS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">IMP <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">CPM <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyArchivedProposal">
+                                        <tr>
+                                            <td colspan="8" class="text-center">Loading data Please wait....</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade fixTabs" id="divProcessedProposalSection" role="tabpanel" aria-labelledby="home-tab" style="width:99%; position:relative;margin-top: -15px;">
+                        <div class="block-content block-content-full" id="divProcessedProposals"
+                             name="divProcessedProposals">
+                            <div class="row gutters-tiny" style="display:none;">
+                                <label class="col-form-label">Network</label>
+                                <div class="col-2">
+                                    <select id="ddlNetworksProcessed" onchange="FilterProcessedProposals();">
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="justify-content: center;" class="row">
+                                <table class="table display" cellspacing="0" cellpadding="0" id="ProcessedProposalTable" name="ProcessedProposalTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">NETWORK <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DEAL <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">PROCESSED<i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">SPOTS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">DOLLARS <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">IMP <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center">CPM <i class="fa fa-sort"></i><i class="fa fa-sort-asc"></i><i class="fa fa-sort-desc"></i></th>
+                                            <th class="text-center exportingdata">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyProcessedProposalTable">
+                                        <tr>
+                                            <td colspan="8" class="text-center">Loading data Please wait....</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnDRClose" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <input type="button" id="btnImport" value="Next" class="btn btn-alt-success" onclick="PerformNext()" data-type="view" />
+            </div>
+        </div>
+    </div>
+</div>

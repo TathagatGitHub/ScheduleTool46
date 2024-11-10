@@ -1,0 +1,26 @@
+﻿
+@model UpfrontExpansionViewModel
+
+<script type="text/javascript">
+    var NoExitPrompt = false;
+</script>
+
+<main id="main-container">
+    <div class="content">
+        @Html.HiddenFor(m => m.CurrentUpfrontExpansionTracking.Yearly)
+
+        <div id="divHeader">
+            @if (Model.CurrentUpfrontExpansionTracking.Yearly ?? false) {
+                @await Html.PartialAsync("~/Views/UpfrontExpansion/_HeaderYearly.cshtml", Model)
+            }
+            else {
+                @await Html.PartialAsync("~/Views/UpfrontExpansion/_Header.cshtml", Model)
+            }
+        </div>
+            
+        <div id="divDetail">
+            @await Html.PartialAsync("~/Views/UpfrontExpansion/_Detail.cshtml", Model)
+        </div>
+        
+    </div>
+</main>

@@ -1,0 +1,120 @@
+﻿
+<style type="text/css">
+    .bg-color {
+        background-color: #F79646;
+    }
+
+    table.display {
+        margin: 0 auto;
+        width: 100%;
+        clear: both;
+        border-collapse: collapse;
+        table-layout: fixed;
+        word-wrap: break-word;
+    }
+
+    .dataTables_filter {
+        width: 50%;
+        float: right;
+        text-align: right;
+    }
+
+    .HeaderPropertyNamePM {
+        min-width: 300px !important;
+        max-width: 300px !important;
+    }
+
+    .HeaderWeekDOWPM {
+        min-width: 88px !important;
+        max-width: 88px !important;
+    }
+
+    .HeaderStartToEndPM {
+        min-width: 110px !important;
+        max-width: 110px !important;
+    }
+
+    .HeaderBuyTypePM, .HeaderDPPM {
+        min-width: 35px !important;
+        max-width: 35px !important;
+    }
+
+    .HeaderSpotLenPM {
+        min-width: 65px !important;
+        max-width: 65px !important;
+    }
+
+    .HeaderDemoNamePM {
+        min-width: 122px !important;
+        max-width: 122px !important;
+    }
+
+    .HeaderImpsPM, .HeaderCPMPM {
+        min-width: 100px !important;
+        max-width: 100px !important;
+    }
+
+    .HeaderRatePM, .HeaderWeekDayPM {
+        min-width: 105px !important;
+        max-width: 105px !important;
+    }
+
+    .hideThis {
+        display: none;
+    }
+</style>
+
+<div class="modal fade" id="modal-PotentialMatches" tabindex="-1" role="dialog" draggable="true" data-backdrop="static"
+     aria-labelledby="modal-PotentialMatches" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="min-width: 950px;max-width: 950px;max-height: 95%;margin-top:10%;margin-left:22%;">
+        <div class="modal-content" style="height:100%;">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="ImportHeadingDataPotentialMatches"></h3>
+                </div>
+                <div class="block-content" style="max-width: 100%;max-height: 95%;padding:0;margin:0;">
+                    <div class="form-group row gutters-tiny">
+                        <div class="block-content block-content-full" id="divPotentialMatchedData">
+                            <div class="cleafix" style="width:840px;color:black;margin-left:20px;font-size:20px;">
+                                One or more existing properties have been identified as a near match. Check the one which applies and select <strong>MERGE</strong> to add the deal property to the existing property shown below.
+                            </div>
+                            <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap"
+                                   id="PotentialMatchesProposals" name="PotentialMatchesProposals" style="width:840px;max-width:840px;max-width:840px;border: 1px solid #e5e5e5;">
+                                <thead id="thPotentialMatchesProposals">
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderPropertyNamePM dtBackgroundColor filterhead highZindex">Existing Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderWeekDOWPM dtBackgroundColor filterhead highZindex">DOW</th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderStartToEndPM dtBackgroundColor filterhead highZindex">Start - End</th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderBuyTypePM dtBackgroundColor filterhead highZindex">BT</th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderSpotLenPM dtBackgroundColor filterhead highZindex">SpotLen</th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDemoNamePM dtBackgroundColor filterhead highZindex">Demo Name</th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderRatePM dtBackgroundColor filterhead highZindex">Rate</th>
+                                </thead>
+                                <tbody id="tbPotentialMatchesProposals">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancelPotentialMatch" class="btn btn-alt-secondary" onclick="ClosedPotentialMatchPopup();">Cancel</button>
+                <input type="button" id="btnMergePotentialMatches" style="float: right;" disabled
+                       value="Merge"
+                       class="btn btn-alt-success"
+                       onclick="return MergePotentialMatches();" data-type="view">
+            </div>
+        </div>
+    </div>
+</div>

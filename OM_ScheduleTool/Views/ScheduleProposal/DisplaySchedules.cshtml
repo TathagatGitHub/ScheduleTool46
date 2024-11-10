@@ -1,0 +1,74 @@
+﻿@model DisplaySchedulesViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+<main id="main-container">
+    <div class="content">
+        <!-- Dynamic Table Full -->
+        @using (Html.BeginForm("ExportSchedulesExcel", "ManageMedia", FormMethod.Get, new { @class = "js-validation-bootstrap", @id = "formDisplaySchedulePage" }))
+        {
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Schedules</h3>
+                <div class="block-options">
+                    <button id="btnExcel" type="submit" class="btn btn-alt-primary" data-toggle='tooltip' title='Export to Excel'><i class="fa fa-file-excel-o mr-5"></i> Export to Excel</button>
+                </div>
+            </div>
+
+            <div class="block-content block-content-full">
+                <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="DisplayScheduleTable" name="DisplayScheduleTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Country</th>
+                            <th>Schedule Name</th>
+                            <th class="d-none d-sm-table-cell">Client Name</th>
+                            <th class="d-none d-sm-table-cell">Buyer</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Last Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Schedules in Model.Schedules)
+                        {
+                        <tr>
+                            <td class="text-center">@Schedules.Client.Country.CountryShort</td>
+                            <td class="font-w600">@Schedules.ScheduleName</td>
+                            <td class="d-none d-sm-table-cell">@Schedules.Client.ClientName</td>
+                            <td class="d-none d-sm-table-cell">
+                                @if (Schedules.BuyerUser != null)
+                                {
+                                        @Schedules.BuyerUser.LastName
+                                }
+                           </td>
+                            <td class="text-center">
+                            @if (Schedules.LockedByUserId != null)
+                            {
+                                <button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'  data-toggle="popover" title="Schedule Locked" data-placement="top" data-content="@Schedules.LockedDt @Schedules.LockedByUser.DisplayName"><i class='fa fa-lock'></i></button>
+                            }
+                            else
+                            {
+                                <button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'><i class='fa fa-unlock'></i></button>
+                            }
+                            </td>
+                            <td class="text-center">
+                            @if (Schedules.UpdatedBy != null)
+                            {
+                                @Schedules.UpdateDt
+                                <br/>
+                                @Schedules.UpdatedBy.DisplayName;
+                            }
+                            </td>
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        }
+    </div>
+</main>

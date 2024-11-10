@@ -1,0 +1,54 @@
+@model PreLogViewModel
+
+<style type="text/css">
+    div.cb-dropdown-wrap:hover {
+        z-index: 2;
+    }
+</style>
+<script asp-append-version="true" src="~/js/logs/PreLog.js"></script>
+<script asp-append-version="true" type="text/javascript" src="~/js/check_browser_close.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width() - 20);         
+    });
+    localStorage.removeItem("DataTables_PreLogViewTable_" + getParameterByName('prelogid'));
+     var unloadEvent = function (e) {              
+        var prelogId = $('#prelogId').val();
+
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: '/Logs/UnLockPreLog',
+            data: { prelogId },
+            success: function (result) {                    
+                //window.close();
+            },
+            error: function (response) {
+                //window.close();
+            }
+        });
+        window.opener.location.reload();
+    };
+
+     $(window).on('unload', function () {
+        try {
+            unloadEvent();
+        }
+        catch (err) {
+        }
+    });
+</script>
+
+<input id="prelogId" name="prelogId" type="hidden" value="@Model.PrelogId" />
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/Logs/_PreLogHeader.cshtml", Model)
+            </div>
+        </div>
+        @Html.Partial("~/Views/Logs/_PreLogDataTable_Edit.cshtml", Model)
+    </div>
+</main>
+

@@ -1,0 +1,849 @@
+@model ProposalViewModel
+
+    <style type="text/css">
+        .CanadaQNameWidth {
+            min-width: 370px !important
+        }
+
+        .USQNameWidth {
+            min-width: 290px !important
+        }
+
+        .ViewCanadaQNameWidth {
+            min-width: 370px !important
+        }
+
+        .ViewUSQNameWidth {
+            min-width: 290px !important
+        }
+
+        .calculatorEditTableTotalsHeader .dtfc-fixed-left {
+        }
+    </style>
+
+<div class="block block-themed block-rounded" id="divCalculatorEdit">
+    @if (Model.ProposalInfo.ScheduleType.ScheduleTypeId == 1)
+    {
+        <div class="block-header block-header-default bg-success">
+            <h3 class="block-title">Totals for @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                @if (Model.ProposalInfo.CountryId == 2)
+                {
+                    <button id="ShowHideUSDRates" class="btn-block-option" type="button">
+                        <i class="fa fa-dollar"></i>
+                    </button>
+                }
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="block-header block-header-default bg-pulse">
+            <h3 class="block-title">Totals for @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                @if (Model.ProposalInfo.CountryId == 2)
+                {
+                    <button id="ShowHideUSDRates" class="btn-block-option" type="button">
+                        <i class="fa fa-dollar"></i>
+                    </button>
+                }
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    <div class="block-content" id="resize_wrapper">
+        <input id="showgi" value="-1" type="hidden" />
+        <input id="countryid" value="@Model.ProposalInfo.CountryId" type="hidden" />
+            <input id="CalcExch" value="0" type="hidden" />
+        <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+        <!--<table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="UpfrontTable" name="UpfrontTable">-->
+        <table class="display compact nowrap" id="CalculatorEditTable" border="1" name="CalculatorEditTable">
+            <thead>
+                <tr>
+                    @*<th class="d-none d-sm-table-cell dtBackgroundColor">TOTALS</th>*@
+                    <th class="d-none d-sm-table-cell dtBackgroundColor" style='max-width:350px!important'>TOTALS</th>
+
+                    @*<th class="d-none d-sm-table-cell text-center dtBackgroundColor">@Model.ProposalQuarter.QuarterName</th>*@
+                    @if ((@Context.Request.Path.ToString().Contains("ViewSchedule") || @Context.Request.Path.ToString().Contains("ViewProposal")) ? true : false)
+                    {
+                        <th class="d-none d-sm-table-cell text-center dtBackgroundColor @(Model.ProposalInfo.CountryId == 2 ? "ViewCanadaQNameWidth" : "ViewUSQNameWidth")">@Model.ProposalQuarter.QuarterName</th>
+                    }
+                    else
+                    {
+                        <th class="d-none d-sm-table-cell text-center dtBackgroundColor @(Model.ProposalInfo.CountryId == 2 ? "CanadaQNameWidth" : "USQNameWidth")">@Model.ProposalQuarter.QuarterName</th>
+                    }
+
+                    @if (Model.ProposalQuarter.Wk01_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk01_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk01_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk02_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk02_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk02_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk03_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk03_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk03_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk04_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk04_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk04_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk05_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk05_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk05_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk06_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk06_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk06_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk07_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk07_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk07_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk08_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk08_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk08_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk09_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk09_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk09_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk10_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk10_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk10_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk11_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk11_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk11_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk12_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk12_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk12_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk13_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk13_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk13_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk14_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk14_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk14_Date)</th>
+                    }
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+        @if (Model.ProposalInfo.CountryId == 2)
+        {
+            <table class="display compact nowrap" id="CalculatorUSDTable" name="CalculatorUSDTable">
+                <thead>
+                    <tr>
+                        <th class="d-none d-sm-table-cell">TOTALS</th>
+                        <th class="d-none d-sm-table-cell text-center" >@Model.ProposalQuarter.QuarterName</th>
+                        @if (Model.ProposalQuarter.Wk01_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk01_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk02_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk02_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk03_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk03_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk04_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk04_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk05_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk05_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk06_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk06_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk07_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk07_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk08_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk08_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk09_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk09_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk10_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk10_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk11_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk11_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk12_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk13_Date)</th>}
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <th class="d-none d-sm-table-cell text-center" >@String.Format("{0:MM/dd/yyyy}", Model.ProposalQuarter.Wk14_Date)</th>}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-user="2">
+                        <td class="d-none d-sm-table-cell">SPOTS</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalSpots_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk01_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk01_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk02_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk02_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk03_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk03_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk04_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk04_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk05_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk05_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk06_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk06_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk07_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk07_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk08_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk08_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk09_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk09_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk10_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk10_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk11_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk11_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk12_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk13_Converted"></td>}
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalSpotsWk14_Converted"></td>}
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="d-none d-sm-table-cell">GROSS DOLLARS (USD)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollars_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossDollarsWk14_Converted"></td>
+                        }
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="d-none d-sm-table-cell">GROSS CPM (USD)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPM_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossCPMWk14_Converted"></td>
+                        }
+                    </tr>
+                    <tr class="table-success">
+                        <td class="d-none d-sm-table-cell">CLIENT DOLLARS (USD)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollars_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientDollarsWk14_Converted"></td>
+                        }
+                    </tr>
+                    <tr class="table-success">
+                        <td class="d-none d-sm-table-cell">CLIENT CPM (USD)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPM_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalClientCPMWk14_Converted"></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">GI</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressions_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGrossImpressionsWk14_Converted"></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">GRPs</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRP_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk01_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk02_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk03_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk04_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk05_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk06_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk07_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk08_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk09_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk10_Converted"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk11_Converted"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk12_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk13_Converted"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGRPWk14_Converted"></td>
+                        }
+                    </tr>
+
+                    <tr data-user="2">
+                        <td class="d-none d-sm-table-cell">GI % - :15</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk01"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk02"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk03"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk04"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk05"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk06"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk07"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk08"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk09"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk10"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk11"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk12"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk13"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD15Wk14"></td>
+                        }
+                    </tr>
+                    <tr data-user="2">
+                        <td class="d-none d-sm-table-cell">GI % - :30</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk01"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk02"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk03"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk04"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk05"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk06"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk07"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk08"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk09"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk10"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk11"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk12"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk13"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD30Wk14"></td>
+                        }
+                    </tr>
+                    <tr data-user="2">
+                        <td class="d-none d-sm-table-cell">GI % - :60</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk01"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk02"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk03"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk04"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk05"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk06"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk07"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk08"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk09"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk10"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk11"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk12"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk13"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD60Wk14"></td>
+                        }
+                    </tr>
+                    <tr data-user="2">
+                        <td class="d-none d-sm-table-cell">GI % - :120</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk01"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk02"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk03"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk04"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk05"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk06"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk07"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk08"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk09"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk10"></td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk11"></td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk12"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk13"></td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalGIPercentUSD120Wk14"></td>
+                        }
+                    </tr>
+
+
+                    <tr>
+                        <td class="d-none d-sm-table-cell">Exchange Rates (USD)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSD">@String.Format("{0:n5}", Model.ClientExchangeRate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk01">@String.Format("{0:n5}", Model.ClientWeeklyExchangeRate.Week01Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk02">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week02Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk03">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week03Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk04">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week04Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk05">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week05Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk06">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week06Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk07">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week07Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk08">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week08Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk09">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week09Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk10">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week10Rate)</td>
+                        <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk11">@String.Format("{0:n5}", @Model.ClientWeeklyExchangeRate.Week11Rate)</td>
+                        @if (Model.ProposalQuarter.Wk12_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk12">@String.Format("{0:n5}", Model.ClientWeeklyExchangeRate.Week12Rate)</td>
+                        }
+                        @if (Model.ProposalQuarter.Wk13_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk13">@String.Format("{0:n5}", Model.ClientWeeklyExchangeRate.Week13Rate)</td>
+                        }
+                        @if (Model.ProposalQuarter.Wk14_Date != null)
+                        {
+                            <td class="d-none d-sm-table-cell text-center" id="TotalUSDWk14">@String.Format("{0:n5}", Model.ClientWeeklyExchangeRate.Week14Rate)</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<script asp-append-version="true" src="~/js/scheduleproposal/Calculator.js"></script>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        // Summary Table
+        var pathName = window.location.pathname;
+        $('#CalculatorEditTable').wrap('<div id="hideEdit" style="display:block"/>');
+        //var calctable = $('#CalculatorEditTable').DataTable({
+        //    ajax: {
+        //        url: '/ScheduleProposal/GetProposalData',
+        //        type: 'POST',
+        //        data: function (d) {
+        //            d.proposalId = _UniqueId,
+        //            d.discountRate = parseFloat($("#DiscountPrice").find(":selected").text().replace('%', '')),
+        //            d.ViewOnly = (pathName.includes("ViewSchedule") || pathName.includes("ViewProposal")) ? true : false,
+        //            d.pageNum = $("#CurPage").val(),
+        //            d.pageLength = 200,
+        //            d.showTotals = true,
+        //            d.calcExch = ($('#CalcExch').val() == '1'? true : false),
+        //            d.schedule = (pathName.includes("EditSchedule") || pathName.includes("ViewSchedule")) ? true : false
+        //        }
+        //    },
+        //    columns: [
+        //        {
+        //            targets: 0,
+        //            data: "description",
+        //            class: "d-none d-sm-table-cell",
+        //        },
+        //        {
+        //            targets: 1,
+        //            data: "total",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 2,
+        //            data: "wk01",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 3,
+        //            data: "wk02",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 4,
+        //            data: "wk03",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 5,
+        //            data: "wk04",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 6,
+        //            data: "wk05",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 7,
+        //            data: "wk06",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 8,
+        //            data: "wk07",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 9,
+        //            data: "wk08",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 10,
+        //            data: "wk09",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 11,
+        //            data: "wk10",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 12,
+        //            data: "wk11",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 13,
+        //            data: "wk12",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 14,
+        //            data: "wk13",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+        //        {
+        //            targets: 15,
+        //            data: "wk14",
+        //            class: "d-none d-sm-table-cell text-center",
+        //        },
+
+        //        {
+        //            targets: 17,
+        //            defaultContent: '',
+        //            render: function (data, type, row, meta) {
+        //                return "<input style='width:0px!important;border-right-style:hidden;border-left-style:hidden;border-top-style:hidden;border-bottom-style:hidden;background-color: white;max-height:0px;' disabled>";
+        //                //border - right - style: hidden; border - left - style: hidden; border - top - style: hidden; border - bottom - style: hidden
+        //            }
+        //        },
+        //    ],
+        //    paging: false,
+        //    searching: true,
+        //    info: false,
+        //    ordering: false,
+        //    autoWidth: false,
+        //    dom: 'lrtip',
+        //    scrollX: true,
+        //    scrollCollapse: true,
+        //    fixedColumns: {
+        //        leftColumns: 2
+        //     },
+        //    rowCallback: function (row, data) {
+        //        if (weekCounts["wk01"] > 0 || wk1 == true) {
+        //            $('td:eq(2)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk01"] == 0) {
+        //            $('td:eq(2)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk02"] > 0 || wk2 == true) {
+        //            $('td:eq(3)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk02"] == 0) {
+        //            $('td:eq(3)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk03"] > 0 || wk3 == true) {
+        //            $('td:eq(4)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk03"] == 0) {
+        //            $('td:eq(4)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk04"] > 0 || wk4 == true) {
+        //            $('td:eq(5)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk04"] == 0) {
+        //            $('td:eq(5)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk05"] > 0 || wk5 == true) {
+        //            $('td:eq(6)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk05"] == 0) {
+        //            $('td:eq(6)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk06"] > 0 || wk6 == true) {
+        //            $('td:eq(7)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk06"] == 0) {
+        //            $('td:eq(7)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk07"] > 0 || wk7 == true) {
+        //            $('td:eq(8)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk07"] == 0) {
+        //            $('td:eq(8)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk08"] > 0 || wk8 == true) {
+        //            $('td:eq(9)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk08"] == 0) {
+        //            $('td:eq(9)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk09"] > 0 || wk9 == true) {
+        //            $('td:eq(10)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk09"] == 0) {
+        //            $('td:eq(10)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk10"] > 0 || wk10 == true) {
+        //            $('td:eq(11)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk10"] == 0) {
+        //            $('td:eq(11)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk11"] > 0 || wk11 == true) {
+        //            $('td:eq(12)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk11"] == 0) {
+        //            $('td:eq(12)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk12"] > 0 || wk12 == true) {
+        //            $('td:eq(13)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk12"] == 0) {
+        //            $('td:eq(13)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk13"] > 0 || wk13 == true) {
+        //            $('td:eq(14)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk13"] == 0) {
+        //            $('td:eq(14)', row).removeClass('text-danger');
+        //        }
+        //        if (weekCounts["wk14"] > 0 || wk14 == true) {
+        //            $('td:eq(15)', row).addClass('text-danger');
+        //        }
+        //        else if (weekCounts["wk14"] == 0) {
+        //            $('td:eq(15)', row).removeClass('text-danger');
+        //        }
+        //    }
+        //});
+
+        // This the table that stores all Exchange Rates equivalentson the summary table
+        if ($("#countryid").val() == 2) {
+            $('#CalculatorUSDTable').wrap('<div id="hideUSD" style="display:none"/>');
+            var calcusd = $('#CalculatorUSDTable').DataTable({
+                paging: false,
+                searching: true,
+                info: false,
+                ordering: false,
+                autoWidth: false,
+                dom: 'lrtip'
+            });
+        }
+
+        $("#ShowHideUSDRates").click(function () {
+            ShowHideExchangeRates();
+        });
+
+        $("#reset").click(function () {
+            $.fn.dataTable.ext.search.pop();
+            calctable.draw();
+        });
+    });
+
+
+/****************************** not reviewed ******************************************/
+    function ReloadCalculatorWithUSD(proptable) {
+    $.ajax({
+        type: "POST",
+        data: {
+            ProposalId: _Id,
+            DiscountPrice: _DiscountPrice
+        },
+        url: '/ScheduleProposal/_Proposal_DataTable',
+        success: function (result) {
+            $('#ProposalTableDiv').html(result);
+        },
+        error: function (response) {
+            $('#ProposalTableDiv').html(response.responseText);
+        }
+    });
+
+
+    //alert(DiscountPrice.find('option:selected').attr('value'));
+    //$('#ProposalTableDiv').html(DiscountPrice.find('option:selected').attr('value'));
+
+    //$('#ProposalTableDiv').load("~/ScheduleProposal/_Proposal_DataTable?ProposalId=251&DiscountPrice=0.07");
+    //    @*'@(Url.Action("_Proposal_DataTable","ManageMedia",null, Request.Url.Scheme))?ProposalId=' + getParameterByName('ProposalId') + '&DiscountPrice=' + DiscountPrice*@
+    //);
+
+}
+
+
+    function UpdateWeek(WeekNo) {
+        var proptable = $("#MyProposalTable").DataTable();
+        var TotalSpotsWk = 0;
+        var TotalGrossDollars = 0;
+        var TotalGrossImpressions = 0;
+        var TotalClientDollars = 0;
+        var TotalGRP = 0;
+        var TotalGrossCPM = 0;
+        var TotalClientCPM = 0;
+        var TotalGI15 = 0;
+        var TotalGI30 = 0;
+        var TotalGI60 = 0;
+        var TotalGI120 = 0;
+
+        proptable.rows({ search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
+            var data = this.data();
+            var node = this.node();
+
+            var FullRate = parseFloat(data.rateAmt);
+            var Impressions = parseInt(data.impressions);
+            var Universe = parseInt(data.demoUniverse);
+            var SpotLen = parseInt(data.spotLen);
+
+            var SpotsWk = 0;
+            if (document.getElementById("wk" + WeekNo + "_" + data.scheduleLineId)) {
+                SpotsWk = parseInt($("#wk" + WeekNo + "_" + data.scheduleLineId).val());
+                TotalSpotsWk = TotalSpotsWk + SpotsWk;
+                TotalGrossDollars = TotalGrossDollars + (FullRate * SpotsWk);
+                TotalGrossImpressions = TotalGrossImpressions + (Impressions * SpotsWk);
+                TotalClientDollars = TotalClientDollars + (SpotsWk * (FullRate * 0.85));
+                TotalGRP = TotalGRP + (Universe <= 0 ? 0 : TotalGrossImpressions / (.1 * Universe));
+                TotalGrossCPM = TotalGrossCPM + (TotalGrossImpressions <= 0 ? 0 : TotalGrossDollars / TotalGrossImpressions);
+                TotalClientCPM = TotalClientCPM + (TotalGrossImpressions <= 0 ? 0 : TotalClientDollars / TotalGrossImpressions);
+            }
+        });
+        $("#TotalSpotsWk" + WeekNo).html(TotalSpotsWk).show();
+        $("#TotalGrossDollarsWk" + WeekNo).html(formatCurrency(TotalGrossDollars)).show();
+        $("#TotalGrossImpressionsWk" + WeekNo).html(TotalGrossImpressions.toLocaleString()).show();
+        $("#TotalClientDollarsWk" + WeekNo).html(formatCurrency(TotalClientDollars)).show();
+        $("#TotalGRPWk" + WeekNo).html(formatCurrency(TotalGRP)).show();
+        $("#TotalGrossCPMWk" + WeekNo).html(formatCurrency(TotalGrossCPM)).show();
+        $("#TotalClientCPMWk" + WeekNo).html(formatCurrency(TotalClientCPM)).show();
+    }
+
+</script>

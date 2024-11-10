@@ -1,0 +1,235 @@
+@model ProposalViewModel
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        var table = $('#NoteTable').DataTable({
+            lengthMenu: [[5, 10, 15, 20], [5, 10, 15, 20]],
+            autoWidth: false,
+            columns: [
+                {
+                    targets: 0,
+                    visible: true
+                },
+                {
+                    targets: 1,
+                    visible: true
+                },
+                {
+                    targets: 2,
+                    visible: true
+                },
+                {
+                    targets: 3,
+                    visible: true
+                },
+                {
+                    targets: 4,
+                    visible: false
+                },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                console.log(row);
+                console.log(data);
+                console.log(dataIndex);
+                $(row).find('td:eq(2)').attr('id', "rowNote-" + data[4]);
+                
+            }
+        });
+
+    });
+
+    function SaveNote(curProposalId) {
+       if ($("#txtNote").val() == "")
+            return false;
+        $.ajax({
+            url: "/ManageMedia/AddProposalNote",
+            data: {
+                Note: $("#txtNote").val(),
+                ProposalId: curProposalId
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    var res = result.responseText.split(";");
+                    var table = $('#NoteTable').DataTable();
+                    table.row.add([
+                        res[0],
+                        res[1],
+                        res[2],
+                        "<button type='button' class='btn btn-sm btn-alt-secondary' id='btnAdd-" + result.myUpfrontNoteId + "' name='btnAdd-" + result.myUpfrontNoteId + "' onclick='javascript: AddSubNote(this, " + result.myUpfrontNoteId + "); '>Add</button>",
+                        result.myUpfrontNoteId
+                    ]).draw(false);
+                    $("#txtNote").val("");
+                }
+                else {
+                    var notify = $.notify(result.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true
+                    });
+                }
+
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+
+
+    function SaveSubNote(ParentNoteId, NoteText) {
+        $.ajax({
+            url: "/ManageMedia/AddProposalSubNote",
+            data: {
+                ProposalParentNoteId: ParentNoteId,
+                Note: NoteText
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    $("#rowNote-" + ParentNoteId).append('<br/><i>' + result.createDt + ' ' + result.displayName + '<br/></i>' + result.newNote + '<br/>');
+
+                    var notify = $.notify(result.responseText, {
+                        type: 'success',
+                        allow_dismiss: true
+                    });
+                }
+                else {
+                    var notify = $.notify(result.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true
+                    });
+                }
+
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+
+    function ReloadNoteDataTable() {
+        var date = new Date();
+        var random = Math.floor(Math.random() * 1000) + 1 + date.getMilliseconds();
+        $("#NoteDataTableDiv").load("/ManageMedia/ReloadNotesDataTable?ProposalId=" + getParameterByName('ProposalId') + "&r=" + random);
+    }
+
+    function AddSubNote(btn, ProposalNoteId) {
+        swal({
+            html: 'Enter comment to note: <input id="txtSubNote" autofocus class="form-control swal2-input">',
+            preConfirm: function (selectedOption) {
+                return new Promise(function (resolve, reject) {
+                    if ($('#txtSubNote').val()) {
+                        resolve({ value: document.getElementById('txtSubNote').value });
+                    }
+                    else {
+                        reject('Please enter comment to note.');
+                    }
+                });
+            },
+            onOpen: function () {
+                $('#txtSubNote').focus();
+            }
+        }).then(function (result) {
+            SaveSubNote(ProposalNoteId, result.value);
+        }).catch(swal.noop)
+    }
+</script>
+
+@{
+    var AllowEdit = false;
+
+    if (Model.UserFeaturePermissionInfo.EditNotesAction == 4)
+    {
+        AllowEdit = true;
+    }
+}
+
+<div class="modal fade" id="modal-notes" role="dialog" aria-labelledby="modal-notes" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.ProposalInfo.ScheduleName</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <label class="col-12" for="txtNetworkName">Add Note:</label>
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" id="txtNote" name="txtNote">
+                        </div>
+                    </div>
+                    <div class="form-group row" id="NoteDataTableDiv">
+                        <div class="block-content block-content-full">
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="NoteTable" name="NoteTable">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:20%">Date</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Creator</th>
+                                        <th class="d-none d-sm-table-cell" style="width:60%">Note</th>
+                                        <th class="d-none d-sm-table-cell"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var proposalnote in Model.ProposalNotes)
+                                    {
+                                        if (proposalnote.ParentNoteId == null)
+                                        {
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell bg-secondary-light" id="rowDate-@proposalnote.ProposalNoteId">@proposalnote.CreateDt</td>
+                                                <td class="d-none d-sm-table-cell bg-secondary-light" id="rowName-@proposalnote.ProposalNoteId">@proposalnote.CreatedBy.DisplayName</td>
+                                                <td class="font-w600 bg-secondary-light" id="rowNote-@proposalnote.ProposalNoteId">@Html.Raw(proposalnote.Note)</td>
+                                                <td class="d-none d-sm-table-cell text-center bg-secondary-light">
+                                                    @if (AllowEdit == true)
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-alt-secondary" id="btnAdd-@proposalnote.ProposalNoteId" name="btnAdd-@proposalnote.ProposalNoteId" onclick="javascript: AddSubNote(this, @proposalnote.ProposalNoteId);">Add</button>
+                                                    }
+                                                </td>
+                                                <td>@proposalnote.ProposalNoteId</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td class="d-none d-sm-table-cell" id="rowDate-@proposalnote.ProposalNoteId">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>@proposalnote.CreateDt</i></td>
+                                                <td class="d-none d-sm-table-cell" id="rowName-@proposalnote.ProposalNoteId"><i>@proposalnote.CreatedBy.DisplayName</i></td>
+                                                <td class="font-w600" id="rowNote-@proposalnote.ProposalNoteId"><i>@proposalnote.Note</i></td>
+                                                <td class="d-none d-sm-table-cell text-center"></td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                @if (AllowEdit == true)
+                {
+                    <button type="button" class="btn btn-alt-success" onclick="javascript: SaveNote(@Model.ProposalInfo.ScheduleId);">
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+

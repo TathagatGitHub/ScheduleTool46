@@ -1,0 +1,589 @@
+﻿@model ManageMediaViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!--
+        <div class="block block-themed">
+            <div class="block-header @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                <h3 class="block-title">Manage Media</h3>
+            </div>
+        </div>
+            -->
+        @Html.Partial("~/Views/ManageMedia/_ManageMediaSel.cshtml", Model)
+        <div class="block block-themed">
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label>Country</label><br />
+                                    @foreach (var country in Model.Countries)
+                                    {
+                                        if (country.CountryId == Model.LastSelectedCountryId)
+                                        {
+                                            <label class="css-control css-control-primary css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" checked="checked" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control css-control-primary css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label>Plan Year Type</label><br />
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" checked="checked">
+                                        <span class="css-control-indicator"></span> Broadcast
+                                    </label>
+                                    <!--
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" >
+                                        <span class="css-control-indicator"></span> Calendar
+                                    </label>
+                                        -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label>Plan Year</label>
+                                    <select name="ddlplanyear" id="ddlplanyear" class="form-control" size="1" onchange="javascript: ChangePlanYear(this.value);">
+                                        @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 2; idx++)
+                                        {
+                                            @if (idx == Model.LastSelectedPlanYear)
+                                            {
+                                                <option value="@idx" selected>@idx</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idx">@idx</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label>Network Name</label>
+                                    <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="1" onchange='javascript: ChangeNetwork(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label>Client Name</label>
+                                    <select class="form-control" id="ddlclients" name="ddlclients" size="1" disabled></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <a class="btn btn-primary"
+                               asp-controller="ManageMedia"
+                               asp-action="DisplayUpfronts">
+                                Display All Upfronts
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="block">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group-row">
+                                <div class="col-12">
+                                    <!-- Block Tabs Animated Slide Up -->
+                                    <div class="block">
+                                        <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 1)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 2)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 3)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 4)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+
+                                            </li>
+                                            <li class="nav-item ml-auto">
+                                                <a class="nav-link" href="#btabs-animated-slideup-4q"><i class="si si-settings"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="block-content tab-content overflow-hidden">
+                                            @if (Model.LastQuarter == 1)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 2)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 3)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 4)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            <div class="tab-pane fade fade-up" id="btabs-animated-slideup-settings" role="tabpanel">
+                                                <h4 class="font-w400">Settings Content</h4>
+                                                <p>Content slides up..</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END Block Tabs Animated Slide Up -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="block block-themed">
+        </div>
+
+        <div class="modal hide fade" id="modal-createUpfrontExpansion" tabindex="-1" role="dialog" aria-labelledby="modal-createUpfrontExpansion" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="overflow:hidden;"></div>
+            </div>
+        </div>
+
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+<script language="javascript" type="text/javascript">
+    // Begin Initializations
+    var gURcountryId = @Model.LastSelectedCountryId;
+    var resultQtrs = [];
+    function GetQuarters() {        
+        $.ajax({
+            url: "/CreateNewProperty/GetQuarters",
+            data: {
+                Year: $("#ddlplanyear").val()
+            },
+            cache: false,
+            async: false,
+            type: "POST",
+            success: function (result) {                
+                resultQtrs = result;
+            }
+        });
+    }
+    function GetNetworks(_countryid) {
+        var procemessage = "<option value='0'> Loading networks...</option>";
+        $("#ddlnetwork").html(procemessage).show();
+
+        var url = "/ManageMedia/GetNetworkByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+               for (var x = 0; x < result.length; x++) {
+                    if (@Model.LastSelectedNetworkId == result[x].value) {
+                        if (_countryid == 5)
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option selected value=" + result[x].value + ">" + "(CA) " + result[x].text + "</option>";
+                    } else {
+                        if (_countryid == 5)
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option value=" + result[x].value + ">" + "(CA) " + result[x].text + "</option>";
+                    }
+                }
+                $("#ddlnetwork").html(markup).show();
+                GetUpfront($("#ddlnetwork").val());
+            },
+            error: function (response) {
+                swal("error : " + response.responseText);
+            }
+        });
+
+    }
+
+    function SetupQuarters(_year) {
+        $("#Q4").html("Q4 " + (_year-1)).show();
+        $("#Q1").html("Q1 " + _year).show();
+        $("#Q2").html("Q2 " + _year).show();
+        $("#Q3").html("Q3 " + _year).show();
+    }
+    // End Initializations
+
+    // There is another UnlockUpfront in checkbrowser_close.js.  Almost identical except 
+    // for how the success return is handled.  You might want to use just one.
+    function UnlockUpfront(_upfrontId) {
+        var url = "/ManageMedia/UnlockUpfront/";
+
+        $.ajax({
+            url: url,
+            data: { UpfrontId: _upfrontId },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success !== true) {
+                    swal('Wait!', result.responseText, 'warning');
+                }
+                else {
+                    window.location.reload();
+                }
+            },
+            error: function (response) {
+                swal('Stop!', response.responseText, 'error');
+            }
+        });
+
+    }
+
+    // Populates the quarters as the filters are selected.
+    function GetUpfront() {
+        var url = "/UpfrontRemnant/GetUpfrontByNetwork/";
+       
+        $.ajax({
+            url: url,
+            data: {
+                networkid: $("#ddlnetwork").val(),
+                broadcastyr: $("#ddlplanyear").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {                
+                var markup = "";
+                $("#btabs-animated-slideup-4q").html("");
+                $("#btabs-animated-slideup-1q").html("");
+                $("#btabs-animated-slideup-2q").html("");
+                $("#btabs-animated-slideup-3q").html("");
+
+                for (var x = 0; x < result.length; x++) {
+                    markup = "";
+                    markup += "<h4 class='font-w400'>" + $("#ddlplanyear :selected").text() + " " + $("#ddlnetwork :selected").text() + "</h4>";
+                    markup += "<p>";
+                    markup += "<table class='table table-bordered table-vcenter'>";
+                    markup += "<tbody>";
+                    markup += "<tr><th scope='row' width='125'>Quarter</th><td>" + result[x].quarter.broadcastQuarterNbr + "</td ></tr > ";
+                    markup += "<tr><th scope='row'>Upfront Name</th><td>" + result[x].name + "</td></tr>";
+                    if (result[x].upfrontLockedByUserId != null) {
+                        markup += "<tr><th scope='row'>Locked</th><td><button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'><i class='fa fa-lock'></i></button> </td></tr>";
+                        markup += "<tr><th scope='row'>Lock Date</th><td><span class='badge badge-success'>" + formatDate(new Date(result[x].upfrontLockedDate)) + "</span></td></tr>";
+                        markup += "<tr><th scope='row'>Locked By</th><td>" + result[x].upfrontLockedBy.displayName + "</td></tr>";
+                    }
+                    markup += "<tr><th scope='row'>Creation Date</th><td>" + formatDate(new Date(result[x].createDt)) + " " + "</td></tr>";
+                    markup += "<tr><th scope='row'>Last Updated</th><td>" + formatDate(new Date(result[x].updateDt))  + " ";
+                    if (result[x].updatedByUser != null) {
+                        markup += result[x].updatedByUser.displayName;
+                    }
+                    markup += "</td></tr>";
+                    markup += "</tbody>";
+                    markup += "</table>";
+                    markup += "</p>";
+
+                    markup += "<div class=\"form-group row\">";
+                    markup += "<div class=\"col-12\">";
+
+
+                    if (result[x].canEditUpfront === 1) {
+                        markup += "<a onclick=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + screen.Width + ", this.href, '/ManageMedia/Index?UpfrontId=" + result[x].upfrontId + "'); localStorage.removeItem('DataTables_UpfrontTable_" + result[x].upfrontId +"'); return false; \" onkeypress=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + @Model.LastWindowWidth + ", this.href, '/ManageMedia/Index?UpfrontId= " + result[x].upfrontId + "'); return false;\" class=\"btn btn-alt-primary\" href=\"/UpfrontRemnant/EditUR?upfrontid=" + result[x].upfrontId + "&URcountry=" + gURcountryId + "\"><i class=\"fa fa-edit mr-5\"></i>Edit</a>&nbsp;";
+                    }
+                    if (result[x].canViewUpfront === 1) {
+                        markup += "<a onclick=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + screen.Width + ", this.href, '/ManageMedia/Index?UpfrontId=" + result[x].upfrontId + "'); localStorage.removeItem('DataTables_UpfrontTable_" + result[x].upfrontId +"'); return false; \" onkeypress=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + @Model.LastWindowWidth + ", this.href, '/ManageMedia/Index?UpfrontId= " + result[x].upfrontId + "'); return false;\" class=\"btn btn-alt-primary\" href=\"/UpfrontRemnant/ViewUR?upfrontid=" + result[x].upfrontId + "\"><i class=\"fa fa-edit mr-5\"></i>View</a>&nbsp;";
+                    }
+                    // If admin, allow user to unlock locked upfronts
+                    if (result[x].upfrontLockedByUserId != null && (@Model.LoggedOnUser.PermissionLevelId === 1 || ((@Model.LoggedOnUser.PermissionLevelId === 2 || @Model.LoggedOnUser.PermissionLevelId === 3) && @Model.LoggedOnUser.UserId === result[x].upfrontLockedByUserId))) {
+                        markup += "<a href=\"javascript: UnlockUpfront(" + result[x].upfrontId + ");\" class=\"btn btn-alt-primary\"><i class=\"fa fa-edit mr-5\"></i>Unlock</a>&nbsp;";
+                    }
+                    if (result[x].canUpfrontCreateUpfrontExpansion === 1) {
+                        markup += "<a class=\"btn btn-alt-primary\" href=\"javascript: void (0)\" onclick=\"PopupCreateExpansion(" + result[x].upfrontId + ")\"><i class=\"fa fa-edit mr-5\"></i>Create Upfront Expansion</a>&nbsp;";
+                        //markup += "<a onclick=\"javascript:alert('This feature is available to you but it has not yet been implemented'); \" class=\"btn btn-alt-primary\"><i class=\"fa fa-edit mr-5\"></i>Upfront Expansion</a>&nbsp;";
+                    }
+                    if (result[x].canUpfrontManageUpfrontExpansion === 1) {
+                        markup += "<a onclick=\"ManageExpansion(" + result[x].upfrontId + ", '/ManageMedia/Index?UpfrontId=" + result[x].upfrontId + "');\" class=\"btn btn-alt-primary\" href=\"javascript: void (0)\" ><i class=\"fa fa-edit mr-5\"></i>Manage Upfront Expansion</a>&nbsp;";
+                    }
+
+                    markup += "</div>";
+                    markup += "</div>";
+
+                    if (result[x].quarter.broadcastQuarterNbr == 1) {
+                        $("#btabs-animated-slideup-4q").html(markup);
+                    }
+                    else if (result[x].quarter.broadcastQuarterNbr == 2) {
+                        $("#btabs-animated-slideup-1q").html(markup);
+                    }
+                    else if (result[x].quarter.broadcastQuarterNbr == 3) {
+                        $("#btabs-animated-slideup-2q").html(markup);
+                    }
+                    else if (result[x].quarter.broadcastQuarterNbr == 4) {
+                        $("#btabs-animated-slideup-3q").html(markup);
+                    }
+                }
+
+                var netid = $("#ddlnetwork").val();
+                var year = $("#ddlplanyear").val();
+                var loggedUserId = @Model.LoggedOnUser.UserId;
+                
+                var quarter4 = "4Q" + (year-1);
+                var quarter1 = "1Q" + year;
+                var quarter2 = "2Q" + year;
+                var quarter3 = "3Q" + year;                
+
+                if ($("#btabs-animated-slideup-4q").html() == "" && resultQtrs.findIndex(x => x.text == quarter4) > -1) {
+                    //markup = "<p>There is no upfront for this quarter.";
+                    markup = "";
+                    markup += "<a class=\"btn btn-alt-primary\" onclick=\"CreateUpfront(" + netid  + ",'" + quarter4 +  "'" + ")\"><i class=\"fa fa-edit mr-5\"></i>Create</a>&nbsp;";
+                    $("#btabs-animated-slideup-4q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-1q").html() == "" && resultQtrs.findIndex(x => x.text == quarter1) > -1) {
+                    //markup = "<p>There is no upfront for this quarter.";
+                    markup = "";
+                    markup += "<a class=\"btn btn-alt-primary\" onclick=\"CreateUpfront(" + netid + ",'" + quarter1 +  "'" + ")\"><i class=\"fa fa-edit mr-5\"></i>Create</a>&nbsp;";
+                    $("#btabs-animated-slideup-1q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-2q").html() == "" && resultQtrs.findIndex(x => x.text == quarter2) > -1) {
+                    //markup = "<p>There is no upfront for this quarter.";
+                    markup = "";
+                    markup += "<a class=\"btn btn-alt-primary\"  onclick=\"CreateUpfront(" + netid  + ",'" + quarter2 +  "'" + ")\"><i class=\"fa fa-edit mr-5\"></i>Create</a>&nbsp;";
+                    $("#btabs-animated-slideup-2q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-3q").html() == "" && resultQtrs.findIndex(x => x.text == quarter3) > -1) {
+                    //markup = "<p>There is no upfront for this quarter.";
+                    markup = "";
+                    markup += "<a class=\"btn btn-alt-primary\"  onclick=\"CreateUpfront(" + netid + ",'" + quarter3 +  "'" + ")\"><i class=\"fa fa-edit mr-5\"></i>Create</a>&nbsp;";
+                    $("#btabs-animated-slideup-3q").html(markup);
+                }
+
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+     function CreateUpfront(netId, quarterName) {
+        var url = "/UpfrontRemnant/CreateUpfront/";
+
+        $.ajax({
+            url: url,
+            data: {
+                NetworkId: netId,
+                QName: quarterName
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success) {
+                    swal({
+                        title: "Result",
+                        text: result.responseText,
+                        type: "success",
+                        allowOutsideClick: false,//ST-773
+                        allowEscapeKey: false//ST-773
+                    }).then(
+                        function (result) {
+                            //GetUpfront();
+                            window.location.reload();
+                        });
+                }
+                else {
+                    swal({
+                        title: "Error",
+                        text: result.responseText,
+                        type: "error",
+                    });
+                }
+                
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+    }
+
+    // Begin UpfrontExpansions
+    function PopupCreateExpansion(id) {
+        $.get("/UpfrontExpansion/Create?UpfrontId=" + id, function (data) {
+            $("#modal-createUpfrontExpansion .modal-content").html(data);
+            $('#modal-createUpfrontExpansion').modal('show');
+        }).fail(function (xhr, status, error) { swal('Error!', error.responseText, 'warning'); });
+    }
+
+    function ManageExpansion(id, parentUrl) {
+        $.ajax({
+            url: "/UpfrontExpansion/GetYearlyFlag",
+            data: {
+                UpfrontId: id,
+                LoggedOnUserId: @Model.LoggedOnUser.UserId
+            },
+            cache: false,
+            success: function (result) {
+                if (result.id == 0)
+                    result.id = id;
+
+                if (result.canChangeYearly || result.yearly == null) {
+                    $.get("/UpfrontExpansion/Yearly_Or_Quarterly?UpfrontId=" + result.id + "&LoggedOnUserId=" + @Model.LoggedOnUser.UserId + "&LastWindowHeight=" + @Model.LastWindowHeight, function (data) {
+                        $("#modal-createUpfrontExpansion .modal-content").html(data);
+                        $('#modal-createUpfrontExpansion').modal('show');
+                    }).fail(function (xhr, status, error) { swal('Error!', error.responseText, 'warning'); });
+                }
+                else
+                    OpenNewWindow(@Model.LastWindowHeight, screen.width, "/UpfrontExpansion/Index?upfrontid=" + result.id, parentUrl);
+            },
+            error: function (response) {
+                swal('error', response.responseText, 'error');
+            }
+        });
+
+        return false;
+    }
+    // End UpfrontExpansions
+
+
+    function OpenEditUpfront(_upfrontid, link) {
+        var url = "/UpfrontRemnant/LockUpfront/";
+
+        $.ajax({
+            url: url,
+            data: { upfrontid: _upfrontid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    OpenNewWindow(screen.height, screen.width, link);
+                }
+                else {
+                    if (result.success == undefined) {
+                        swal('Error!', "Unknown error.  Please retry", 'error');
+                    }
+                    else {
+                        swal('Wait!', result.responseText, 'warning');
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+    }
+
+    function ChangeCountry(_countryid, _countryshort) {
+        gURcountryId = _countryid;
+        GetNetworks(_countryid);
+        SaveSettings("UpfrontRemnant_CountryId", _countryid);
+    }
+      
+    $("#ddlplanyear").on('change', function (e) {
+        // Keeping this here in case you need it later :)
+        // var optionSelected = $("option:selected", this);
+        var _year = this.value;       
+        GetQuarters();
+        GetUpfront();
+        SetupQuarters(_year);
+        SaveSettings("UpfrontRemnant_PlanYear", _year);
+    });
+
+    $("#ddlnetwork").on('change', function (e) {
+        // Keeping this here in case you need it later :)
+        // var optionSelected = $("option:selected", this);
+        var _networkid = this.value;
+
+        GetUpfront();
+        SaveSettings("UpfrontRemnant_NetworkId", _networkid);
+    });
+
+    $("#Q1, #Q2, #Q3, #Q4").on('click', function (e) {
+        SaveSettings("UpfrontRemnant_BroadcastQuarterNbr", parseInt(this.id.slice(1)) == 4 ? 1 : parseInt(this.id.slice(1)) + 1);
+    });   
+
+    $(document).ready(function () {
+        GetQuarters();
+        GetNetworks(@Model.LastSelectedCountryId);
+        SetupQuarters(@Model.LastSelectedPlanYear);
+        $('#modal-createUpfrontExpansion').draggable();
+    });
+</script>

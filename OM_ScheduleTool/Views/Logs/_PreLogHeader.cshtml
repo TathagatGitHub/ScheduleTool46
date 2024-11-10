@@ -1,0 +1,137 @@
+@model PreLogViewModel
+<style type="text/css">
+    .border{
+        border-color:black !important;
+        border-width:2px !important;
+    }
+    .pl-45{
+        padding-left:45px !important;
+    }
+</style>
+<div class="block block-themed block-rounded">
+    <div class="block-header block-header-default bg-secondary">
+        <h3 class="block-title">PRE LOG FOR @Model.ScheduleName</h3>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+        </div>
+    </div>
+    @{ 
+        var selectedCountryId = Context.Request.Query["logsSelectedCountryId"];
+    }
+    <div class="block-content">
+        <div class="row gutters-tiny">
+            <div class="col-lg-2 col-md-3 col-sm-5">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label for="upfront_name">Client Name</label></td>
+                        <td>@Model.ClientName @(selectedCountryId == "2" ? " (CANADA)" : "")</td>
+                    </tr>
+                    <tr>
+                        <td><label>Week #</label></td>
+                        <td>@Model.PreLog.WeekNbr</td>
+                    </tr>
+                    <tr>
+                        <td><label>Week Date</label></td>
+                        <td id="WeekDate">@Model.PreLog.WeekDate.ToString("MM/dd/yyyy")</td>
+                    </tr>                    
+                </table>
+            </div>
+            <div class="col-md-3 col-sm-5">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label>Last Modified By</label></td>
+                        <td>
+                            @Model.PreLog.UpdUsr
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Last Modified On</label></td>
+                        <td>@Model.PreLog.UpdDte</td>
+                    </tr>
+                    <tr>
+                        <td><label>Mode</label></td>
+                        @if (Model.ViewOnly == false)
+                        {
+                            <td>EDIT</td>
+                        }
+                        else
+                        {
+                            <td>VIEW</td>
+                        }
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-2">
+                <div class="block-content">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td class="table-primary text-center">Poor Separation</td>
+                        </tr>
+                        <tr>
+                            <td class="table-danger text-center">Out of Daypart</td>
+                        </tr>
+                        <tr>
+                            <td class="table-success text-center">Unplaced</td>
+                        </tr>
+                        @if (Model.ViewOnly == false)
+                        {
+                            <tr>
+                                <td class="bg-gray-lighter text-danger text-center">Pending Changes</td>
+                            </tr>
+                        }
+                    </table>
+                    <br />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <table class="dataTable border compact display" style="width:100%">
+                        <thead>
+                            <tr class="border">
+                                <th class="text-right border"></th>
+                                <th class="text-center"><b>SPOTS</b></th>
+                                <th class="text-center"><b>FULL RATE</b></th>
+                                <th class="text-center"><b>RATE</b></th>
+                                <th class="text-center"><b>IMP</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="text-center">
+                                <td class="text-right border"><b>CLEARED</b></td>
+                                <td><label id="lblTotalClearedSpots"></label></td>
+                                <td><label id="lblTotalClearedFullRate"></label></td>
+                                <td><label id="lblTotalClearedRate"></label></td>
+                                <td><label id="lblTotalClearedIMP"></label></td>
+                            </tr>
+                            <tr class="text-center">
+                                <td class="text-right border"><b>UNCLEARED</b></td>
+                                <td><label id="lblTotalUnClearedSpots"></label></td>
+                                <td><label id="lblTotalUnClearedFullRate"></label></td>
+                                <td><label id="lblTotalUnClearedRate"></label></td>
+                                <td><label id="lblTotalUnClearedIMP"></label></td>
+                            </tr>
+                            <tr class="text-center">
+                                <td class="text-right border"><b>UNPLACED</b></td>
+                                <td><label id="lblTotalUnPlacedSpots"></label></td>
+                                <td><label id="lblTotalUnPlacedFullRate"></label></td>
+                                <td><label id="lblTotalUnPlacedRate"></label></td>
+                                <td><label id="lblTotalUnPlacedIMP"></label></td>
+                            </tr>
+                            <tr class="text-center border">
+                                <td class="text-right border"><b>TOTAL</b></td>
+                                <td><label id="lblTotalSpots"></label></td>
+                                <td><label id="lblTotalFullRate"></label></td>
+                                <td><label id="lblTotalRate"></label></td>
+                                <td><label id="lblTotalIMP"></label></td>
+                            </tr>
+                            <tr>
+                                <td class="text-right border" colspan="1"><b>FILTERING ENABLED</b></td>
+                                <td class="pl-45" colspan="4"><label id="lblFilter" style="font-weight:bold"></label>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>

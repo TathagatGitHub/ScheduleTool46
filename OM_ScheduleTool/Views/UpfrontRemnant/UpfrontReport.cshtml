@@ -1,0 +1,409 @@
+﻿@*@model UpfrontReportViewModel
+
+<script language="javascript">
+    $(document).ready(function() {
+        function ShowWarning() {
+            swal('Information', 'No Deal Points Cancel Policy Found.', 'info');
+        }
+        $('#ExcelLink').removeAttr('href');
+        $('#ExcelLink').attr('href', "/UpfrontRemnant/ExportToExcel?UpfrontId=@Model.UpfrontInfo.UpfrontId&DR=UP&de=" + encodeURIComponent(getParameterByName('de')) + "&bt=" + encodeURIComponent(getParameterByName('bt')));
+        if ($("#hiddenWarn").val() == "0") {
+            ShowWarning();
+        }
+    });
+</script>
+<!-- Main Container -->
+<main id="main-container">
+    @if (Model.DealPointInfo == null && !Model.IsDRBuyType)
+    {
+        <input type="hidden" id="hiddenWarn" value="0" />
+    }
+    else
+    {
+        <input type="hidden" id="hiddenWarn" value="1" />
+    }
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Invoice -->
+        <h2 class="content-heading d-print-none">
+            <!--
+            <button type="button" class="btn btn-sm btn-rounded btn-success float-right">New Invoice</button>
+            -->
+            Export Upfront
+        </h2>
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">@Model.ReportName</h3>
+                <div class="block-options">
+                    <!-- Print Page functionality is initialized in Codebase() -> uiHelperPrint() -->
+                    <a id="ExcelLink" class="btn-block-option" href="/UpfrontRemnant/ExportToExcel?UpfrontId=@Model.UpfrontInfo.UpfrontId&DR='UP'">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <!--
+                    <a id="ExcelLink" class="btn-block-option"
+                       asp-controller="UpfrontRemnant"
+                       asp-action="ExportToExcel"
+                       asp-route-UpfrontId="@Model.UpfrontInfo.UpfrontId"
+                       asp-route-DR="UP">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                        -->
+
+                    <button type="button" class="btn-block-option" onclick="Codebase.helpers('print-page');">
+                        <i class="si si-printer"></i> Print
+                    </button>
+                    <button type="button" class="btn-block-option" data-toggle="block-option" data-action="fullscreen_toggle"></button>
+                    <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo">
+                        <i class="si si-refresh"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="block-content">
+                <!-- Invoice Info -->
+                <div class="row my-20">
+                    <!-- Client Info -->
+                    <div class="col-6">
+                        <p class="h3">@Model.NetworkInfo.StdNetName</p>
+                        Quarter: @Model.Quarter<br />
+                        Media: @Model.Media<br />
+                        Feed: @Model.FeedType<br />
+                        Guaranteed: @Model.Guaranteed<br />
+                    </div>
+                    <!-- END Client Info -->
+                    <!-- Company Info -->
+                    <div class="col-6 text-right">
+                        <p class="h3">Ocean Media LLC</p>
+                        <address>
+                            17011 Beach Blvd, 15th Floor <br/>
+                            Huntington Beach, CA 92647<br/>
+                            714-969-5244<br>
+                            @Model.LoggedOnUser.EmailAddress
+                        </address>
+                    </div>
+                    <!-- END Company Info -->
+                </div>
+                <!-- END Invoice Info -->
+                <!-- Table -->
+                <div class="table-responsive push">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Property</th>
+                                <th class="text-center">M</th>
+                                <th class="text-center">T</th>
+                                <th class="text-center">W</th>
+                                <th class="text-center">T</th>
+                                <th class="text-center">F</th>
+                                <th class="text-center">S</th>
+                                <th class="text-center">S</th>
+                                <th class="text-center">StartTime</th>
+                                <th class="text-center">EndTime</th>
+                                <th class="text-center">Buy<br />Type</th>
+                                <th class="text-center">Day<br />Part</th>
+                                <th class="text-center">Len</th>
+                                <th class="text-center">Split</th>                                
+                                <!--<th class="text-center">BB</th>-->
+                                <th class="text-center">Demo</th>
+                                <th class="text-center">Pop</th>
+                                <th class="text-right">Rate</th>
+                                @if (!Model.IsDRBT)
+                                {
+                                    <th class="text-right">Imp</th>
+                                    <th class="text-right">CPM</th>
+                                }
+                                    <th class="text-center">Approval</th>
+                                    <th class="text-center">Status</th>
+                                    @if (Model.ClientMandatesAvailable != null && Model.ClientMandatesAvailable.Count() > 0)
+                                    {
+                                        <th class="text-center">Mandate Client</th>
+                                    }
+                                    <th class="text-center">Eff Dt</th>
+                                    <th class="text-center">Exp Dt</th>
+                                    <th class="text-center">Rev #</th>
+                                </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var upfrontline in Model.UpfrontLines)
+                            {
+                                var tableclass = "";
+                                if (upfrontline.BuyTypeCode == "A" && upfrontline.SpotLen == 30)
+                                {
+                                    tableclass = "table-warning";
+                                }
+                            <tr class="@tableclass">
+                                <td class="text-center">@upfrontline.PropertyName</td>
+                                <td class="text-center">
+                                    @if (upfrontline.Monday == true)
+                                    {
+                                        <i id="Monday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Monday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Tuesday == true)
+                                    {
+                                        <i id="Tuesday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Tuesday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Wednesday == true)
+                                    {
+                                        <i id="Wednesday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Wednesday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Thursday == true)
+                                    {
+                                        <i id="Thursday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Thursday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Friday == true)
+                                    {
+                                        <i id="Friday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Friday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Saturday == true)
+                                    {
+                                        <i id="Saturday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Saturday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <td class="text-center">
+                                    @if (upfrontline.Sunday == true)
+                                    {
+                                        <i id="Sunday-@upfrontline.UpfrontLineId" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i id="Sunday-@upfrontline.UpfrontLineId"></i>
+                                    }
+
+                                </td>
+                                <!--<td class="text-center"><span class="badge badge-pill badge-primary">1</span></td>-->
+                                <td class="text-center">@upfrontline.StartTime.ToShortTimeString()</td>
+                                <td class="text-center">@upfrontline.EndTime.ToShortTimeString()</td>
+                                <td class="text-center">@upfrontline.BuyTypeCode</td>
+                                <td class="text-center">@upfrontline.DayPartCd</td>
+                                @if (upfrontline.SpotLen == 120)
+                                {
+                                    <td class="text-center"><span class="badge badge-pill badge-danger">@upfrontline.SpotLen</span></td>
+                                }
+                                else if (upfrontline.SpotLen == 60)
+                                {
+                                    <td class="text-center"><span class="badge badge-pill badge-primary">@upfrontline.SpotLen</span></td>
+                                }
+                                else if (upfrontline.SpotLen == 15)
+                                {
+                                    <td class="text-center"><span class="badge badge-pill badge-warning">@upfrontline.SpotLen</span></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><span class="badge badge-pill badge-success">@upfrontline.SpotLen</span></td>
+                                }
+                                <td class="text-center">@upfrontline.SplitNo</td>
+
+                                <!--<td class="text-center">&nbsp;</td>-->
+                                <td class="text-center">@upfrontline.DemoName</td>
+                                <td class="text-center">@upfrontline.Universe</td>
+                                <td class="text-right">@upfrontline.RateAmt.ToString("c0")</td>
+                                @if (!Model.IsDRBT)
+                                {
+                                    <td class="text-right">@upfrontline.Impressions.ToString("n0")</td>
+                                    <td class="text-right">@upfrontline.CPM.ToString("c2")</td>
+                                }
+                                    <td class="text-center">
+                                        @if (upfrontline.Approved == true)
+                                        {
+                                            @: APPROVED
+                                        }
+                                        else
+                                        {
+                                            @: NOT APPROVED
+                                        }
+                                    </td>
+
+                                    <td class="text-center">@upfrontline.DoNotBuyTypeDescription</td>
+                                    @if (Model.ClientMandatesAvailable != null && Model.ClientMandatesAvailable.Count() > 0)
+                                    {
+                                        <td class="text-center">@upfrontline.MandateClientName</td>
+                                    }
+                                    <td class="text-center">@upfrontline.EffectiveDate.ToShortDateString()</td>
+                                    <td class="text-center">@upfrontline.ExpirationDate.ToShortDateString()</td>
+                                    <td class="text-center">@upfrontline.Revision</td>
+                                </tr>
+                            }
+
+                            <!--
+                <tr>
+                    <td colspan="4" class="font-w600 text-right">Subtotal</td>
+                    <td class="text-right">$25.000,00</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="font-w600 text-right">Vat Rate</td>
+                    <td class="text-right">20%</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="font-w600 text-right">Vat Due</td>
+                    <td class="text-right">$5.000,00</td>
+                </tr>
+                <tr class="table-warning">
+                    <td colspan="4" class="font-w700 text-uppercase text-right">Total Due</td>
+                    <td class="font-w700 text-right">$30.000,00</td>
+                </tr>
+                    -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- END Table -->
+                <div class="row">
+                    <div class="col-6">
+                        <strong class="text-danger">NATIONAL BREAKS</strong>
+                    </div>
+                    <div class="col-6 text-right">
+                    </div>
+                </div>
+                @if (Model.IsDRBuyType)
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="text-danger">
+                                No more than 1 spot per 30 minutes.<br />
+                                Notwithstanding anything herein or elsewhere contained to the company,<br />
+                                @Model.NetworkInfo.StdNetName acknowledges that Ocean Media is an agent for a disclosed principal and, accordingly, has no liability to<br />
+                                @Model.NetworkInfo.StdNetName unless and until said principal has paid Ocean Media
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row warning">
+                        <div class="col-2 text-danger">
+                            Billboard Added Value:
+                        </div>
+                        <div class="col-10 text-danger">
+                            @if (Model.DealPointInfo != null && Model.DealPointInfo.BillboardAddedValue != null)
+                            {
+                                @Model.DealPointInfo.BillboardAddedValue
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 text-danger">
+                            Upfront Sponsorship:
+                        </div>
+                        <div class="col-10 text-danger">
+                            @if (Model.DealPointInfo != null && Model.DealPointInfo.UpfrontSponsorship != null)
+                            {
+                                @Model.DealPointInfo.UpfrontSponsorship
+                            }
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <span class="signature">Signature</span>
+                    <span class="date">Date</span>
+                </div>
+                @if (!Model.IsDRBuyType)
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">UPFRONT CANCELLATION:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.UpfrontCancellation != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.UpfrontCancellation</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">SCATTER CANCELLATION:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.ScatterCancellation != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.ScatterCancellation</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">NETWORK SEPARATION POLICY:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.NetworkSeparationPolicy != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.NetworkSeparationPolicy</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="text-danger">
+                                All paid spots are non pre-emptible unless approved by Ocean Media prior to pre-emption.<br />
+                                No more than 1 spot per program.<br />
+                                Not withstanding anything herein or elsewhere contained to the company, @Model.NetworkInfo.StdNetName acknowledges that Ocean Media is an agent for a disclosed principal and, accordingly, has no liability to @Model.NetworkInfo.StdNetName unless and until said principal has paid Ocean Media<br />
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">
+                                    SCATTER CANCELLATION: Five Business Days Cancel
+                                </strong>
+                            </p>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <label class="col-12" for="example-textarea-input">Comments</label>
+                    <div class="col-12">
+                        <textarea name="example-textarea-input" class="form-control" id="example-textarea-input" placeholder="Content.." rows="6"></textarea>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <p class="text-muted text-center">Thank you very much for doing business with us. We look forward to working with you again!<br />Proposal Generated on:  @DateTime.Now.ToLongDateString() @DateTime.Now.ToShortTimeString() by @Model.LoggedOnUser.DisplayName</p>
+                <!-- END Footer -->
+            </div>
+        </div>
+        <!-- END Invoice -->
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->*@

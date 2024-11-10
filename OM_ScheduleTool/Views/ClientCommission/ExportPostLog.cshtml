@@ -1,0 +1,264 @@
+﻿@model ExportPostLogViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        /* When Country is Changed, populate clients and networks  */
+        $("#ddlCountry").change(function () {
+            if ($("#ddlCountry").val() === "") {
+                $("#ddlClient").prop("disabled", true);
+                $("#ddlNetwork").prop("disabled", true);
+            }
+            else {
+                GetClients($("#ddlCountry").val());
+                GetNetworks($("#ddlCountry").val());
+                $("#ddlClient").removeAttr("disabled");
+                $("#ddlNetwork").removeAttr("disabled");
+            }
+        });
+
+        $("#ddlClient").change(function () {
+            $("#divErrorMessage").attr("style", "display:none");
+        });
+
+        $("#ddlNetwork").change(function () {
+            $("#divErrorMessage").attr("style", "display:none");
+        });
+
+        $("#ddlPlanYearType").change(function () {
+            GetLogDescription();
+            $("#divErrorMessage").attr("style", "display:none");
+        });
+
+        $("#ddlPlanYear").change(function () {
+            GetLogDescription();
+            $("#divErrorMessage").attr("style", "display:none");
+        });
+
+        $("#ddlMonth").change(function () {
+            GetLogDescription();
+            $("#divErrorMessage").attr("style", "display:none");
+        });
+
+
+        GetNetworks(5);
+        GetLogDescription();
+
+    });
+
+    function GetLogDescription () {
+        if ($("#ddlPlanYearType option:selected").val() == 'B') {
+            var url = "/ClientCommission/GetBroadcastDates/";
+
+            $.ajax({
+                url: url,
+                data: {
+                        month: $("#ddlMonth option:selected").val(),
+                        year:  $("#ddlPlanYear option:selected").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var dateStart = new Date(result.dateFrom);
+                    var dateEnd = new Date(result.dateTo);
+
+                    $("#txtDateFrom").val((dateStart.getMonth()+1) + '/' + dateStart.getDate() + '/' + dateStart.getFullYear());
+                    $("#txtDateTo").val((dateEnd.getMonth()+1) + '/' + dateEnd.getDate() + '/' + dateEnd.getFullYear());
+
+                    $("#ExportLogDescription").html("Post Log will be generated from " + (dateStart.getMonth()+1) + '/' + dateStart.getDate() + '/' + dateStart.getFullYear() + " to " + (dateEnd.getMonth()+1) + '/' + dateEnd.getDate() + '/' + dateEnd.getFullYear() + ".").show();
+                },
+                error: function (response) {
+                    swal("error : " + response.responseText);
+                }
+            });
+        }
+        else {
+            var dateStart = new Date($("#ddlPlanYear option:selected").val(), $("#ddlMonth option:selected").val()-1);
+            var dateEnd = new Date($("#ddlPlanYear option:selected").val(), $("#ddlMonth option:selected").val(), 0);
+
+            $("#txtDateFrom").val((dateStart.getMonth()+1) + '/' + dateStart.getDate() + '/' + dateStart.getFullYear());
+            $("#txtDateTo").val((dateEnd.getMonth()+1) + '/' + dateEnd.getDate() + '/' + dateEnd.getFullYear());
+
+            $("#ExportLogDescription").html("Post Log will be generated from " + (dateStart.getMonth()+1) + '/' + dateStart.getDate() + '/' + dateStart.getFullYear() + " to " + (dateEnd.getMonth()+1) + '/' + dateEnd.getDate() + '/' + dateEnd.getFullYear() + ".").show();
+        }
+    }
+
+    function GetLogCount() {
+        var url = "/ClientCommission/GetLogCount/";
+
+        $.ajax({
+            url: url,
+            data: {
+                    clientId:   $("#ddlMonth option:selected").val(),
+                    networkId:  $("#ddlPlanYear option:selected").val(),
+                    dateFrom:   $("#txtDateFrom").val(),
+                    dateTo:     $("#txtDateTo").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                $("#ExportLogDescription").html("Post Log will be generated from " + (dateStart.getMonth()+1) + '/' + dateStart.getDate() + '/' + dateStart.getFullYear() + " to " + (dateEnd.getMonth()+1) + '/' + dateEnd.getDate() + '/' + dateEnd.getFullYear() + ".").show();
+            },
+            error: function (response) {
+                swal("error : " + response.responseText);
+            }
+        });
+
+    }
+
+    function GetNetworks(_countryid) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlNetwork").html(procemessage).show();
+        var url = "/Network/GetNetworkByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                if (_countryid == 5)
+                {
+                    markup += "<option value='0'>All US Networks</option>";
+                }
+                else
+                {
+                    markup += "<option value='0'>All CA Networks</option>";
+                }
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                }
+                $("#ddlNetwork").html(markup).show();
+            },
+            error: function (response) {
+                swal("error : " + response.responseText);
+            }
+        });
+    }
+</script>
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Bootstrap Forms Validation -->
+        <h2 class="content-heading">Client Specific Planning</h2>
+
+        @using (Html.BeginForm("ExportPostLog", "ClientCommission", FormMethod.Get, new { @class = "js-validation-bootstrap", @id = "formExportPostLog" }))
+        {
+            <div class="block block-themed">
+                <div class="block-header block-header-default @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                    <h3 class="block-title">Export Post Log</h3>
+                </div>
+                @if (Model.ErrMessage.ResponseText.Length > 0)
+                {
+                    @if (Model.ErrMessage != null && Model.ErrMessage.Success == true)
+                    {
+                        <div class="alert alert-success alert-dismissable" role="alert">
+                            <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h3 class="alert-heading font-size-h4 font-w400">Success</h3>
+                            <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger alert-dismissable" role="alert" id="divErrorMessage" style="display:normal;">
+                            <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                        </div>
+                    }
+                }
+                <div class="alert alert-info alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="mb-0" id="ExportLogDescription"></p>
+                </div>
+
+                <div class="block-content">
+                    <div class="row justify-content-center py-20">
+                        <div class="col-xl-11">
+                            <div class="form-group row">
+                                <label class="col-4">Country</label>
+                                <label class="col-4 col-form-label" for="ClientId">Client <span class="text-danger">*</span></label>
+                                <label class="col-4 col-form-label" for="NetworkId">Network <span class="text-danger">*</span></label>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.CountryId,
+                                        new SelectList(Model.Countries, "CountryId", "CountryShort", "5"),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlCountry" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.ClientId,
+                                        new SelectList(Model.Clients, "ClientId", "ClientName"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlClient" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.NetworkId,
+                                        new SelectList(Model.Networks, "NetworkId", "StdNetName"),
+                                        //Enumerable.Empty<SelectListItem>(),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlNetwork" }
+                                    )
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-4">Plan Year Type</label>
+                                <label class="col-4">Plan Year</label>
+                                <label class="col-4">Month</label>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.PlanYearType,
+                                        new SelectList(Model.PlanYearTypes, "Value", "Text"),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlPlanYearType" }
+                                    )
+                                </div>
+                                <div class="col-4">
+                                    @Html.DropDownListFor(m => m.PlanYear,
+                                        new SelectList(Model.PlanYears, "Value", "Text"),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlPlanYear" }
+                                        )
+                                </div>
+                                <div class="col-4">
+                                        @Html.DropDownListFor(m => m.Month,
+                                        new SelectList(Model.Months, "Value", "Text"),
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlMonth" }
+                                        )
+                                    @Html.TextBoxFor(m => m.DateFrom, new { @class = "form-control", @id="txtDateFrom", @hidden="hidden" })
+                                    @Html.TextBoxFor(m => m.DateTo, new { @class = "form-control", @id="txtDateTo", @hidden="hidden" })
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="block block-themed">
+                <div class="block-content">
+                    <div class="row justify-content-center py-20">
+                        <div class="col-xl-12">
+                            <div class="form-group row">
+                                <div class="col-lg-12 ml-auto">
+                                    <button type="submit" class="btn btn-alt-primary" id="btnExport" name="btnExport" >
+                                        <i class="fa fa-check mr-5"></i> Export Log For Invoice Comparison
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- Bootstrap Forms Validation -->
+
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->

@@ -1,0 +1,99 @@
+﻿@model DropdownViewModel
+@if (Model != null)
+{
+    @if (Model.ResultsStr != null)
+    {
+        var arrSels = string.IsNullOrEmpty(Model.Sels) ? null : Model.Sels.Split('~');
+        var isSelectAll = (arrSels == null) ? true : (arrSels.Length - 1 == Model.ResultsStr.Count()) ? true : false;
+
+        <li><label><span>Select All</span><input type=checkbox checked="@isSelectAll" value="Select All"></label></li>
+        @foreach (var item in Model.ResultsStr)
+        {
+            if (string.IsNullOrEmpty(Model.Sels) || arrSels.Contains(item))
+            {
+                <li><label><span>@item</span><input type=checkbox checked value="@item"></label></li>
+            }
+            else
+            {
+                <li><label><span>@item</span><input type=checkbox value="@item"></label></li>
+            }
+        }
+    }
+    else if (Model.ResultsDbl != null)
+    {
+        var arrSels = string.IsNullOrEmpty(Model.Sels) ? null : Model.Sels.Split('~');
+        var isSelectAll = (arrSels == null) ? true : (arrSels.Length - 1 == Model.ResultsDbl.Count()) ? true : false;
+
+        <li><label><span>Select All</span><input type=checkbox checked="@isSelectAll" value="Select All"></label></li>
+        @foreach (var item in Model.ResultsDbl)
+        {
+            if (string.IsNullOrEmpty(Model.Sels) || arrSels.Contains(Convert.ToString(item)))
+            {
+                <li><label><span>@((Model.IsCurrency == true) ? String.Format("{0:c}", item) : String.Format("{0:n2}", item)) </span><input type=checkbox checked value="@item"></label></li>
+                
+            }
+            else
+            {                
+                 <li><label><span>@((Model.IsCurrency == true)? String.Format("{0:c}", item) : String.Format("{0:n2}", item))</span><input type=checkbox value="@item"></label></li>
+            }
+        }
+    }
+    else if (Model.ResultsDt != null)
+    {
+        var arrSels = string.IsNullOrEmpty(Model.Sels) ? null : Model.Sels.Split('~');
+        var isSelectAll = (arrSels == null) ? true : (arrSels.Length - 1 == Model.ResultsDt.Count()) ? true : false;
+
+        <li><label><span>Select All</span><input type=checkbox checked="@isSelectAll" value="Select All"></label></li>
+        @foreach (var item in Model.ResultsDt)
+        {
+            if (string.IsNullOrEmpty(Model.Sels) || arrSels.Contains(Convert.ToString(item)))
+            {
+                <li><label><span>@item</span><input type=checkbox checked value="@item"></label></li>
+            }
+            else
+            {
+                <li><label><span>@item</span><input type=checkbox value="@item"></label></li>
+            }
+        }
+    }
+    else if (Model.ResultsInt != null)
+    {
+        var arrSels = string.IsNullOrEmpty(Model.Sels) ? null : Model.Sels.Split('~');
+        var isSelectAll = (arrSels == null) ? true : (arrSels.Length - 1 == Model.ResultsInt.Count()) ? true : false;
+
+        <li><label><span>Select All</span><input type=checkbox checked="@isSelectAll" value="Select All"></label></li>
+        @foreach (var item in Model.ResultsInt)
+        {
+            if (string.IsNullOrEmpty(Model.Sels) || arrSels.Contains(Convert.ToString(item)))
+            {
+                <li><label><span>@item</span><input type=checkbox checked value="@item"></label></li>
+            }
+            else
+            {
+                <li><label><span>@item</span><input type=checkbox value="@item"></label></li>
+            }
+        }
+    }
+    else if (Model.ResultSelListItems != null)
+    {
+        var arrSels = string.IsNullOrEmpty(Model.Sels) ? null : Model.Sels.Split('~');
+        var isSelectAll = (arrSels == null) ? true : (arrSels.Length - 1 == Model.ResultSelListItems.Count()) ? true : false;
+
+        <li><label><span>Select All</span><input type=checkbox checked="@isSelectAll" value="Select All"></label></li>
+        @foreach (var item in Model.ResultSelListItems)
+        {
+            if (string.IsNullOrEmpty(Model.Sels) || arrSels.Contains(item.Value))
+            {
+                <li><label><span>@item.Text</span><input type=checkbox checked value="@item.Value"></label></li>
+            }
+            else
+            {
+                <li><label><span>@item.Text</span><input type=checkbox value="@item.Value"></label></li>
+            }
+        }
+
+    }
+
+}
+
+

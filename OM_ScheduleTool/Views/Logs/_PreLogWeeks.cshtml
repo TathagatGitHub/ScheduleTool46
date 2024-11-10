@@ -1,0 +1,249 @@
+@model LogsViewModel
+
+@{
+    string PL = Model.manageMediaViewModel.LoggedOnUser.PermissionLevel.Description.ToLower();
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        DisplayPreLogButtons();
+
+        $('table[id = "tblPreLogWeeks"] tr').click(function () { //Once any element with class "table_row" is clicked
+            if ($(this).children("th").length == 0) {
+                $('table[id="tblPreLogWeeks"] tr').removeClass('selected'); // "Unselect" all the rows
+                $(this).addClass('selected'); // Select the one clicked
+
+                DisplayPreLogButtons();
+            }
+        });
+
+        $("#divPreLogButtons").on("click", "#btnCreatePreLog",function () {
+            var WeekNbr = $('table[id="tblPreLogWeeks"]  tr.selected td:nth-child(1)').text();
+            $.ajax({
+                url: "/Logs/CreatePreLog",
+                data: {
+                    SchedID: $("#hidSchedID").val(),
+                    WeekNbr: WeekNbr,
+                    WeekDate: $('table[id="tblPreLogWeeks"]  tr.selected td:nth-child(2)').text()
+                },
+                async: false,
+                type: "POST",
+                success: function (result) {
+                    //Refresh Logs Weeks
+                    swal('', 'Your PreLog has been created and populated based on the matching Schedule, but no Network Logs have been added yet. <br><br> Available Network Logs will be added to your PreLog when it is opened in [EDIT] mode.', 'success');
+                    $.ajax({
+                        url: "/ManageMedia/LogsTab_Change",
+                        data: { Year: $("#ddlplanyear option:selected").val(), BroadcastQuarterNbr: GetQuarterTabPosition(), ClientId: $("#ddlclients option:selected").val() },
+                        type: "GET",
+                        cache: false,
+                        success: function (result) {
+                            $("#div_LogsWeeks").html(result);
+                            $('table[id="tblPreLogWeeks"]  tr:eq(' + WeekNbr + ')').addClass("selected");
+                            DisplayPreLogButtons();
+                        },
+                        error: function (response) {
+                            swal('Error!', response.responseText, 'error');
+                        }
+                    });
+
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'error');
+                }
+            });
+        });
+
+        $("#divPreLogButtons").on("click", "#btnEditPreLog",function () {
+            sessionStorage.setItem("PreLogQtrName", $(".nav-tabs .nav-item .active").text());
+            lockPrelog();
+
+        });
+
+        $("#divPreLogButtons").on("click", "#btnViewPreLog", function () {
+            sessionStorage.setItem("PreLogQtrName", $(".nav-tabs .nav-item .active").text());
+            var logsViewSelectedCountryId = $('#hiddenLogsSelectedCountryId').val();
+            OpenNewDataTablesWin('/Logs/ViewPreLog?prelogid=' + $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").val() + "&logsSelectedCountryId=" + logsViewSelectedCountryId);
+        });
+        $("#divPreLogButtons").on("click", "#btnDeletePreLog", function () {
+            var weekNbr = $("table[id='tblPreLogWeeks'] tr.selected").find("input:hidden").data("weeknbr");
+            var preLogId = $("table[id='tblPreLogWeeks'] tr.selected").find("input:hidden").val();
+            swal({
+                title: "",
+                text: "Are you sure you want to delete selected PRE LOG?",
+                type: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes",
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(
+                function (result) {
+                    $.ajax({
+                        url: "/Logs/DeletePreLog",
+                        type: "POST",
+                        data: {
+                            PreLogId: preLogId
+                        },
+                        success: function (result) {
+                            if (result.success) {                              
+                                swal("", result.responseText, "success");
+                                $.ajax({
+                                    url: "/ManageMedia/LogsTab_Change",
+                                    data: { Year: $("#ddlplanyear option:selected").val(), BroadcastQuarterNbr: GetQuarterTabPosition(), ClientId: $("#ddlclients option:selected").val() },
+                                    type: "GET",
+                                    cache: false,
+                                    success: function (result) {
+                                        $("#div_LogsWeeks").html(result);
+                                        $("table[id='tblPreLogWeeks']  tr:eq(" + weekNbr + ")").addClass("selected");
+                                        DisplayPreLogButtons();
+                                    },
+                                    error: function (response) {
+                                        swal("Error!", response.responseText, "error");
+                                    }
+                                });
+                            }
+                            else {
+                                swal("Error!", result.responseText, "error");
+                            }
+
+                        },
+                        error: function (response) {
+                            swal("Error!", response.responseText, "error");
+                        }
+                    })
+                });
+
+        });
+
+        $("#divPreLogButtons").on("click", "#btnUnlockPreLog", function () {
+            var _prelogId = $("table[id='tblPreLogWeeks'] tr.selected").find("input:hidden").val();
+            $.ajax({
+                url: "/Logs/UnlockPreLog/",
+                data: { preLogId: _prelogId },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result) {
+                        window.location.reload();
+                    }
+                },
+                error: function (response) {
+                    swal('Stop!', response.responseText, 'error');
+                }
+            });
+        });
+    });
+
+    function lockPrelog() {
+
+        var preLogId = $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").val();
+
+        var schedId = $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").data('schedid');
+        var weekNbr = $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").data('weeknbr');
+        var logsEditSelectedCountryId = $('#hiddenLogsSelectedCountryId').val();
+
+        $.ajax({
+            url: '/Logs/LockPreLog',
+            data: { preLogId: preLogId }, // CP -- This had a javascript error for me so I added this ... Please correct if you are not getting the same thing.
+            type: 'POST',
+            success: function (result) {
+                if (result.lockedToOtherUser) {
+                    var notify = $.notify("Item cannot be edited. It is locked by: " + result.lockedBy + " At " + result.lockTime, {
+                        type: 'danger',
+                        allow_dismiss: true,
+                    });
+                } else if (!result.lockedToOtherUser) {                    
+                    if (result.lockedBy && result.lockTime) {
+                        OpenNewDataTablesWin('/Logs/EditPreLogNetworkUserAction?prelogid=' + preLogId + "&schedId=" + schedId + "&weekNbr=" + weekNbr + "&logsSelectedCountryId=" + logsEditSelectedCountryId);
+                        setTimeout(() => {  window.location.reload(); }, 5000);
+                        }
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true,
+                });
+            }
+        });
+    }
+    
+    function DisplayPreLogButtons() {
+
+        var markup = "";
+        if ($('table[id="tblPreLogWeeks"] tr.selected').length > 0) {
+
+            var canEdit = $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").data('caneditprelog') == "True";
+            var preloglocked = $('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").data('preloglocked') == "True";
+            var preloglockedby = parseInt($('table[id="tblPreLogWeeks"] tr.selected').find("input:hidden").data('preloglockedby'));
+            if (canEdit) {
+                if ("@PL" == "admin" || "@PL" == "buyer" || "@PL" == "assistant") {
+                    if ($('table[id="tblPreLogWeeks"] tr.selected').find("span").first().text().length == 0) {
+                        markup += "<button id='btnCreatePreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Create</button>";
+                    }
+                    else {
+                        markup += "<button id='btnEditPreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Edit</button>&nbsp; &nbsp;";
+                        markup += "<button id='btnViewPreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-book'></i> View</button>&nbsp; &nbsp;";
+                        markup += "<button id='btnDeletePreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-trash'></i> Delete</button>";
+                        if (preloglocked == true && ("@PL" == "admin" || (("@PL" == "buyer" || "@PL" == "assistant") && @Model.manageMediaViewModel.LoggedOnUser.UserId == preloglockedby) )) {
+                            markup += "&nbsp;<button id='btnUnlockPreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Unlock</button>";
+                        }
+                    }
+                }             
+            }
+            else {
+                if ($('table[id="tblPreLogWeeks"] tr.selected').find("span").first().text().length > 0) {
+                    markup += "<button id='btnViewPreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-book'></i> View</button>";
+                    if (preloglocked == true && ("@PL" == "admin" || (("@PL" == "buyer" || "@PL" == "assistant") && @Model.manageMediaViewModel.LoggedOnUser.UserId == preloglockedby) )) {
+                            markup += "&nbsp;<button id='btnUnlockPreLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Unlock</button>";
+                        }
+                } 
+            }
+            $("#divPreLogButtons").html(markup);
+        }
+    }
+    
+</script>
+
+
+<div class="form-group-row">
+    <div class="col-12">
+        <h4 class="text-center">PRE LOGS</h4>
+        <table id="tblPreLogWeeks">
+            <tr><th style="width:15%">Wk#</th><th style="width:22%">Wk Date</th><th style="width:40%">Associated Schedule Name</th><th style="width:15%">Locked</th></tr>
+            @{int i = 1;}
+            @foreach (var week in Model.prelogs)
+            {
+                <tr style="height:25px">
+                    <td style="padding-left:5px">@i
+                    <input type="hidden" value="@week.PreLogId" data-preloglocked="@week.PreLogLocked" data-preloglockedby="@week.PreLogLockedBy" data-caneditprelog="@week.CanEditPreLog" data-schedId="@week.SchedId" data-weekNbr="@week.WeekNbr"  />
+                </td>
+                <td>@week.WeekDate.ToString("MM/dd/yyyy")</td>
+                <td><span name="ScheduleName">@week.ScheduleName</span></td>
+                <td>@if (@week.PreLogLocked ==  true) {
+                        <span>@week.PreLogLockedUser?.FirstName</span> }
+            </td>
+        </tr>
+        i++;
+    }
+        </table>
+
+    </div>
+</div>
+<br />
+<div class="form-group-row">
+    <div class="col-12" id="divPreLogButtons">       
+    </div>
+    <div class="col-12">
+        <span id="statusBar"></span>
+    </div>
+</div>
+<br />
+

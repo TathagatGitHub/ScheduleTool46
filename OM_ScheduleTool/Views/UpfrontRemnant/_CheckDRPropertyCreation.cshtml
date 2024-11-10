@@ -1,0 +1,190 @@
+@model ViewUpfrontsViewModel
+
+<style>
+    #dTable {
+        width: 1400px;
+        height: 700px;
+        overflow-y: auto;
+        text-align: justify;
+    }
+
+    table {
+        text-align: left;
+        position: relative;
+    }
+
+    th {
+        background: white;
+        position: sticky;
+        top: 0;
+    }
+
+    th {
+        background: #C3C2C2;
+    }
+</style>
+
+<script language="javascript" type="text/javascript">
+
+    function DRGoBack() {
+        $('#modal-checkDRPropertyCreation').modal('toggle');
+        EnableAdd();
+        $("#modal-DRPropertyCreation").modal();
+    }
+    function ReloadMainPage() {
+        window.location.reload();
+    }
+
+    function CreateDRProperties() {
+        CheckSelectedDRProperties(1);
+    }
+
+    function PopulateDRPropertiesRevisionScreen(_networkId, _quarterName, _estimateVersion, _listDRSelectedData, _isCreatePropertyRates) {
+
+        $.ajax({
+            url: "/UpfrontRemnant/DRCheckProperties",
+            data: {
+                lstDRSelectedProperties: _listDRSelectedData,
+                NetworkId: _networkId,
+                QuarterName: _quarterName,
+                EstimateVersion: _estimateVersion,
+                IsCreateDRPropertyRates: _isCreatePropertyRates
+                //IsCreatePropertyRates: _isCreatePropertyRates
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                var btnShowCreateDRProperties = false;
+                if (_isCreatePropertyRates) {
+                    swal('Wait!', 'Properties are created Successfully', 'success');
+                    setTimeout(function () { window.location.reload(); }, 3000);
+                }
+
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<tr>";
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].demoName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].propertyName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].startTimeFormatted + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].endTimeFormatted + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].dp + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].days + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center"><span class="badge badge-pill badge-success">' + result[x].spotLen + '</span></td>';
+                    /*markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].spBuy + '</td>';*/
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + '' + '</td>';
+                    if (result[x].rateAmt == 0) {
+                        markup += '<td class="d-none d-sm-table-cell text-center">--' + '</td>';
+                    }
+                    else {
+                        markup += '<td class="d-none d-sm-table-cell text-center">$' + (result[x].rateAmt).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    }
+                    //markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].imp + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + (result[x].imp).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    //markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].cpm + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + (result[x].cpm).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].status + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].clientName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].effectiveDate + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].expirationDate + '</td>';
+                    //markup += '<td class="d-none d-sm-table-cell text-center">' + (result[x].revision == null || result[x].revision == undefined) ? "" : result[x].revision + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].revision + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].buyTypeCode + '</td>';
+
+
+                    if (result[x].canCreateQTRProperty == 1) {
+                        markup += '<td class="d-none d-sm-table-cell text-center text-success">';
+                        markup += '<i class="fa fa-check-circle-o"></i> OK TO CREATE';
+                        markup += '</td>';
+                        btnShowCreateDRProperties = true;
+                    }
+                    else {
+                        markup += '<td class="d-none d-sm-table-cell text-center text-danger">';
+                        markup += '<i class="fa fa-check-circle-o"></i> CAN NOT CREATE';
+                        markup += '</td>';
+                    }
+
+                    markup += "</tr>";
+                }
+
+                if (!btnShowCreateDRProperties) {
+                    $('#btnDRCreateProperty').attr('disabled', 'disabled');
+                }
+                else {
+                    $('#btnDRCreateProperty').removeAttr('disabled');
+                }
+                $("#ListDRPropertyCanCreate").html(markup).show();
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+
+</script>
+
+<div class="modal fade" id="modal-checkDRPropertyCreation" tabindex="-1" role="dialog" aria-labelledby="modal-checkDRPropertyCreation" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="min-width:1400px !important;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId">
+                        </div>
+                    </div>
+                    <div><label><h4>Following Properties will be created. Please review.</h4></label></div>
+                    <div id="dTable" class="form-group row">
+                        <div class="block-content block-content-full">
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-striped table-vcenter js-dataTable-simple" id="DRDeleteTable" name="DRDeleteTable">
+                                <thead>
+                                    <tr>
+                                        <th width="10%" class="d-none d-sm-table-cell text-center">Demo Name</th>
+                                        <th width="20%" class="d-none d-sm-table-cell text-center">Property Name</th>
+                                        <th width="5%" class="d-none d-sm-table-cell text-center">StartTime</th>
+                                        <th width="5%" class="d-none d-sm-table-cell text-center">EndTime</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">DP</th>
+                                        <th class="d-none d-sm-table-cell text-center">Days</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Len</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">SPBuy</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center">Status</th>
+                                        <th class="d-none d-sm-table-cell text-center">Client Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">EffDt</th>
+                                        <th class="d-none d-sm-table-cell text-center">ExpDt</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Rev#</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Buy Type</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Create Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ListDRPropertyCanCreate"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" onclick="javascript: DRGoBack();">Back</button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button id="btnDRCreateProperty" type="button" class="btn btn-alt-success" onclick="javascript: CreateDRProperties();">
+                    Create Properties Listed
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

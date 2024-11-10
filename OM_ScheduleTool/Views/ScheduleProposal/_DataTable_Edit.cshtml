@@ -1,0 +1,476 @@
+@model ProposalViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+
+<!-- Data Table Buttons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css ">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+
+<!--<link rel="stylesheet" href="https://rawgit.com/wenzhixin/multiple-select/master/multiple-select.css">-->
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+
+<style type="text/css">   
+    body {
+        overflow-y: visible;
+        overflow-x: visible;
+        line-height: 1;
+        /* Disabled content selection for ST-678/721 By HM */     
+    }
+
+    table.dataTable tbody tr.selected {
+        background-color: #ffffff;
+    }
+
+    .bg-color {
+        background-color: #F79646;
+    }
+
+    .HeaderWeekDOW .cb-dropdown-wrap:hover {
+        width: 200px !important;
+    }
+    .HeaderRateRevisedDate .cb-dropdown-wrap:hover {
+        width: 80px !important;
+    }
+
+    .HeaderStartToEnd .cb-dropdown-wrap:hover {
+        width: 165px !important;
+    }
+
+    .HeaderDemoName .cb-dropdown-wrap:hover {
+        width: 200px!important;
+    }
+
+    .HeaderPropertyName .cb-dropdown-wrap:hover {
+        width: 400px !important;
+    }
+
+    .HeaderNetworkName .cb-dropdown-wrap:hover {
+        width: 300px!important;
+    }
+
+    .HeaderDemoName, .col-6-DemoName {
+        min-width: 130px !important;
+    }
+
+    .HeaderNetworkName, .col-7-NetworkName {
+        min-width: 175px !important;
+    }
+    
+    .HeaderPropertyName, .col-8-PropName {
+        min-width: 300px !important;
+    }
+
+    .HeaderImpression, .col-28-Impressions {
+        min-width: 75px !important;
+    }
+
+    .HeaderDiscount, .col-25-Discount {
+        min-width: 50px !important;
+    }
+
+    .HeaderTotalSpots {
+        /*min-width:90px!important;*/
+    }
+
+ /*   .HeaderWeekDayM, .HeaderNetworkName, .HeaderDemoName {
+        padding-right: 5px !important;
+        padding-left: 0px !important;
+    }*/
+
+
+    .HeaderWeekDayM, .HeaderWeekDayT, .HeaderWeekDayW, .HeaderWeekDayTH, .HeaderWeekDayF, .HeaderWeekDaySA, .HeaderWeekDaySU,
+    .HeaderDP {
+        min-width: 25px;
+    }
+
+   
+
+    /*Proposal Redesign - Added for fixed colmns back-ground color to remove H-Scroll columns overlay transperancy*/
+    #CalculatorEditTable td:nth-child(1), #CalculatorEditTable td:nth-child(2), #CalculatorEditTable td:nth-child(3), #CalculatorEditTable td:nth-child(4),
+    #CalculatorEditTable td:nth-child(5), #CalculatorEditTable td:nth-child(6), #CalculatorEditTable td:nth-child(7), #CalculatorEditTable td:nth-child(8),
+    #CalculatorEditTable td:nth-child(9), #CalculatorEditTable td:nth-child(10), #CalculatorEditTable td:nth-child(11), #CalculatorEditTable td:nth-child(12),
+    #CalculatorEditTable td:nth-child(13), #CalculatorEditTable td:nth-child(14), #CalculatorEditTable td:nth-child(15), #CalculatorEditTable td:nth-child(16),
+    #CalculatorEditTable td:nth-child(17), #CalculatorEditTable td:nth-child(18), #CalculatorEditTable td:nth-child(19), #CalculatorEditTable td:nth-child(20),
+    #CalculatorEditTable td:nth-child(21), #CalculatorEditTable td:nth-child(22), #CalculatorEditTable td:nth-child(23), #CalculatorEditTable td:nth-child(24) {
+        background-color: white;
+    }
+
+    #MyProposalTable td:nth-child(1), #MyProposalTable td:nth-child(2), #MyProposalTable td:nth-child(3), #MyProposalTable td:nth-child(4),
+    #MyProposalTable td:nth-child(5), #MyProposalTable td:nth-child(6), #MyProposalTable td:nth-child(7), #MyProposalTable td:nth-child(8),
+    #MyProposalTable td:nth-child(9), #MyProposalTable td:nth-child(10), #MyProposalTable td:nth-child(11), #MyProposalTable td:nth-child(12),
+    #MyProposalTable td:nth-child(13), #MyProposalTable td:nth-child(14), #MyProposalTable td:nth-child(15), #MyProposalTable td:nth-child(16),
+    #MyProposalTable td:nth-child(17), #MyProposalTable td:nth-child(18), #MyProposalTable td:nth-child(19), #MyProposalTable td:nth-child(20),
+    #MyProposalTable td:nth-child(21), #MyProposalTable td:nth-child(22), #MyProposalTable td:nth-child(23), #MyProposalTable td:nth-child(24) {
+        background-color: white;
+    }
+
+    #AddNewPropertyTable tr:nth-child(even) {
+        background-color: #F8F8F8;        
+    }
+
+
+    /*Proposal Redesign - Added for fixed colmns Header back-ground color to remove H-Scroll columns overlay transperancy*/
+    .dtBackgroundColor {
+        background-color: white; /*#FAF8F7; */
+    }
+
+    /*Proposal Redesign - Added for fixed colmns to set Header width to make Filters dropdowns visible*/
+    table.dataTable thead#dtHeader th.dtfc-fixed-left {
+        height: 50px;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns to display dropdown Filters infornt of rows*/
+    div.cb-dropdown-wrap {
+        pointer-events: auto;
+        background-color: white;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns to display dropdown Filters infornt of rows*/
+    div.dataTables_scrollHead {
+        /*pointer-events: none;*/
+    }   
+
+    /*Proposal Redesign - Added for fixed colmns to display dropdown Filters infornt of rows*/
+    div.dataTables_scrollHead:hover {
+       /*overflow: visible !important;*/
+    }
+
+    #MyProposalTable_wrapper div.dataTables_scrollHead {
+        height: 250px;
+    }
+
+    #MyProposalTable_wrapper div.dataTables_scrollBody {
+        margin-top: -190px;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns Header back-ground color for filters dropdown on mouse hover action*/
+    /*th.dtfc-fixed-left div.cb-dropdown-wrap:hover, div.cb-dropdown-wrap:hover */
+
+  /*  th.dtfc-fixed-left div.cb-dropdown-wrap:hover {
+        height: 170px;
+        background-color: white;
+    }*/
+
+ /*   th.HeaderWeekDayM .dtfc-fixed-left > div.cb-dropdown-wrap:hover {
+        height: 70px!important;
+        background-color: white;
+    }*/
+
+    /*Proposal Redesign - Added for fixed colmns to hide duplicate Header width (otherwise shows 2 headers)*/
+    table.dtfc-has-left thead#dtHeader tr {
+        height: 0px !important;
+    }
+
+  
+    /*Proposal Redesign - Added for fixed colmns Header to hide duplicate filter dropdown for SPOTs count columns*/
+    div.dataTables_sizing div.cb-dropdown-wrap {
+        display: none;
+    }
+
+
+    /*Proposal Redesign - Added for fixed colmns Header back-ground default color to filters dropdown for contrast looks*/
+    th.dtfc-fixed-left div.cb-dropdown-wrap, div.cb-dropdown-wrap, #txtPropertyName {
+        background-color: #dddfe2;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns back-ground color TOP Right TOTALS section to remove H-Scroll columns overlay transperancy*/
+    table#CalculatorEditTable tbody tr td.no-color {
+        background-color: white;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns Filters dropdwon to get Zoom effects on mouse hover*/
+    .cb-dropdown li label > span {
+        display: block;
+        margin-left: 18px;
+        font-weight: normal;
+        text-align: left;
+      
+    }
+
+    /*Proposal Redesign - Added for fixed colmns Filters dropdwon to get check box on LEFT side of filter text*/
+/*    .cb-dropdown-wrap {
+        max-height: 80px;
+        position: relative;
+        height: 19px;
+    }*/
+
+    /*Proposal Redesign - Added for fixed colmns Filters dropdwon to get check box on LEFT side of filter text*/
+    .cb-dropdown li label > input {
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        width: 16px;
+        z-index:15;
+    }
+    /*Proposal Redesign - Added for fixed colmns H-scroll to keep fixed columns on TOP of SPOTS dropdown filters */
+    .highZindex {
+        z-index: 10;
+    }
+
+    /*Proposal Redesign - Added for fixed colmns H-scroll to make SPOTS dropdown filters go behind fixed columns dropdown filters*/
+    div.cb-dropdown-wrap {
+        z-index: 5;
+    }
+
+    /*Proposal Redesign - Added to set width for proposal records display (for both default & on refresh of applying Filters) */
+    div.dataTables_scrollHead, div.dataTables_scrollBody {
+        /*max-width: 3720px !important;*/
+    }
+
+    /*Proposal Redesign - Added for Fixed columns to remove extra space in SPOTS display for Proposal records display */
+    div.dtfc-right-top-blocker{
+        display:none;
+    }
+
+
+
+    .HeaderRevNo, .HeaderRateRevisedDate, .HeaderNetworkName, .HeaderDemoName, .HeaderPropertyName,
+    .HeaderWeekDayM, .HeaderWeekDayT, .HeaderWeekDayW, .HeaderWeekDayTH, .HeaderWeekDayF, .HeaderWeekDaySA, .HeaderWeekDaySU,
+    .HeaderDP, .HeaderStartToEnd, .HeaderOMDP, .HeaderSPBuy, .HeaderSpotLen, .HeaderBuyType, .HeaderRateAmt,
+    .HeaderDiscount, .HeaderUSD, .HeaderCPM, .HeaderImpression, .HeaderTotalSpots {
+        /* padding-right: 0px !important;
+        padding-left: 0px !important;*/
+        /*left: 0px !important;*/ /*Makes fixed columns header scroll and have fixed columns*/
+        /* z-index: 15 !important;*/
+    }
+
+    /***Proposal Redesign - Need to add Z-index for each cell to make z-index of next cell less than previous, 
+         so that dropdown Filters comes infornt of next cell***/
+    .HeaderRevNo {
+        z-index: 30 !important;
+    }
+
+    .HeaderRateRevisedDate {
+        z-index: 29 !important;
+    }
+
+    .HeaderDemoName {
+        z-index: 28 !important;
+    }
+
+    .HeaderNetworkName {
+        z-index: 27 !important;
+    }
+
+    .HeaderPropertyName {
+        z-index: 26 !important;
+    }
+
+    .HeaderWeekDOW {
+        z-index: 19 !important;
+    }
+   
+    .HeaderWeekDayM {
+        z-index: 25 !important;
+    }
+
+    .HeaderWeekDayT {
+        z-index: 24 !important;
+    }
+
+    .HeaderWeekDayW {
+        z-index: 23 !important;
+    }
+
+    .HeaderWeekDayTH {
+        z-index: 22 !important;
+    }
+
+    .HeaderWeekDayF {
+        z-index: 21 !important;
+    }
+
+    .HeaderWeekDaySA {
+        z-index: 20 !important;
+    }
+
+    .HeaderWeekDaySU {
+        z-index: 19 !important;
+    }
+
+    .HeaderDP {
+        z-index: 18 !important;
+    }
+
+    .HeaderStartToEnd {
+        z-index: 17 !important;
+    }
+
+    .HeaderOMDP {
+        z-index: 16 !important;
+    }
+
+    .HeaderSPBuy {
+        z-index: 15 !important;
+    }
+
+    .HeaderSpotLen {
+        z-index: 14 !important;
+    }
+
+    .HeaderBuyType {
+        z-index: 13 !important;
+    }
+
+    .HeaderRateAmt {
+        z-index: 12 !important;
+    }
+
+    .HeaderDiscount {
+        z-index: 11 !important;
+    }
+
+    .HeaderUSD {
+        z-index: 10 !important;
+    }
+
+    .HeaderCPM {
+        z-index: 9 !important;
+    }
+
+    .HeaderImpression {
+        z-index: 8 !important;
+    }
+    .HeaderTotalSpots {
+        z-index: 7 !important;
+    }
+
+    thead#dtHeader > tr th:first-child {
+        width: 21px;
+        z-index: 6;
+    }
+
+    .table-bordered > thead#dtHeader > tr > th {
+        border-right: 0;
+        border-left: 0;
+    }
+
+    .dataTables_scrollHeadInner table.table-bordered {
+        border-left: 0;
+    }
+
+    table#MyProposalTable,
+    table#MyProposalTable tbody td {
+        border:0;
+    }
+
+    .HeaderSPBuy span:empty {
+        display: inline-block;
+    }
+     .HeaderWeekDOW {
+        min-width: 60px !important;
+    }
+
+    ProposalTableDiv.dataTables_scrollBody table {
+        margin-left: 2px!important;
+    }
+
+    .active-premiere {
+       /* background-color: #F79646 !important;*/
+        color: #000!important;
+        background-color: gold !important;
+        border-color: gold !important;
+    }
+</style>
+
+
+@Html.Partial("~/Views/ScheduleProposal/_Menu_Edit.cshtml", Model)
+<div class="block block-themed block-rounded" id="ProposalTableDiv">
+    <div class="block-content block-content-full" id="resize_wrapper">
+
+        <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap"  id="MyProposalTable" name="MyProposalTable" style="width:95%">
+            <thead id="dtHeader">
+                <tr>
+                    <th></th>
+                    <th class="d-none d-sm-table-cell align-text-top  HeaderType HeaderApproved dtBackgroundColor highZindex">APPRV</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderDoNotBuyType dtBackgroundColor highZindex">Status</th>                    
+                    <th class="d-none d-sm-table-cell align-text-top dtBackgroundColor highZindex ">Demo Univ</th>    
+                    <th></th>
+                    <th></th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderDemoName dtBackgroundColor filterhead highZindex">Demo Name</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderNetworkName dtBackgroundColor filterhead highZindex">Network</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderPropertyName dtBackgroundColor filterhead highZindex">Property Name</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderEffectiveDate dtBackgroundColor highZindex">Eff Dt</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderExpirationDate dtBackgroundColor highZindex">Exp Dt</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDOW dtBackgroundColor filterhead highZindex" >DOW</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDayT dtBackgroundColor filterhead highZindex" >T</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDayW dtBackgroundColor filterhead highZindex" >W</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDayTH dtBackgroundColor filterhead highZindex" >Th</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDayF dtBackgroundColor filterhead highZindex" >F</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDaySA dtBackgroundColor filterhead highZindex" >Sa</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWeekDaySU dtBackgroundColor filterhead highZindex" >Su</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderDP dtBackgroundColor filterhead highZindex" >DP</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderStartToEnd dtBackgroundColor filterhead highZindex">Start - End</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderOMDP dtBackgroundColor highZindex">OMDP</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderSPBuy dtBackgroundColor filterhead highZindex">SP</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderSpotLen dtBackgroundColor filterhead highZindex">SpotLen</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderBuyType dtBackgroundColor filterhead highZindex">BT</th>
+                    <th class="d-none d-sm-table-cell text-right HeaderType align-text-top HeaderRateAmt dtBackgroundColor filterhead highZindex">Full Rate</th>
+                    <th class="d-none d-sm-table-cell text-right align-text-top HeaderType HeaderDiscount dtBackgroundColor filterhead highZindex" id="DiscountPriceHeader">Rate</th>
+                    <th class="d-none d-sm-table-cell text-right align-text-top HeaderType HeaderUSD dtBackgroundColor highZindex" CountryId="@Model.ClientInfo.CountryId">
+                        @(Model.ClientInfo.CountryId == 2 ? Model.ProposalInfo.QtrName == "4Q2019" ? "USD GROSS RATE" : "USD NET RATE" : "USD Rate")
+                    </th>
+                    <th class="d-none d-sm-table-cell text-right HeaderType align-text-top HeaderCPM CurrencyHeaderType dtBackgroundColor filterhead highZindex">CPM</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderImpression dtBackgroundColor filterhead highZindex">Imp</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderRevNo dtBackgroundColor filterhead highZindex">Rev #</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderRateRevisedDate dtBackgroundColor filterhead highZindex">Rev Dt</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderTotalSpots dtBackgroundColor filterhead highZindex">Tot Spots</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK01 filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk01_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk01_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK02 filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk02_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk02_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK03  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk03_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk03_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK04 filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk04_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk04_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK05  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk05_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk05_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK06 filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk06_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk06_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK07  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk07_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk07_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK08  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk08_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk08_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK09  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk09_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk09_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK10  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk10_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk10_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK11  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk11_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk11_Date)</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK12  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk12_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", (Model.ProposalQuarter.Wk12_Date == null ? DateTime.Parse("12/6/1971") : Model.ProposalQuarter.Wk12_Date))</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK13  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk13_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", (Model.ProposalQuarter.Wk13_Date == null ? DateTime.Parse("12/6/1971") : Model.ProposalQuarter.Wk13_Date))</th>
+                    <th class="d-none d-sm-table-cell align-text-top HeaderType HeaderWK14  filterhead @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk14_Lock ? "bg-color" : "")">@String.Format("{0:MM/dd/yy}", (Model.ProposalQuarter.Wk14_Date == null ? DateTime.Parse("12/6/1971") : Model.ProposalQuarter.Wk14_Date))</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+        <input id="CurPage" name="CurPage" value="1" type="hidden" />
+        <input id="hdnPremiereFilter" name="hdnPremiereFilter" value="0" type="hidden" />
+    </div>
+</div>
+
+<!-- Auto Column Hiding-->
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+<script src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+<script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+<script type="text/javascript" src="~/datatable-editor/js/PageLoadMore.js?v=201907160718"></script>
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+<script src="~/lib/datatables.net-fixedcolumns/dataTables.fixedColumns.min.js"></script>
+<!--<script src="https://rawgit.com/wenzhixin/multiple-select/master/multiple-select.js"></script>-->
+
+<script asp-append-version="true" src="~/js/scheduleproposal/ScheduleProposal_Edit.js"></script>
+
+<script type="text/javascript" language="javascript">
+    function ResizeMainTable() {
+        //if (($(window).height() - $("#divScrollable").offset().top - 40) > 20) {
+            $("#ProposalTableDiv .dataTables_scrollBody").height($(window).height() - $("#ProposalTableDiv .dataTables_scrollBody").offset().top - 40);
+        //}   
+   
+    }
+
+</script>

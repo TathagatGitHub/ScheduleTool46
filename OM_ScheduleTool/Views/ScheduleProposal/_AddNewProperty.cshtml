@@ -1,0 +1,817 @@
+﻿@model ProposalViewModel
+
+<script language="javascript" type="text/javascript">
+    var checkboxSetFlag = false;
+    $(document).ready(function () {
+        PopulateAvailableProperties();
+
+
+        $('#AddNewPropertyTable').on('click', 'tbody input.editor-active', function () {
+            console.log('delegated click event'); // it is never shown
+            cb = $(this).prop('checked');
+            console.log(cb)
+        });
+
+          
+        $('#AddNewPropertyTable').on('change', 'tbody input.editor-active', function () {
+            console.log('delegated change event'); // it is never shown
+            cb = $(this).prop('checked');
+            console.log(cb)
+        });
+
+        $('input[type=checkbox]').on('change', function () {
+            //var oTable = $('#AddNewPropertyTable').dataTable();
+            //var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+            //rowcollection.each(function (index, elem) {
+            //    var checkbox_value = $(elem).val();
+            //});
+       
+        });
+
+
+        $('#properties-select-all').on('click', function(){
+           // Get all rows with search applied
+           var oTable = $('#AddNewPropertyTable').DataTable();
+           var rows = oTable.rows({ 'search': 'applied' }).nodes();
+           // Check/uncheck checkboxes for all rows in the table
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            EnableAdd();
+        });
+
+        $('#AddNewPropertyTable tbody').on('change', 'input[type="checkbox"]', function(){
+            if (!$(this).prop("checked")) {
+                $("#properties-select-all").prop("checked", false);
+            }
+        });
+
+        $('#AddNewPropertyTable tbody').on('click', 'input[type="checkbox"]', function(){
+            checkboxSetFlag = true;
+            var oTable = $('#AddNewPropertyTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+            if (totalCheckboxes == numberOfChecked) {
+                $("#properties-select-all").prop("checked", true);
+            }
+        });
+
+        $('#AddNewPropertyTable').on('click', 'tbody tr', function () {
+            var checkbox = $(this).find("input[type='checkbox']");
+            var oTable = $('#AddNewPropertyTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+
+            if (!checkboxSetFlag) {
+                if (!checkbox.prop('checked')) {
+                    checkbox.prop('checked', true);
+                    numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+                    totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+                    if (totalCheckboxes == numberOfChecked) {
+                        $("#properties-select-all").prop("checked", true);
+                    }
+                    EnableAdd();
+                }
+                else {
+                    checkbox.prop('checked', false);
+                    $("#properties-select-all").prop("checked", false);
+                    numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+                    if (numberOfChecked == 0) {
+                         EnableAdd();
+                    }
+                }
+            }
+             checkboxSetFlag = false;
+        });
+
+        $("#ddlNetworks").change(function () {
+            PopulateDemoNames($(this).val());
+            PopulateAvailableProperties();
+        });
+
+        $("#ddlDemoName").change(function () {
+            PopulateAvailableProperties();
+        });
+
+        $("#ddlStartTime").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(12).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlEndTime").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(13).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlDP").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(3).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlDays").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(4).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlLen").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(5).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlBuyType").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(14).search($(this).val(), true, false).draw();
+        });
+
+        $("#ddlStatus").change(function () {
+            var table = $('#AddNewPropertyTable').DataTable();
+            table.column(9).search($(this).val(), true, false).draw();
+        });
+    });
+
+    function PopulateStartTime() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlStartTime").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(12).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlStartTime").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlStartTime").removeAttr('disabled');
+            }
+            else {
+                $("#ddlStartTime").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateEndTime() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlEndTime").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(13).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlEndTime").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlEndTime").removeAttr('disabled');
+            }
+            else {
+                $("#ddlEndTime").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateDP() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlDP").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(3).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlDP").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlDP").removeAttr('disabled');
+            }
+            else {
+                $("#ddlDP").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateDays() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlDays").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(4).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlDays").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlDays").removeAttr('disabled');
+            }
+            else {
+                $("#ddlDays").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateLen() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlLen").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(5).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlLen").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlLen").removeAttr('disabled');
+            }
+            else {
+                $("#ddlLen").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateBuyType() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlBuyType").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(14).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlBuyType").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlBuyType").removeAttr('disabled');
+            }
+            else {
+                $("#ddlBuyType").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    function PopulateStatus() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlStatus").html(procemessage).show();
+
+        var table = $('#AddNewPropertyTable').DataTable();
+
+        var markup = "";
+        if (table) {
+            var data = table.column(9).data().unique();
+            markup = "<option value=''>Please select ...</option>";
+            for (var idx = 0; idx < data.length; idx++) {
+                markup += "<option value='" + data[idx] + "'>" + data[idx] + "</option>";
+            }
+            $("#ddlStatus").html(markup).show();
+            if (data.length > 1) {
+                $("#ddlStatus").removeAttr('disabled');
+            }
+            else {
+                $("#ddlStatus").attr('disabled', 'disabled');
+            }
+        }
+    }
+
+    //$('#AddNewPropertyTable').on('click', 'input[type="checkbox"]', function () {
+    //    var index = $(this).index;
+    //});
+
+     //$('#AddNewPropertyTable tbody').on('change', 'input[type="checkbox"]', function () {
+     //   if (!this.checked) {
+                   
+     //   }
+     //});
+
+
+
+    function EnableAdd() {
+        $('#btnAdd').attr('disabled', 'disabled');
+        //var rowIndex = $(ele).data('id');
+        
+        var oTable = $('#AddNewPropertyTable').dataTable();
+       // var data = oTable.row(this).data();
+        
+        var selRowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+        
+        selRowcollection.each(function (index, elem) {
+            $('#btnAdd').removeAttr('disabled');
+        });      
+    }
+
+    function AddScheduleLines() {
+        var _RateIds = "";
+        $('#btnAdd').attr('disabled', 'disabled');
+        var oTable = $('#AddNewPropertyTable').dataTable();
+
+        var allRowscollection = oTable.$(".editor-active", { "page": "all" });
+        var rowsCount = allRowscollection.length;
+
+        allRowscollection.each(function (index, elem) {
+
+            if ($(elem).is(':checked')) {
+                var currentRow_value = $(elem).val();
+                var currentRow_rateId = $(elem).attr('id');
+                var currentRow_splitId = $(elem).attr('splitId');
+                var currentRow_spotLen = $(elem).attr('spotLen');
+
+                if (_RateIds.length > 0) {
+                    _RateIds = _RateIds + ',';
+                }
+                _RateIds = _RateIds + currentRow_rateId;
+
+                if ($(elem).attr('spotLen') == 15 && currentRow_splitId == 2) {
+                    if (index < rowsCount - 1) { //row index starts from 0 so rowsCount - 1
+                        var nextRow = allRowscollection[index + 1];
+                        var nextRowRateId = 0;
+                        var nextRow_rateId = $(nextRow).attr('id');
+                        var nextRow_splitId = $(nextRow).attr('splitId');
+                        var nextRow_spotLen = $(nextRow).attr('spotLen');
+
+                        //check if next row is also spotLen == 15
+                        if ($(nextRow).attr('spotLen') == 15 && nextRow_splitId == 3) {
+                            var nextRowCheckbox = $(nextRow).find('td:first-child input[type="checkbox"]');
+
+                            //if ($(nextRowCheckbox).is(':unchecked')) {
+                                nextRowRateId = $(nextRow).attr('id');
+
+                                if (_RateIds.length > 0) {
+                                    _RateIds = _RateIds + ',';
+                                }
+                                _RateIds = _RateIds + nextRowRateId;
+                            //}
+                        }
+                    }
+                }
+                else if ($(elem).attr('spotLen') == 15 && currentRow_splitId == 3) //check if next row is also spotLen == 15
+                {
+                    if (index > 0) {
+                        var previousRow = allRowscollection[index - 1];
+                        var previousRowRateId = 0;
+                        var previousRow_rateId = $(previousRow).attr('id');
+                        var previousRow_splitId = $(previousRow).attr('splitId');
+                        var previousRow_spotLen = $(previousRow).attr('spotLen');
+
+                        if ($(previousRow).attr('spotLen') == 15 && previousRow_splitId == 2) {
+                            var previousRowCheckbox = $(previousRow).find('td:first-child input[type="checkbox"]');
+
+                            //if ($(previousRowCheckbox).is(':unchecked')) {
+                                previousRowRateId = $(previousRow).attr('id');
+
+                                if (_RateIds.length > 0) {
+                                    _RateIds = _RateIds + ',';
+                                }
+
+                                _RateIds = _RateIds + previousRowRateId;
+                           // }
+                        }
+                    }
+                }
+                    
+
+            }
+        });
+
+        var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+
+        //rowcollection.each(function (index, elem) {
+        //    $('#btnAdd').removeAttr('disabled');
+        //    //var checkbox_value = $(elem).val();
+        //    var checkbox_rateId = $(elem).attr('id');
+        //    if (_RateIds.length > 0) {
+        //        _RateIds = _RateIds + ',';
+        //    }
+        //    _RateIds = _RateIds + checkbox_rateId
+        //});
+
+        _RateIds = Array.from(new Set(_RateIds.split(','))).toString();
+        
+        if (_RateIds != '') {
+            $.ajax({
+                url: '/ScheduleProposal/AddScheduleLines',
+                data: {
+                    ProposalId: _UniqueId,
+                    RateIds: _RateIds
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    swal('Rates', _RateIds, 'error');
+                    if (result.success == true) {
+                        swal({
+                            position: 'top-end',
+                            type: 'success',
+                            title: 'Success!',
+                            text: 'Rates were successfully added.  Page will refresh in 3 seconds.',
+                            showConfirmButton: true,
+                            timer: 5000
+                        });
+                        window.setTimeout(function () { window.location.reload() }, 3000);
+                    }
+                    else {
+                        swal('Error!', result.responseText, 'error');
+                    }
+                },
+                error: function (response) {
+                    var notify = $.notify(response.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true
+                    });
+                }
+            });
+        }
+        else {
+            swal('Wait!', 'None selected for addition', 'error');
+        }
+    }
+    
+    function PopulateAvailableProperties(_NetworkId, _DemoId) {
+        // if ($.fn.DataTable.isDataTable('#AddNewPropertyTable')) {
+        //    return;
+        //}        
+        var addnewpropertytable = $('#AddNewPropertyTable').DataTable({
+            info: false,
+            scrollX: false,
+            scrollY: 400,
+            scrollCollapse: true,
+            paging: false,
+            destroy: true,
+            deferRender: true,
+            //processing: true,
+            ordering: true,            
+            language: {
+                infoFiltered: "",
+                processing: "<i class='fa fa-refresh fa-spin'></i>"
+            },
+            ajax: {
+                url: '/ScheduleProposal/GetAvailableProperties',
+                type: 'POST',
+                data: function (d) {
+                    d.proposalId = _UniqueId,
+                    d.NetworkId = $('#ddlNetworks').val(),
+                    d.DemoId = $('#ddlDemoName').val()
+                }
+            },
+            //columns: [
+            columnDefs:[
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+
+                            //return '<input type="checkbox" class="editor-active" id="' + data.rateId + '", splitId="' + data.splitId + '" onclick="javascript:EnableAdd();">';
+                            return '<input type="checkbox" class="editor-active" id="' + data.rateId + '", splitId="' + data.splitId + '", spotLen="' + data.spotLen + '"onclick="javascript:EnableAdd();">';
+                            //return '<input type="checkbox" class="editor-active">';
+                        }
+                        return data;
+                    },
+                    //className: 'select-checkbox',
+                    width: 10,
+                    orderable: false,
+                    searchable: false,
+                    selectRow: true
+                },
+                {
+                    targets: 1,
+                    data: "propertyName",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.ellipsis(2000, true),
+                    visible: true
+                },
+                {
+                    targets: 2,
+                    data: "time",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 3,
+                    data: "dp",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 4,
+                    data: "days",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 5,
+                    data: "spotLen",
+                    visible: true,
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === 120) {
+                            return "<span class='badge badge-pill badge-danger'>" + data + "</span>";
+                        }
+                        else if (data === 60) {
+                            return "<span class='badge badge-pill badge-primary'>" + data + "</span>";
+                        }
+                        else if (data === 15) {
+                            return "<span class='badge badge-pill badge-warning'>" + data + "</span>";
+                        }
+                        else {
+                            return "<span class='badge badge-pill badge-success'>" + data + "</span>";
+                        }
+                    }
+                },               
+                {
+                    targets: 6,
+                    data: "rateAmt",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                    visible: true
+                },
+                {
+                    targets: 7,
+                    data: "imp",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                    visible: true
+                },
+                {
+                    targets: 8,
+                    data: "cpm",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                    visible: true
+                },
+                {
+                    targets: 9,
+                    data: "status",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 10,
+                    data: "effExp",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 11,
+                    data: "reviseDt",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    render: function (d) {
+                        return "<span style='display:none;'>" + d +"</span>" + moment(d).format("MM/DD/YYYY hh:mm A");
+                    }
+                },
+                {
+                    targets: 12,
+                    data: "startTimeFormatted",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: false
+                },
+                {
+                    targets: 13,
+                    data: "endTimeFormatted",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: false
+                },
+                {
+                    targets: 14,
+                    data: "buyTypeDescription",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+            ],
+            fixedColumns: true,
+            initComplete: function () {
+                PopulateStartTime();
+                PopulateEndTime();
+                PopulateDP();
+                PopulateDays();
+                PopulateLen();
+                PopulateBuyType();
+                PopulateStatus();
+            }
+
+        });
+
+        // Filter event handler
+        $(addnewpropertytable.table().container()).on('change', '#ddlStartTime', function () {
+            table
+                .column($(this).data('index'))
+                .search(this.value)
+                .draw();
+        });
+
+        $('#AddNewPropertyTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+              
+            }
+        });
+
+            $('#AddNewPropertyTable').on('click', 'tbody input.editor-active', function () {
+        console.log('delegated click event'); // it is never shown
+        cb = $(this).prop('checked');
+        console.log(cb)
+        });
+  
+    }
+
+    function PopulateDemoNames(_NetworkId) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlDemoName").html(procemessage).show();
+        var url = "/ScheduleProposal/GetDemoNamesForAddProperty";
+
+        $.ajax({
+            url: url,
+            data: {
+                NetworkId: _NetworkId,
+                ClientId: @Model.ClientInfo.ClientId,
+                QuarterId: @Model.ProposalQuarter.QuarterId,
+                ScheduleProposalId: @Model.ProposalInfo.ScheduleId
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                if (result.success) {
+                    markup = "<option value='-1'>Please select ...</option>";
+                    for (var x = 0; x < result.data.length; x++) {
+                        markup += "<option value='" + result.data[x].demoNamesId + "'>" + result.data[x].description + "</option>";
+                    }
+                }
+                else {
+                    markup = "<option value='0'>No demos found</option>";
+                }
+                $("#ddlDemoName").html(markup).show();
+                $("#ddlDemoName").removeAttr('disabled');
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating Demo Names:  ' + response, 'error');
+            }
+        });
+    }
+
+    // This is actually never used and is loaded when the Model is loaded but I'm keeping this here in case later
+    // We don't refresh the entire page after a property has been added.
+    function PopulateNetworks() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#val-select2-network").html(procemessage).show();
+        var url = "/ScheduleProposal/GetNetworksForProposal";
+
+        $.ajax({
+            url: url,
+            data: {
+                ClientId: @Model.ClientInfo.ClientId,
+                QuarterId: @Model.ProposalQuarter.QuarterId,
+                ProposalId: @Model.ProposalInfo.ScheduleId,
+                CountryId: @Model.ProposalInfo.CountryId
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                if (result.length == 0) {
+                    if (MyCountryId == 5) {
+                        markup = "<option value='0'>No network assigned (US)</option>";
+                    }
+                    else {
+                        markup = "<option value='0'>No network assigned (CA)</option>";
+                    }
+                }
+                else {
+                    markup = "<option></option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value='" + result[x].value + "'>" + result[x].text + "</option>";
+                    }
+                }
+                $("#val-select2-network").html(markup).show();
+            },
+            error: function (response) {
+                swal('Ooops ...', 'Error Populating Networks:  ' + response, 'error');
+            }
+        });
+    }   
+
+</script>
+
+<div class="modal fade" id="modal-addnewproperty" tabindex="-1" role="dialog" aria-labelledby="modal-addnewproperty" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 90%;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Add New Property to @Model.ProposalInfo.ScheduleName</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row gutters-tiny">
+                        <label class="col-6">Network</label>
+                        <label class="col-6 col-form-label" for="ClientId">Demo Name <span class="text-danger">*</span></label>
+                        <div class="col-6">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        new SelectList(Model.Networks, "NetworkId", "StdNetName"),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlNetworks" }
+                                    )
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId">
+                        </div>
+                        <div class="col-6">
+                            @Html.DropDownListFor(m => m.DemographicSettingsId,
+                                        new SelectList(Model.DemographicSettings, "DemographicSettingsId", "DemoName"),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlDemoName", @disabled = "disabled" }
+                                    )
+                        </div>
+                    </div>
+                    <div class="form-group row gutters-tiny">
+                        <label class="col-1">Start Time</label>
+                        <label class="col-1">End Time </label>
+                        <label class="col-2">DP</label>
+                        <label class="col-2">Days</label>
+                        <label class="col-1">Len</label>
+                        <label class="col-2">BuyType</label>
+                        <label class="col-3">Status</label>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlStartTime", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlEndTime", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlDP", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlDays", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-1">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlLen", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-2">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlBuyType", @disabled = "disabled" }
+                                    )
+                        </div>
+                        <div class="col-3">
+                            @Html.DropDownListFor(m => m.NetworkId,
+                                        Enumerable.Empty<SelectListItem>(),
+                                        "Please select ...",
+                                        new { @class = "form-control", @sizeof = "1", @id = "ddlStatus", @disabled = "disabled" }
+                                    )
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="block-content block-content-full" id="divAvailableProperties">
+                            @{Html.RenderPartial("_AddNewProperty_AvailableProperties", Model);}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" disabled class="btn btn-alt-success" id="btnAdd" onclick="javascript: AddScheduleLines();">
+                    <i class="fa fa-check"></i> Add Selected Properties
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

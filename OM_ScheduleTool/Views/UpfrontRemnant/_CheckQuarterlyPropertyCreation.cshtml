@@ -1,0 +1,187 @@
+@model ViewUpfrontsViewModel
+
+<style>
+    #dTable {
+        width: 1400px;
+        height: 700px;
+        overflow-y: auto;
+        text-align: justify;
+    }
+
+    table {
+        text-align: left;
+        position: relative;
+    }
+
+    th {
+        background: white;
+        position: sticky;
+        top: 0;
+    }
+
+    th {
+        background: #C3C2C2;
+    }
+</style>
+
+<script language="javascript" type="text/javascript">
+
+    function GoBack() {
+        $('#modal-checkQuarterlyPropertyCreation').modal('toggle');
+        EnableAdd();
+        $("#modal-QuarterlyPropertyCreation").modal();
+    }
+
+    function CloseModalProp() {
+        window.location.reload();
+    }
+
+    function CreateQTRProperties() {
+        CheckAddQuarterlyProperties(true);
+    }
+
+    function PopulateCheckCreateQTRProperties(_RateIds, _selectedDemoItems, _proposedQuarterName, _copyRateImp, _proposedBuyTypeId, _upfrontTypeId, _upfrontId, _isCreatePropertyRates) {
+
+        $.ajax({
+            url: "/UpfrontRemnant/CheckQuarterlyPropertyCanCreate",
+            data: {
+                ExistingRateIds: _RateIds,
+                ProposedDemosIds: _selectedDemoItems,
+                ProposedQuarterName: _proposedQuarterName,
+                CopyRateImp: _copyRateImp,
+                ProposedBuyTypeId: _proposedBuyTypeId,
+                UpfrontTypeId: _upfrontTypeId,
+                UpfrontId: _upfrontId,
+                IsCreatePropertyRates: _isCreatePropertyRates
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                var btnShowCreateQTRProperties = false;
+                if (_isCreatePropertyRates) {
+                    //swal('Wait!', 'Properties are created Successfully', 'success');
+                }
+
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<tr>";
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].demoName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].propertyName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].time + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].dp + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].days + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center"><span class="badge badge-pill badge-success">' + result[x].spotLen + '</span></td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].spBuy + '</td>';
+                    if (result[x].rateAmt == 0) {
+                        markup += '<td class="d-none d-sm-table-cell text-center">--' + '</td>';
+                    }
+                    else {
+                        markup += '<td class="d-none d-sm-table-cell text-center">$' + (result[x].rateAmt).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    }
+                    //markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].imp + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + (result[x].imp).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    //markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].cpm + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + (result[x].cpm).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }); + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].status + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].clientName + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].effExp + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].revision + '</td>';
+                    markup += '<td class="d-none d-sm-table-cell text-center">' + result[x].buyTypeCode + '</td>';
+
+
+                    if (result[x].canCreateQTRProperty == 1) {
+                        markup += '<td class="d-none d-sm-table-cell text-center text-success">';
+                        markup += '<i class="fa fa-check-circle-o"></i> OK TO CREATE';
+                        markup += '</td>';
+                        btnShowCreateQTRProperties = true;
+                    }
+                    else {
+                        markup += '<td class="d-none d-sm-table-cell text-center text-danger">';
+                        markup += '<i class="fa fa-check-circle-o"></i> CAN NOT CREATE';
+                        markup += '</td>';
+                    }
+
+                    markup += "</tr>";
+                }
+
+                if (!btnShowCreateQTRProperties) {
+                    $('#btnCreateQTRroperty').attr('disabled', 'disabled');
+                }
+                else {
+                    $('#btnCreateQTRroperty').removeAttr('disabled');
+                }
+                $("#ListQuarterlyPropertyCanCreate").html(markup).show();
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+
+</script>
+
+<div class="modal fade" id="modal-checkQuarterlyPropertyCreation" tabindex="-1" role="dialog" aria-labelledby="modal-checkQuarterlyPropertyCreation" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="min-width:1400px;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId">
+                        </div>
+                    </div>
+                    <div><label><h4>Following Properties will be created. Please review.</h4></label></div>
+                    <div id="dTable" class="form-group row">
+                        <div class="block-content block-content-full">
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-striped table-vcenter js-dataTable-simple" id="DeleteTable" name="DeleteTable">
+                                <thead>
+                                    <tr>
+                                        <th width="10%" class="d-none d-sm-table-cell text-left">Demo Name</th>
+                                        <th width="20%" class="d-none d-sm-table-cell text-left">Property Name</th>
+                                        <th width="5%" class="d-none d-sm-table-cell text-center">Time</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">DP</th>
+                                        <th class="d-none d-sm-table-cell text-center">Days</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Len</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">SPBuy</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center">Status</th>
+                                        <th class="d-none d-sm-table-cell text-center">Client Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Eff-Exp</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Rev#</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Buy Type</th>
+                                        <th width="2%" class="d-none d-sm-table-cell text-center">Create Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ListQuarterlyPropertyCanCreate"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*onclick="ReloadMainPage();"*@
+                <button type="button" class="btn btn-alt-secondary" onclick="javascript: GoBack();">Back</button>
+                <button type="button" class="btn btn-alt-secondary" onclick="javascript: CloseModalProp();">Close</button>
+                <button id="btnCreateQTRroperty" type="button" class="btn btn-alt-success" onclick="javascript: CreateQTRProperties();">
+                    Create Properties Listed
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,553 @@
+@model ViewUpfrontsViewModel
+
+@Html.Partial("~/Views/UpfrontRemnant/_CreateUpfrontByDemo.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_CreateUpfrontByDemoCA.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_UpfrontNotes.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_ExportSelect.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_DeleteUpfrontLine.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_ProgramChangeSelect.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_ReviseEstimate.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_ApprovalList.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_UnapprovalList.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_QuarterlyPropertyCreation.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_CheckQuarterlyPropertyCreation.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_DRPropertyCreation.cshtml", Model)
+@Html.Partial("~/Views/UpfrontRemnant/_CheckDRPropertyCreation.cshtml", Model)
+
+<script language="javascript" type="text/javascript">
+    var ChangeCount = 0;
+    $(document).ready(function () {
+        SetupMenus();
+    });
+
+    function SetupMenus() {
+        $.ajax({
+            url: '/UpfrontRemnant/GetUpfrontChangeCount',
+            type: 'POST',
+            data: {
+                upfrontId: getParameterByName('upfrontid'),
+            },
+            success: function (result) {
+                if (result.success) {
+                    /*
+                    var notify = $.notify(result.responseText, {
+                        type: 'info',
+                        allow_dismiss: true
+                    })
+                    */
+                    ChangeCount = result.changeCount;
+                    promptExit(0);
+                    $("#btnSaveChanges").attr("disabled", "disabled");
+                    $("#btnRevertChanges").attr("disabled", "disabled");
+                    $("#btnAddNewProperty").removeAttr("disabled");
+                    $("#btnDelete").removeAttr("disabled");
+                    $("#btnApprove").removeAttr("disabled");
+                    $("#btnUnapprove").removeAttr("disabled");
+                    $("#btnProgramChange").removeAttr("disabled");
+                    $("#btnReviseEstimate").removeAttr("disabled");
+                    $("#btnReviseDRRates").removeAttr("disabled");
+                    $("#btnAutoApprove").removeAttr("disabled");
+                    $("#btnUpdateDealPointData").removeAttr("disabled");
+                    $("#btnExport").removeAttr("disabled");
+
+                    if (parseInt(result.changeCount) > 0) {
+                        promptExit(1);
+                        $("#btnSaveChanges").removeAttr("disabled");
+                        $("#btnRevertChanges").removeAttr("disabled");
+                        $("#btnAddNewProperty").attr("disabled", "disabled");
+                        $("#btnDelete").attr("disabled", "disabled");
+                        $("#btnApprove").attr("disabled", "disabled");
+                        $("#btnUnapprove").attr("disabled", "disabled");
+                        $("#btnProgramChange").attr("disabled", "disabled");
+                        $("#btnReviseEstimate").attr("disabled", "disabled");
+                        $("#btnReviseDRRates").attr("disabled", "disabled");
+                        $("#btnAutoApprove").attr("disabled", "disabled");
+                        $("#btnUpdateDealPointData").attr("disabled", "disabled");
+                        $("#btnExport").attr("disabled", "disabled");
+                    }
+
+
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true,
+                })
+            }
+        });
+    }
+
+    function LockUpfront(_UpfrontId) {
+        var url = "/UpfrontRemnant/LockUpfront/";
+
+        $.ajax({
+            url: url,
+            data: { upfrontid: _upfrontid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+
+    }
+
+    function SaveUpfrontChanges(_UpfrontId, _UpfrontName) {
+        swal({
+            title: _UpfrontName,
+            text: 'Are you sure?  All changes will be permanently saved.',
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, save it!',
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        resolve();
+                    }, 50);
+                });
+            }
+        }).then(
+            function (result) {
+                $.ajax({
+                    url: "/UpfrontRemnant/SaveUpfrontChanges",
+                    type: 'POST',
+                    data: {
+                        upfrontId: _UpfrontId
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            swal({
+                                title: 'Success',
+                                text: result.responseText + '  Click OK to refresh page.',
+                                type: 'success',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'OK',
+                                preConfirm: function () {
+                                    return new Promise(function (resolve) {
+                                        setTimeout(function () {
+                                            resolve();
+                                        }, 50);
+                                    });
+                                }
+                            }).then(
+                                function (result) {
+                                    promptExit(0);
+                                    // Reloading the page should lock it again.
+                                    window.location.reload();
+                                });
+                        }
+                        else {
+                            swal('Error!', result.responseText, 'warning');
+                            return;
+                        }
+
+                    },
+                    error: function (response) {
+                        swal('Error1!', response.responseText, 'warning');
+                        return;
+                    }
+                })
+            });
+    }
+
+</script>
+
+<div id="divGroupSel" class="btn-group" role="group" aria-label="btnGroupSel">
+</div>
+
+<div id="divGroupSave" class="btn-group" role="group" aria-label="btnGroup1">
+    <div id="divSaveProperty"
+         title="Save Changes"
+         data-toggle="popover"
+         data-original-title="Save Changes"
+         data-placement="top"
+         data-content="All changes will be saved.">
+        <button class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                id="btnSaveChanges"
+                name="btnSaveChanges"
+                disabled="disabled"
+                onclick="javascript: SaveUpfrontChanges('@Model.UpfrontInfo.UpfrontId', '@Model.UpfrontInfo.Name');">
+            <i class="fa fa-save mr-5"></i>
+        </button>
+    </div>
+</div>
+
+
+<div class="btn-group btn-group" role="group" aria-label="btnGroup3">
+
+    @*@if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontAddProperty == 1)*@
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.Where(a => a.UpfrontLockedByUserId == Model.LoggedOnUser.UserId).First().CanUpfrontAddProperty == 1)
+    {
+        @Html.Partial("~/Views/ManageMedia/_CreatePropertyModal.cshtml", Model.createNewPropertyViewModel)
+        <div id="divAddProperty"
+         title="Add Property"
+         data-toggle="popover"
+         data-original-title="Add Property"
+         data-placement="top"
+         data-content="New properties/rates will be added to this upfront.">
+            <!--
+            <button tooltip="Create/Add Properties"
+                    class="btn btn-success"
+                    aria-describedby="popover880418"
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#modal-createproperty">
+                <i class="fa fa-list mr-5"></i>
+            </button>
+            -->
+            <button class="btn btn-success"
+                type="button"
+                id="btnAddNewProperty"
+                name="btnAddNewProperty">
+                <i class="fa fa-list mr-5"></i>
+            </button>
+        </div>
+
+        <div id="divQuarterlyPropertyCreation"
+         title="Quarterly Property Creation"
+         data-toggle="popover"
+         data-original-title="Quarterly Property Creation"
+         data-placement="top"
+         data-content="Quarterly Property Creation.">
+            <button tooltip="Quarterly Property Creation"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                id="btnQuarterlyPropertyCreation"
+                name="btnQuarterlyPropertyCreation"
+                data-toggle="modal"
+                data-target="#modal-QuarterlyPropertyCreation">
+                @*Quarterly Property Creation*@
+                <i class="fa fa-check-square-o mr-5"></i>
+            </button>
+        </div>
+
+
+        @if (Model.UpfrontInfo.UpfrontType.Description == "Remnant" && @Model.UpfrontInfo.Network.Country.CountryId == 5)
+        {
+            <div id="divDRPropertyCreation"
+                 title="Create DR Properties"
+                 data-toggle="popover"
+                 data-original-title="Create DR Properties"
+                 data-placement="top"
+                 data-content="Create DR Properties.">
+                <button tooltip="Create DR Properties"
+                        class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnDRPropertyCreation"
+                        name="btnDRPropertyCreation"
+                        data-toggle="modal"
+                        data-target="#modal-DRPropertyCreation">
+                    <i class="fa fa-anchor mr-5"></i>
+                </button>
+            </div>
+        }
+    }
+
+    @if (Model.UpfrontPermissions.First().CanUpfrontViewNotes == 1)
+    {
+        <div id="divNotes"
+         title="Notes"
+         data-toggle="popover"
+         data-original-title="Notes"
+         data-placement="top"
+         data-content="Notes for maintaining this @Model.UpfrontInfo.UpfrontType.Description.">
+            <button tooltip="Notes"
+                class="btn btn-success"
+                aria-describedby="popover880418"
+                type="button"
+                data-toggle="modal"
+                data-target="#modal-notes">
+                <i class="fa fa-comments-o mr-5"></i>
+            </button>
+        </div>
+    }
+
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontDeleteSelectedProperties == 1)
+    {
+        <div id="divDeleteProperty"
+         title="Delete Property"
+         data-toggle="popover"
+         data-original-title="Delete Property"
+         data-placement="top"
+         data-content="Delete Property Set.">
+
+            <button class="btn btn-success"
+                data-toggle="popover"
+                data-content="Delete Property Set"
+                data-placement="top"
+                aria-describedby="popover880418"
+                type="button"
+                id="btnDelete"
+                name="btnDelete"
+                disabled>
+                <i class="fa fa-remove mr-5"></i>
+            </button>
+        </div>
+    }
+
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontApprove == 1)
+    {
+        <button class="btn btn-success"
+            data-toggle="popover"
+            data-content="Approve Checked Properties"
+            data-placement="top"
+            aria-describedby="popover880418"
+            type="button"
+            id="btnApprove"
+            name="btnApprove"
+            UpfrontName="@Model.UpfrontInfo.Name">
+            <i class="fa fa-thumbs-up mr-5"></i>
+        </button>
+    }
+
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontUnapprove == 1)
+    {
+        <button class="btn btn-success"
+            data-toggle="popover"
+            data-content="Unapprove Checked Properties"
+            data-placement="top"
+            aria-describedby="popover880419"
+            type="button"
+            id="btnUnapprove"
+            name="btnUnapprove"
+            UpfrontName="@Model.UpfrontInfo.Name">
+            <i class="fa fa-thumbs-down mr-5"></i>
+        </button>
+    }
+</div>
+
+<div class="btn-group btn-group" role="group" aria-label="btnGroup3">
+
+
+    @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontProgramChange == 1)
+    {
+        <div id="divProgramChange"
+         title="Program Change"
+         data-toggle="popover"
+         data-original-title="Program Change"
+         data-placement="top"
+         data-content="Please select a program with SPOTLEN=30, buy type is NOT ADU and an original property (NOT PC).">
+
+            <button class="btn btn-success"
+                data-toggle="popover"
+                data-content="Program Change"
+                data-placement="top"
+                aria-describedby="popover880418"
+                type="button"
+                id="btnProgramChange"
+                name="btnProgramChange">
+                <i class="si si-loop mr-5"></i>
+            </button>
+        </div>
+
+    }
+
+       @if (Model.UpfrontInfo.UpfrontType.Description == "Remnant")
+    {
+        @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontRevisedEstimates == 1)
+        {
+            <button aria-describedby="popover880418"
+                    type="button"
+                    class="btn btn-success"
+                    id="btnReviseEstimate"
+                    name="btnReviseEstimate"
+                    data-toggle="popover"
+                    data-content="Revise Estimate"
+                    data-placement="top">
+                <i class="si si-eyeglasses mr-5"></i>
+            </button>
+        }
+        @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontDRRateRevision == 1)
+        {
+            <button aria-describedby="popover880418"
+                    type="button"
+                    class="btn btn-success"
+                    id="btnReviseDRRates"
+                    name="btnReviseDRRates"
+                    data-toggle="popover"
+                    data-content="DR Rate Revision"
+                    data-placement="top">
+                <i class="fa fa-dollar mr-5"></i>
+            </button>
+        }
+    }
+
+    <button title="Update Deal Point Data"
+            tooltip="Update Deal Point Data"
+            class="btn btn-success"
+            aria-describedby="popover880418"
+            type="button"
+            id="btnUpdateDealPointData"
+            name="btnUpdateDealPointData"
+            data-toggle="popover"
+            data-original-title="Update Deal Point Data"
+            data-placement="top"
+            data-content="Configure all information that will be used in the export. "
+            Country="@Model.UpfrontInfo.Network.Country.CountryShort"
+            NetworkName="@Model.UpfrontInfo.Network.StdNetName"
+            NetworkId="@Model.UpfrontInfo.Network.NetworkId"
+            PlanYr="@Model.PlanYear">
+        <i class="fa fa-handshake-o mr-5"></i>
+    </button>
+
+    @if (Model.UpfrontInfo.UpfrontType.Description == "Remnant")
+    {
+        @if (Model.ViewOnly == false && Model.UpfrontPermissions.First().CanUpfrontAutoApprove == 1)
+        {
+            <button title="Auto-Approve"
+            aria-describedby="popover880418"
+            type="button"
+            class="btn btn-success"
+            id="btnAutoApprove"
+            name="btnAutoApprove"
+            data-toggle="popover"
+            data-original-title="Auto Approve"
+            data-placement="top"
+            data-content="Automatically approve properties with CPM (from last saved CPM) within -0.02 to 0.02">
+                <i class="fa fa-check-square-o mr-5"></i>
+            </button>
+        }
+    }
+
+
+    @if (Model.UpfrontPermissions.First().CanUpfrontExport == 1)
+    {
+        <button title="Export"
+            tooltip="Export"
+            class="btn btn-success"
+            aria-describedby="popover880468"
+            type="button"
+            id="btnExport"
+            name="btnExport"
+            data-toggle="modal"
+            data-target="#modal-exportselect">
+            <i class="fa fa-external-link mr-5"></i>
+        </button>
+    }
+</div>
+<!--
+@if (Model.UpfrontInfo.UpfrontType.Description == "Upfront")
+{
+        <div class="btn-group btn-group" role="group" aria-label="btnGroup6">
+        @if (Model.UpfrontPermissions.First().CanUpfrontCreateUpfrontExpansion == 1)
+        {
+                    <div id="divCreateUpfrontExpansion"
+                 title="Create Upfront Expansion"
+                 data-toggle="popover"
+                 data-original-title="Create Upfront Expansion"
+                 data-placement="top"
+                 data-content="Create Upfront Expansion.  Will find a more appropriate icon when feature is complete.">
+                        <button tooltip="Notes"
+                        class="btn btn-success"
+                        aria-describedby="popover880448"
+                        type="button"
+                        onclick="javascript:alert('To Add Create Upfront Expansion here.');">
+                            <i class="fa fa-copy mr-5"></i>
+                        </button>
+                    </div>
+        }
+
+        @if (Model.UpfrontPermissions.First().CanUpfrontManageUpfrontExpansion == 1)
+        {
+                    <button title="Manage Upfront Expansion"
+                    tooltip="Manage Upfront Expansion"
+                    class="btn btn-success"
+                    aria-describedby="popover880468"
+                    type="button"
+                    id="btnManageUpfrontExpansion"
+                    name="btnManageUpfrontExpansion">
+                        <i class="fa fa-expand mr-5"></i>
+                    </button>
+        }
+
+        </div>
+}
+-->
+<div class="btn-group btn-group" role="group" aria-label="btnGroupDataTable">
+    <div id="divColumns"
+         title="Column Visibility"
+         data-toggle="popover"
+         data-original-title="Column Visibility"
+         data-placement="top"
+         data-content="Show/Hide Columns">
+        <button tooltip="Show Columns"
+                class="btn btn-success"
+                id="btnPropShowColumns">
+            <i class="fa fa-columns mr-5"></i>
+        </button>
+    </div>
+    <div id="divFilterReset"
+         title="Reset Filters"
+         data-toggle="popover"
+         data-original-title="Reset Filters"
+         data-placement="top"
+         data-content="This will reset filters back to show all rows.">
+        <button tooltip="Reset Filters"
+                class="btn btn-success"
+                id="btnPropResetFilters">
+            <i class="fa fa-filter mr-5"></i>
+        </button>
+    </div>
+    <div id="divLoadMore">
+        <button id="btn-example-load-more" class="btn btn-alt-success">Load More Rows</button>
+    </div>
+    <div id="divResetState"
+         title="Refresh Table"
+         data-toggle="popover"
+         data-original-title="Refresh Table"
+         data-placement="top"
+         data-content="Refresh table only not the entire page.">
+        <button type="button"
+                id="btnReload"
+                tooltip="Reload data"
+                class="btn btn-success">
+            <i class="fa fa-refresh mr-5"></i>
+        </button>
+    </div>
+</div>
+<br />
+<div class="btn-group btn-group" role="group" id="divColumnVisibility" name="divColumnVisibility" aria-label="btnGroup4" style="display:none">
+    <table class="table-borderless display compact nowrap">
+        <tr>
+            <td colspan="1" align="left">
+                <button class="btn btn-secondary" id="ShowHideButton1" onclick="ShowHideColumn(1, this);">DEMO</button>
+                <button class="btn btn-secondary" id="ShowHideButton2" onclick="ShowHideColumn(2, this);">APPRV</button>
+                <button class="btn btn-secondary" id="ShowHideButton3" onclick="ShowHideColumn(3, this);">Property Name</button>
+                <button class="btn btn-secondary" id="ShowHideButton4" onclick="ShowHideColumn(4, this);">M</button>
+                <button class="btn btn-secondary" id="ShowHideButton5" onclick="ShowHideColumn(5, this);">T</button>
+                <button class="btn btn-secondary" id="ShowHideButton6" onclick="ShowHideColumn(6, this);">W</button>
+                <button class="btn btn-secondary" id="ShowHideButton7" onclick="ShowHideColumn(7, this);">Th</button>
+                <button class="btn btn-secondary" id="ShowHideButton8" onclick="ShowHideColumn(8, this);">F</button>
+                <button class="btn btn-secondary" id="ShowHideButton9" onclick="ShowHideColumn(9, this);">Sa</button>
+                <button class="btn btn-secondary" id="ShowHideButton10" onclick="ShowHideColumn(10, this);">Su</button>
+                <button class="btn btn-secondary" id="ShowHideButton11" onclick="ShowHideColumn(11, this);">Start Time</button>
+                <button class="btn btn-secondary" id="ShowHideButton12" onclick="ShowHideColumn(12, this);">End Time</button>
+                <button class="btn btn-secondary" id="ShowHideButton13" onclick="ShowHideColumn(13, this);">DP</button>
+                <button class="btn btn-secondary" id="ShowHideButton14" onclick="ShowHideColumn(14, this);">OMDP</button>
+                <button class="btn btn-secondary" id="ShowHideButton15" onclick="ShowHideColumn(15, this);">SP Buy</button>
+                <button class="btn btn-secondary" id="ShowHideButton16" onclick="ShowHideColumn(16, this);">Buy Type</button>
+                <button class="btn btn-secondary" id="ShowHideButton17" onclick="ShowHideColumn(17, this);">Len</button>
+                <button class="btn btn-secondary" id="ShowHideButton18" onclick="ShowHideColumn(18, this);">Rate</button>
+                <button class="btn btn-secondary" id="ShowHideButton19" onclick="ShowHideColumn(19, this);">IMP</button>
+                <button class="btn btn-secondary" id="ShowHideButton20" onclick="ShowHideColumn(20, this);">CPM</button>
+                <button class="btn btn-secondary" id="ShowHideButton21" onclick="ShowHideColumn(21, this);">STATUS (DNB)</button>
+                <button class="btn btn-secondary" id="ShowHideButton22" onclick="ShowHideColumn(22, this);">CLIENT NAME</button>
+                <button class="btn btn-secondary" id="ShowHideButton23" onclick="ShowHideColumn(23, this);">REV#</button>
+                <button class="btn btn-secondary" id="ShowHideButton24" onclick="ShowHideColumn(24, this);">REVISED DT</button>
+                <button class="btn btn-secondary" id="ShowHideButton25" onclick="ShowHideColumn(25, this);">EFF DT</button>
+                <button class="btn btn-secondary" id="ShowHideButton26" onclick="ShowHideColumn(26, this);">EXP DT</button>
+            </td>
+        </tr>
+    </table>
+</div>

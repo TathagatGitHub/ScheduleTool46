@@ -1,0 +1,155 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/unobtrusive-bootstrap.js"></script>
+<script src="~/lib/jQuery-Unobtrusive-Ajax/jquery.unobtrusive-ajax.min.js"></script>
+
+@model UpfrontExpansionViewModel
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#TradeAmount").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, precision: 0  });
+
+        @if (! ViewData.ModelState.IsValid) {
+            foreach (string key in ViewData.ModelState.Keys)
+            {
+                foreach (var error in ViewData.ModelState[key].Errors)
+                    {
+                        <text>swal('Error!', "@error.ErrorMessage", 'error');</text>
+                    }
+                }
+        }
+
+    });
+
+    SuccessTrade = function (xhr) {
+            swal('', 'Trade completed', 'success');
+        };
+
+
+
+    function DeleteTrade(UpfrontId, UpfrontExpansionTrackingLineId) {
+        if (HeaderValuesChanged())
+            swal('Warning', "Please Save your changes in Total Upfront and UE Dollars Available before doing any trade.", 'info');
+        else {
+            $.ajax({
+                url: "/UpfrontExpansion/DeleteTrade",
+                data: {
+                    UpfrontId: UpfrontId,
+                    UpfrontExpansionTrackingLineId: UpfrontExpansionTrackingLineId
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    window.location.reload();
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'error');
+                }
+            });
+        }
+    }
+
+    function ValidateFormBeforeSubmit() {
+        if (HeaderValuesChanged()) {
+            swal('Warning', "Please Save your changes in Total Upfront and UE Dollars Available before doing any trade.", 'info');
+            event.preventDefault();
+        }
+        else 
+            $('#TradeAmount').val($('#TradeAmount').val().replace(/\$|,/g, ''));                
+    }
+
+</script>
+
+
+<form id="formTrade" asp-action="Index" asp-controller="UpfrontExpansion" method="post" class="js-validation-bootstrap">
+    @Html.HiddenFor(m => m.UpfrontId)
+    @Html.HiddenFor(m => m.UpfrontExpansionTrackingId)
+
+    <div class="row">
+        <div class="col-2">
+            <a href="@Url.Action("Index", new { UpfrontId = Model.UpfrontId  } )" class="btn btn-alt-primary" >Refresh</a>
+        </div>
+        <div class="col" style="text-align:right"><label class="col-form-label" for="ClientFromList">Trade From Client: <span class="text-danger">*</span></label></div>
+        <div class="col">
+            @Html.DropDownListFor(m => m.ClientFromId, new SelectList(Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.GroupBy(x => x.ClientId).Select(g => new { RowNo = g.Max(x => x.RowNo) })
+       .Join(Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails, a => a.RowNo, b=> b.RowNo, (a, b) => new { b.ClientId, b.ClientName, b.UERemaining }).Where(x => x.UERemaining > 0).Select(x => new { ClientId = x.ClientId, ClientName = x.ClientName })
+       , "ClientId", "ClientName"), "", new { @class = "form-control", data_val = "true", data_val_required = "Trade From Client is required" })
+    </div>
+    <span class="field-validation-valid" data-valmsg-for="ClientFromList" data-valmsg-replace="true"></span>
+    <div class="col" style="text-align:right"><label class="col-form-label" for="ClientToList">To Client: <span class="text-danger">*</span></label></div>
+    <div class="col">@Html.DropDownListFor(m => m.ClientToId, new SelectList(Model.ClientList, "ClientId", "ClientName"), "", new { @class = "form-control", data_val = "true", data_val_required = "Trade To Client is required" })</div>
+    <span class="field-validation-valid" data-valmsg-for="ClientToList" data-valmsg-replace="true"></span>
+    <div class="col" style="text-align:right"><label class="col-form-label" for="txtTradeAmount">Amount ($): <span class="text-danger">*</span></label></div>
+    <div class="col">
+        @Html.TextBoxFor(m => m.TradeAmount, new { @class = "form-control", data_val = false, @style = "display:inline-block" })
+        <span class="field-validation-valid" data-valmsg-for="TradeAmount" data-valmsg-replace="true"></span>
+        @*@Html.ValidationMessageFor(m => m.TradeAmount)*@
+    </div>
+    <div class="col"><input type="submit" name="btnTrade" value="Trade" class="btn btn-alt-primary" onclick="ValidateFormBeforeSubmit();" /></div>
+</div>
+@*<div class="row">
+        <div class="col-1"></div>
+        <div class="col-11 text-center field-validation-error">@Html.ValidationMessage("SameClientTrade")</div>
+    </div>*@
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">UPFRONT CLIENT</th>
+            <th scope="col" class="text-right">UPFRONT SPEND</th>
+            <th scope="col" class="text-center">% OF TOTAL UPFRONT</th>
+            <th scope="col" class="text-right">UE AVAILABLE TO CLIENT</th>
+            <th scope="col" class="text-right">TRADED UE DOLLARS</th>
+            <th></th>
+            <th scope="col" class="text-center">TRADE FROM/TO</th>
+            <th scope="col" class="text-right">REVISED UE REMAINING</th>
+            <th scope="col" class="text-right">UE BOOKED</th>
+            <th scope="col" class="text-right">UE REMAINING</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="background-color:#f0f0f4">
+            <td scope="row"><label>TOTAL</label></td>
+            <td scope="row" class="text-right"><label>@String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UpfrontSpend))</label></td>
+            <td scope="row" class="text-center"><label>100%</label></td>
+            <td scope="row" class="text-right"><label>@String.Format("{0:c2}", Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable)</label></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td scope="row" class="text-right"><label>@String.Format("{0:c2}", Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable - Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Where(x => x.TradedUEDollars > 0).Sum(x => x.TradedUEDollars))</label></td>
+            <td scope="row" class="text-right"><label>@String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UEBooked ?? 0))</label></td>
+            <td scope="row" class="text-right">
+                <label>
+                    @String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.GroupBy(x => x.ClientId).Select(g => new { RowNo = g.Max(x => x.RowNo) })
+       .Join(Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails, a => a.RowNo, b => b.RowNo, (a, b) => new { b.ClientId, b.ClientName, b.UERemaining }).Sum(x => x.UERemaining))
+                </label>
+            </td>
+        </tr>
+        @foreach (var tradeDetail in Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails)
+        {
+            <tr>
+                <td scope="row">@tradeDetail.ClientName</td>
+                <td scope="row" class="text-right">@Html.DisplayFor(m => tradeDetail.UpfrontSpend)</td>
+                <td scope="row" class="text-center">@Html.DisplayFor(m => tradeDetail.PercentOfUpfront)</td>
+                <td scope="row" class="text-right">@Html.DisplayFor(m => tradeDetail.UEAvailable)</td>
+
+                <td scope="row" class="text-right">
+                    @Html.DisplayFor(m => tradeDetail.TradedUEDollars)
+                </td>
+                <td scope="row">
+                    @if (tradeDetail.TradedUEDollars > 0)
+                    {
+                        <input type="button" value="Delete" class="btn btn-outline-primary btn-sm" onclick="DeleteTrade(@Model.UpfrontId, @tradeDetail.UpfrontExpansionTrackingLineId);" />
+                    }
+                </td>
+                <td scope="row" class="text-center">@Html.DisplayFor(m => tradeDetail.TradeClientName)</td>
+                <td scope="row" class="text-right">@Html.DisplayFor(m => tradeDetail.RevisedUERemaining)</td>
+                <td scope="row" class="text-right">@Html.DisplayFor(m => tradeDetail.UEBooked)</td>
+                <td scope="row" class="text-right">@Html.DisplayFor(m => tradeDetail.UERemaining)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</form>

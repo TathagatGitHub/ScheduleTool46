@@ -1,0 +1,251 @@
+@model LogsViewModel
+
+@{
+    string PL = Model.manageMediaViewModel.LoggedOnUser.PermissionLevel.Description.ToLower();
+}
+<input type="hidden" id="hidSelectedPostLogID" />
+<div class="form-group-row">
+    <div class="col-12">
+        <h4 class="text-center">POST LOGS</h4>
+        <table id="tblPostLogWeeks">
+            <tr><th style="width:15%">Wk#</th><th style="width:22%">Wk Date</th><th style="width:40%">Associated Schedule Name</th><th style="width:15%">Locked</th></tr>
+            @{int i = 1;}
+            @foreach (var week in Model.postlogs)
+            {                
+                <tr style="height:25px">
+                    <td style="padding-left:5px">@i<input type="hidden" data-postloglockeddt="@week.PostLogLockedDt" data-postloglockedby="@week.PostLogLockedUser?.UserId" data-caneditprelog="@week.CanEditPostLog" value="@week.PostLogId" data-schedId="@week.SchedId" data-weekNbr="@week.WeekNbr" /></td>
+                    <td>@week.WeekDate.ToString("MM/dd/yyyy")</td>
+                    <td><span name="ScheduleName">@week.ScheduleName</span></td>
+                    <td>
+                        @if (@week.PostLogLockedDt != null)
+                        {
+                            <span>@week.PostLogLockedUser.LastName</span>}
+                    </td>
+                </tr>
+                i++;
+            }
+        </table>
+    </div>
+</div>
+<br />
+<div class="form-group-row">
+    <div class="col-12" id="divPostLogButtons">       
+    </div>
+</div>
+<br />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        DisplayButtons();
+
+        $('#tblPostLogWeeks tr').click(function () { //Once any element with class "table_row" is clicked
+            if ($(this).children("th").length == 0) {
+                $('table[id="tblPostLogWeeks"] tr').removeClass('selected'); // "Unselect" all the rows
+                $(this).addClass('selected'); // Select the one clicked
+
+                DisplayButtons();
+            }
+        });
+
+        $("#divPostLogButtons").on("click", "#btnCreatePostLog", function () {
+            var WeekNbr = $('table[id="tblPostLogWeeks"]  tr.selected td:nth-child(1)').text();
+            $.ajax({
+                url: "/Logs/CreatePostLog",
+                data: {
+                    SchedID: $("#hidSchedID").val(),
+                    WeekNbr: WeekNbr,
+                    WeekDate: $('table[id="tblPostLogWeeks"]  tr.selected td:nth-child(2)').text()
+                },
+                async: false,
+                type: "POST",
+                success: function (result) {
+                    //Refresh Logs Weeks
+                    swal('', 'Your PostLog has been created and populated based on the matching Schedule, but no Network Logs have been added yet. <br><br> Available Network Logs will be added to your PostLog when it is opened in [EDIT] mode.', 'success');
+                    $.ajax({
+                        url: "/ManageMedia/LogsTab_Change",
+                        data: { Year: $("#ddlplanyear option:selected").val(), BroadcastQuarterNbr: GetQuarterTabPosition(), ClientId: $("#ddlclients option:selected").val() },
+                        type: "GET",
+                        cache: false,
+                        success: function (result) {
+                            $("#div_LogsWeeks").html(result);
+                            $('table[id="tblPostLogWeeks"]  tr:eq(' + WeekNbr + ')').addClass("selected");
+                            DisplayButtons();
+                        },
+                        error: function (response) {
+                            swal('Error!', response.responseText, 'error');
+                        }
+                    });
+
+                },
+                error: function (response) {
+                    swal('Error!', response.responseText, 'error');
+                }
+            });
+        });
+
+        $("#divPostLogButtons").on("click", "#btnEditPostLog", function () {
+            sessionStorage.setItem("PostLogQtrName", $(".nav-tabs .nav-item .active").text());
+            var postLogId = $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").val();
+            var schedId = $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").data('schedid');
+            var weekNbr = $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").data('weeknbr');
+            var logsSelectedCountryId = $('#hiddenLogsSelectedCountryId').val();
+
+            postlog_CheckLock(postLogId,schedId, weekNbr, logsSelectedCountryId );
+            //OpenNewDataTablesWin('/Logs/EditPostLogNetworkUserAction?postLogId=' + postLogId + "&schedId=" + schedId + "&weekNbr=" + weekNbr + "&logsSelectedCountryId=" + logsSelectedCountryId);
+        });
+
+        $("#divPostLogButtons").on("click", "#btnViewPostLog", function () {
+            sessionStorage.setItem("PostLogQtrName", $(".nav-tabs .nav-item .active").text());
+            var logsViewSelectedCountryId = $('#hiddenLogsSelectedCountryId').val();
+            OpenNewDataTablesWin('/Logs/ViewPostLog?postlogid=' + $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").val() + "&logsSelectedCountryId=" + logsViewSelectedCountryId);
+        });
+
+        $("#divPostLogButtons").on("click", "#btnDeletePostLog", function () {
+            var postLogId = $("table[id='tblPostLogWeeks'] tr.selected").find("input:hidden").val();
+            var schedId = $("table[id='tblPostLogWeeks'] tr.selected").find("input:hidden").data("schedid");
+            var weekNbr = $("table[id='tblPostLogWeeks'] tr.selected").find("input:hidden").data("weeknbr");
+            swal({
+                title: "",
+                text: "Are you sure you want to delete selected POST LOG?",
+                type: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes",
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(
+                function (result) {
+                    $.ajax({
+                        url: "/Logs/DeletePostLog",
+                        type: "POST",
+                        data: {
+                            PostLogId: postLogId,
+                            SchedId: schedId,
+                            WeekNbr: weekNbr
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                swal("", result.responseText, "success");
+                                $.ajax({
+                                    url: "/ManageMedia/LogsTab_Change",
+                                    data: { Year: $("#ddlplanyear option:selected").val(), BroadcastQuarterNbr: GetQuarterTabPosition(), ClientId: $("#ddlclients option:selected").val() },
+                                    type: "GET",
+                                    cache: false,
+                                    success: function (result) {
+                                        $("#div_LogsWeeks").html(result);
+                                        $("table[id='tblPostLogWeeks']  tr:eq(" + weekNbr + ")").addClass("selected");
+                                        DisplayButtons();
+                                    },
+                                    error: function (response) {
+                                        swal("Error!", response.responseText, "error");
+                                    }
+                                });
+                            }
+                            else {
+                                swal("Error!", result.responseText, "error");
+                            }
+
+                        },
+                        error: function (response) {
+                            swal("Error!", response.responseText, "error");
+                        }
+                    })
+                });
+
+        });
+            $("#divPostLogButtons").on("click", "#btnUnlockPostLog", function () {
+            var _postlogId = $("table[id='tblPostLogWeeks'] tr.selected").find("input:hidden").val();
+            $.ajax({
+                url: "/Logs/UnlockPostLog/",
+                data: { PostLogId: _postlogId },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result.success !== true) {
+                        swal('Wait!', result.responseText, 'warning');
+                    }
+                    else {
+                        window.location.reload();
+                    }
+                },
+                error: function (response) {
+                    swal('Stop!', response.responseText, 'error');
+                }
+        });
+
+    });
+    });
+
+    
+    function DisplayButtons() {
+        
+        var markup = "";
+        var postloglockeddt = $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").data('postloglockeddt');
+        var postloglockedby = parseInt($('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").data('postloglockedby'));
+        if ($('table[id="tblPostLogWeeks"] tr.selected').length > 0) {
+            var canEdit = $('table[id="tblPostLogWeeks"] tr.selected').find("input:hidden").data('caneditprelog') == "True";
+             if (canEdit) {
+                 if ("@PL" == "admin" || "@PL" == "buyer" || "@PL" == "assistant") {
+                     if ($('table[id="tblPostLogWeeks"] tr.selected').find("span").first().text().length == 0) {
+                         markup += "<button id='btnCreatePostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Create</button>";
+                    }
+                     else {
+                         markup += "<button id='btnEditPostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Edit</button>&nbsp; &nbsp;";
+                         markup += "<button id='btnViewPostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-book'></i> View</button>&nbsp; &nbsp;";
+                         markup += "<button id='btnDeletePostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-trash'></i> Delete</button>";
+                         if (postloglockeddt != "" && ("@PL" == "admin" || (("@PL" == "buyer" || "@PL" == "assistant") && @Model.manageMediaViewModel.LoggedOnUser.UserId == postloglockedby))) {
+                            markup += "&nbsp;<button id='btnUnlockPostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Unlock</button>";
+                        }
+                    }
+                }
+             }
+            else {
+                 if ($('table[id="tblPostLogWeeks"] tr.selected').find("span").first().text().length > 0) {
+                     markup += "<button id='btnViewPostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-book'></i> View</button>";
+                     if (postloglockeddt != "" && ("@PL" == "admin" || (("@PL" == "buyer" || "@PL" == "assistant") && @Model.manageMediaViewModel.LoggedOnUser.UserId == postloglockedby))) {
+                            markup += "&nbsp;<button id='btnUnlockPostLog' type='button' class='btn btn-alt-primary'><i class='fa fa-edit'></i> Unlock</button>";
+                        }
+                } 
+            }
+            $("#divPostLogButtons").html(markup);
+        }
+    }
+
+    function postlog_CheckLock(postLogId,schedId, weekNbr, logsSelectedCountryId) {
+        $.ajax({
+            url: '/Logs/PostlogCheckLock',
+            data: { postLogId: postLogId }, // CP -- This had a javascript error for me so I added this ... Please correct if you are not getting the same thing.
+            type: 'POST',
+            success: function (result) {
+                if (result.lockedToOtherUser) {
+                    var notify = $.notify("Item cannot be edited. It is locked by: " + result.lockedBy + " At " + result.lockTime, {
+                        type: 'danger',
+                        allow_dismiss: true,
+                    });
+                } else if (!result.lockedToOtherUser) {                    
+                    OpenNewDataTablesWin('/Logs/EditPostLogNetworkUserAction?postLogId=' + postLogId + "&schedId=" + schedId + "&weekNbr=" + weekNbr + "&logsSelectedCountryId=" + logsSelectedCountryId);
+                    setTimeout(() => {  window.location.reload(); }, 5000);
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true,
+                });
+            }
+        });
+    }
+
+
+</script>
+
+
+

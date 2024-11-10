@@ -1,0 +1,839 @@
+﻿<div class="block-content block-content-full" id="resize_wrapper">
+    <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+    <!--<table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="UpfrontTable" name="UpfrontTable">-->
+    <table class="table-bordered table-vcenter js-table-checkable table-hover" id="UpfrontTable" name="UpfrontTable" style="width:97%">
+        <thead>
+            <tr>
+                <th class="text-center">
+                </th>
+                <!-- DemoNames -->
+                @if (Model.DemoNamesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell">
+                        <select class="form-control HeaderType" id="HeaderDemoOption" name="HeaderDemoOption">
+                            <option value=" ">DEMO</option>
+                            @foreach (var DemoName in Model.DemoNamesAvailable)
+                            {
+                                <option value="@DemoName.Description">@DemoName.Description</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell">DEMO</th>
+                }
+                <!-- Approved -->
+                <th class="d-none d-sm-table-cell text-center">APPRV</th>
+                @if (Model.PropertyNamesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell">
+                        <select class="form-control HeaderType" id="HeaderPropertyNameOption" name="HeaderPropertyNameOption">
+                            <option value=" ">PROPERTY NAME</option>
+                            @foreach (var Property in Model.PropertyNamesAvailable)
+                            {
+                                <option value="@Property.PropertyName">@Property.PropertyName</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell">PROPERTY NAME</th>
+                }
+                <th class="d-none d-sm-table-cell text-center">M</th>
+                <th class="d-none d-sm-table-cell text-center">T</th>
+                <th class="d-none d-sm-table-cell text-center">W</th>
+                <th class="d-none d-sm-table-cell text-center">T</th>
+                <th class="d-none d-sm-table-cell text-center">F</th>
+                <th class="d-none d-sm-table-cell text-center">S</th>
+                <th class="d-none d-sm-table-cell text-center">S</th>
+                @if (Model.StartTimesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderStartTimesOption" name="HeaderStartTimesOption">
+                            <option value=" ">START</option>
+                            @foreach (var StartTime in Model.StartTimesAvailable)
+                            {
+                                <option value="@StartTime.ToShortTimeString()">@StartTime.ToShortTimeString()</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">STARTTIME</th>
+                }
+                @if (Model.EndTimesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderEndTimesOption" name="HeaderEndTimesOption">
+                            <option value=" ">END</option>
+                            @foreach (var EndTime in Model.EndTimesAvailable)
+                            {
+                                <option value="@EndTime.ToShortTimeString()">@EndTime.ToShortTimeString()</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">ENDTIME</th>
+                }
+                @if (Model.DayPartAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderDayPartOption" name="HeaderDayPartOption">
+                            <option value=" ">DP</option>
+                            @foreach (var DayPart in Model.DayPartAvailable)
+                            {
+                                <option value="@DayPart">@DayPart</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">DAYPART</th>
+                }
+                <!--<th class="d-none d-sm-table-cell">Combo</th>-->
+                <th class="d-none d-sm-table-cell text-center">OMDP</th>
+                @if (Model.BuyTypeAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center" width="100">
+                        <select class="form-control HeaderType" id="HeaderBuyTypeOption" name="HeaderBuyTypeOption">
+                            <option value=" ">BT</option>
+                            @foreach (var BuyType in Model.BuyTypeAvailable)
+                            {
+                                <option value="@BuyType">@BuyType</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell">BUY TYPE</th>
+                }
+                @if (Model.SpotLenAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderLenOption" name="HeaderLenOption">
+                            <option value=" ">LEN</option>
+                            @foreach (var SpotLen in Model.SpotLenAvailable)
+                            {
+                                <option value="@SpotLen">@SpotLen</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">LEN</th>
+                }
+                @if (Model.RatesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderRateOption" name="HeaderRateOption">
+                            <option value=" ">RATE</option>
+                            @foreach (var Rate in Model.RatesAvailable)
+                            {
+                                <option value="@Rate">@Rate</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center" width="100">RATE</th>
+                }
+
+                @if (Model.ImpAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderImpOption" name="HeaderImpOption">
+                            <option value=" ">IMP</option>
+                            @foreach (var Imp in Model.ImpAvailable)
+                            {
+                                <option value="@Imp">@Imp</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">IMP</th>
+                }
+                <th class="d-none d-sm-table-cell text-right">CPM</th>
+                @if (Model.UpfrontLinesEditableCount > 0 && Model.DoNotBuyStatusAvailable.Count() > 1)
+                {
+                    @if (Model.DoNotBuyStatusAvailable.Count() > 1)
+                    {
+                        <th class="d-none d-sm-table-cell">
+                            <select class="form-control HeaderType" id="HeaderDNBSOption" name="HeaderDNBSOption">
+                                <option value=" ">STATUS (DNB)</option>
+                                @foreach (var dnbs in Model.DoNotBuyStatusAvailable)
+                                {
+                                    <option value="@dnbs">@dnbs</option>
+                                }
+                            </select>
+                        </th>
+                    }
+                    else
+                    {
+                        <th class="d-none d-sm-table-cell">STATUS (DNB)</th>
+                    }
+                }
+                @if (Model.ClientMandatesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell">
+                        <select class="form-control HeaderType" id="HeaderClientOption" name="HeaderClientOption">
+                            <option value=" ">CLIENT NAME</option>
+                            @foreach (var client in Model.ClientMandatesAvailable)
+                            {
+                                <option value="@client">@client</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else if (Model.ClientMandatesAvailable.Count() == 1)
+                {
+                    <th class="d-none d-sm-table-cell">CLIENT NAME</th>
+                }
+                @if (Model.RevNoAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderRevOption" name="HeaderRevOption">
+                            <option value=" ">REV#</option>
+                            @foreach (var rev in Model.RevNoAvailable)
+                            {
+                                <option value="@rev">@rev</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">REV #</th>
+                }
+                @if (Model.RevisedDatesAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderRevDtOption" name="HeaderRevDtOption">
+                            <option value=" ">REV DT</option>
+                            @foreach (var revdt in Model.RevisedDatesAvailable)
+                            {
+                                <option value="@revdt">@revdt.ToShortDateString()</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">REVISED DT</th>
+                }
+                @if (Model.EffDtAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderEffDtOption" name="HeaderEffDtOption">
+                            <option value=" ">EFF DT</option>
+                            @foreach (var effdt in Model.EffDtAvailable)
+                            {
+                                <option value="@effdt">@effdt.ToShortDateString()</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">EFF DT</th>
+                }
+                @if (Model.ExpDtAvailable.Count() > 1)
+                {
+                    <th class="d-none d-sm-table-cell text-center">
+                        <select class="form-control HeaderType" id="HeaderExpDtOption" name="HeaderExpDtOption">
+                            <option value=" ">EXP DT</option>
+                            @foreach (var expdt in Model.ExpDtAvailable)
+                            {
+                                <option value="@expdt">@expdt.ToShortDateString()</option>
+                            }
+                        </select>
+                    </th>
+                }
+                else
+                {
+                    <th class="d-none d-sm-table-cell text-center">EXP DT</th>
+                }
+                <!--
+                <th class="d-none d-sm-table-cell text-center"  width="100">ACTIONS</th>
+                -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var upfrontline in Model.UpfrontLines)
+            {
+                bool Editable = false;
+                @if (upfrontline.Approved == false &&
+                                 upfrontline.ApproveLock == false &&
+                                 upfrontline.SpotLen == 30 
+                                 @*&&
+                                 Model.NetworkAssignments.Where(n => n.NetworkId == Model.UpfrontInfo.NetworkId).Count() > 0*@
+                                 )
+                {
+                    Editable = true;
+                }
+
+                string CellStyle = "";
+                var _approveImg = "";
+                if (upfrontline.DoNotBuyTypeDescription.ToLower() == "do not buy")
+                {
+                    CellStyle = "upfront-donotbuy";
+                }
+                else if (upfrontline.DoNotBuyTypeDescription.ToLower() == "buy at your risk")
+                {
+                    CellStyle = "upfront-buyatyourrisk";
+                }
+                else if (upfrontline.DoNotBuyTypeDescription.ToLower() == "log actual")
+                {
+                    CellStyle = "upfront-logactual";
+                }
+                else if (upfrontline.DoNotBuyTypeDescription.ToLower() == "client mandate")
+                {
+                    CellStyle = "upfront-clientmandate";
+                }
+                else if (upfrontline.DoNotBuyTypeDescription.ToLower() == "client specific")
+                {
+                    CellStyle = "upfront-clientspecific";
+                }
+
+                if (upfrontline.Approved == true)
+                {
+                    CellStyle += " upfront-approved";
+                }
+                else
+                {
+                    CellStyle += " upfront-notapproved";
+                }
+                <tr class="no-gutters">
+                    <td class="text-center">
+                        <label class="css-control css-control-primary css-checkbox">
+                            <input type="checkbox" class="css-control-input checkbox-select" UpfrontLineId='@upfrontline.UpfrontLineId' Approved='@(upfrontline.Approved? 1 : 0)' BuyTypeId="@upfrontline.BuyTypeId" id="chkSelect-@upfrontline.UpfrontLineId-@upfrontline.BuyTypeId-@upfrontline.SpotLen-@upfrontline.Revision-@upfrontline.Approved-@upfrontline.AllUnapproved-@upfrontline.QuarterName-@upfrontline.Demo.Description-@upfrontline.DoNotBuyTypeDescription-@upfrontline.Property.PropertyName-@upfrontline.StartTime-@upfrontline.EndTime-@upfrontline.DayPartCd-@upfrontline.BuyTypeDescription-@upfrontline.RateAmt-@upfrontline.Impressions-@upfrontline.EffectiveDate-@upfrontline.ExpirationDate" name="chkSelect-@upfrontline.UpfrontLineId" onclick="javascript: SelectUpfrontLine(this, @upfrontline.UpfrontLineId);">
+                            <span class="css-control-indicator"></span>
+                        </label>
+                    </td>
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">@upfrontline.Demo.Description</td>
+
+                    <!-- Approved -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (upfrontline.Approved == true)
+                        {
+                            _approveImg = "fa fa-check";
+                        }
+                        else
+                        {
+                            _approveImg = "fa fa-times";
+                        }
+                        <i id="ApproveImage-@upfrontline.UpfrontLineId" class="@_approveImg"></i>
+                    </td>
+
+                    <!-- Property Name -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <input id="txtPropName-@upfrontline.UpfrontLineId" type="text" class="form-control form-control-sm CellPropertyName red-if-changed" placeholder="@upfrontline.Property.PropertyName">
+                        }
+                        else
+                        {
+                            @upfrontline.Property.PropertyName
+                        }
+                    </td>
+
+                    <!-- Monday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblMon-@upfrontline.Id-@upfrontline.Monday" name="lblMon-@upfrontline.Id-@upfrontline.Monday">
+                                @if (upfrontline.Monday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkMon-@upfrontline.UpfrontLineId-1" name="chkMon-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkMon-@upfrontline.UpfrontLineId-0" name="chkMon-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Monday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Tuesday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblTue-@upfrontline.Id-@upfrontline.Tuesday" name="lblTue-@upfrontline.Id-@upfrontline.Tuesday">
+                                @if (upfrontline.Tuesday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkTue-@upfrontline.UpfrontLineId-1" name="chkTue-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkTue-@upfrontline.UpfrontLineId-0" name="chkTue-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Tuesday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Wednesday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblWed-@upfrontline.Id-@upfrontline.Wednesday" name="lblWed-@upfrontline.Id-@upfrontline.Wednesday">
+                                @if (upfrontline.Wednesday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkWed-@upfrontline.UpfrontLineId-1" name="chkWed-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkWed-@upfrontline.UpfrontLineId-0" name="chkWed-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Wednesday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Thursday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblThu-@upfrontline.Id-@upfrontline.Thursday" name="lblThu-@upfrontline.Id-@upfrontline.Thursday">
+                                @if (upfrontline.Thursday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkThu-@upfrontline.UpfrontLineId-1" name="chkThu-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkThu-@upfrontline.UpfrontLineId-0" name="chkThu-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Thursday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Friday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblFri-@upfrontline.Id-@upfrontline.Friday" name="lblFri-@upfrontline.Id-@upfrontline.Friday">
+                                @if (upfrontline.Friday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkFri-@upfrontline.UpfrontLineId-1" name="chkFri-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkFri-@upfrontline.UpfrontLineId-0" name="chkFri-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Friday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Saturday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblSat-@upfrontline.Id-@upfrontline.Saturday" name="lblSat-@upfrontline.Id-@upfrontline.Saturday">
+                                @if (upfrontline.Saturday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkSat-@upfrontline.UpfrontLineId-1" name="chkSat-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkSat-@upfrontline.UpfrontLineId-0" name="chkSat-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Saturday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Sunday -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <label class="css-control css-control-sm css-checkbox css-control-success" id="lblSun-@upfrontline.Id-@upfrontline.Sunday" name="lblSun-@upfrontline.Id-@upfrontline.Sunday">
+                                @if (upfrontline.Sunday == true)
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkSun-@upfrontline.UpfrontLineId-1" name="chkSun-@upfrontline.Id-1" checked>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="css-control-input red-if-changed" id="chkSun-@upfrontline.UpfrontLineId-0" name="chkSun-@upfrontline.Id-0">
+                                }
+                                <span class="css-control-indicator"></span>
+                            </label>
+                        }
+                        else
+                        {
+                            @if (upfrontline.Sunday == true)
+                            {
+                                <i class="fa fa-circle"></i>
+                            }
+                        }
+                    </td>
+
+                    <!-- Start Time -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <input id="txtStartTime-@upfrontline.UpfrontLineId" type="text" class="js-autocompletetime form-control form-control-sm red-if-changed" placeholder="@upfrontline.StartTime.ToShortTimeString()" onkeyup="javascript: ChangeStartTime(this);">
+                        }
+                        else
+                        {
+                            @upfrontline.StartTime.ToShortTimeString()
+                        }
+                    </td>
+
+                    <!-- End Time -->
+                    <td class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <input id="txtEndTime-@upfrontline.UpfrontLineId" type="text" class="js-autocompletetime form-control form-control-sm red-if-changed" placeholder="@upfrontline.EndTime.ToShortTimeString()">
+                        }
+                        else
+                        {
+                            @upfrontline.EndTime.ToShortTimeString()
+                        }
+                    </td>
+
+                    <!-- Day Part-->
+                    <td id="DayPart-@upfrontline.Id" name="DayPart-@upfrontline.Id" class="d-none d-sm-table-cell text-center @CellStyle">
+                        @if (Editable == true)
+                        {
+                            <select class="form-control CellDayPart" id="CellDayPart-@upfrontline.UpfrontLineId" name="CellDayPart-@upfrontline.UpfrontLineId">
+                                @foreach (var dp in Model.DayParts)
+                                {
+                                    @if (upfrontline.DayPartCd == dp.DayPartCd)
+                                    {
+                                        <option selected value="@CellStyle|@dp.DayPartId">@dp.DayPartCd</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="upfront-change|@dp.DayPartId">@dp.DayPartCd</option>
+                                        }
+                                        }
+                                    </select>
+                                    }
+                                    else
+                                    {
+                                    @upfrontline.DayPartCd
+                                    }
+                                </td>
+
+                                <!--<td class="d-none d-sm-table-cell @CellStyle">@upfrontline.Combo</td>-->
+                                <!-- OM DP -->
+                                <td class="d-none d-sm-table-cell text-center @CellStyle">
+                                    @if (upfrontline.EndTime.ToShortTimeString() == upfrontline.EndTime.ToShortTimeString())
+                                    {
+                                        @:R
+
+                                    }
+                                    else if (upfrontline.StartTime > upfrontline.EndTime)
+                                    {
+                                        if (upfrontline.StartTime.Hour >= 23)
+                                        {
+                                            if (upfrontline.EndTime.Hour == 0 ||
+                                                (upfrontline.EndTime.Hour == 1 && upfrontline.EndTime.Minute == 0 && upfrontline.EndTime.Second == 0))
+                                            {
+                                                @:L
+                                            }
+                                            else
+                                            {
+                                                @:R
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @:R
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        @:&nbsp;
+                                    }
+                                </td>
+
+                                <!-- Buy Type -->
+                                <td id="CellBuyType-@upfrontline.Id" name="CellBuyType-@upfrontline.Id" class="d-none d-sm-table-cell text-center @CellStyle">
+                                    @if (Editable == true)
+                                    {
+                                        <select class="form-control CellBuyTypeOption" id="CellBuyTypeOption-@upfrontline.UpfrontLineId" name="CellBuyTypeOption-@upfrontline.BuyTypeId">
+                                            @foreach (var BuyType in Model.BuyTypes)
+                                            {
+                                                @if (upfrontline.BuyTypeId == BuyType.BuyTypeId)
+                                                {
+                                                    <option selected value="@CellStyle|@BuyType.BuyTypeId">@BuyType.BuyTypeDescription</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="upfront-change|@BuyType.BuyTypeId">@BuyType.BuyTypeDescription</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        @upfrontline.BuyTypeDescription
+                                    }
+                                </td>
+
+                                <!-- Spot Len-->
+                                @if (upfrontline.SpotLen == 120)
+                                {
+                                    <td class="d-none d-sm-table-cell upfront-120 text-center @CellStyle upfront-spotlen">@upfrontline.SpotLen</td>
+                                }
+                                else if (upfrontline.SpotLen == 60)
+                                {
+                                    <td class="d-none d-sm-table-cell upfront-60 text-center @CellStyle upfront-spotlen">@upfrontline.SpotLen</td>
+                                }
+                                else if (upfrontline.SpotLen == 15)
+                                {
+                                    <td class="d-none d-sm-table-cell upfront-15 text-center @CellStyle upfront-spotlen">@upfrontline.SpotLen</td>
+                                }
+                                else
+                                {
+                                    <td class="d-none d-sm-table-cell text-center @CellStyle upfront-spotlen30">@upfrontline.SpotLen</td>
+                                }
+
+                                <!-- Rate -->
+                                <td class="d-none d-sm-table-cell text-right @CellStyle">
+                                    @if (Editable == true)
+                                    {
+                                        <input id="txtRate-@upfrontline.UpfrontLineId" type="text" class="form-control form-control-sm text-sm-right red-if-changed" placeholder="@upfrontline.RateAmt.ToString("C2")">
+                                    }
+                                    else
+                                    {
+                                        @upfrontline.RateAmt.ToString("C2")
+                                    }
+                                </td>
+
+                                <!-- Imp-->
+                                <td class="d-none d-sm-table-cell text-right @CellStyle">
+                                    @if (Editable == true)
+                                    {
+                                        <input id="txtImp-@upfrontline.UpfrontLineId" type="text" class="form-control form-control-sm text-sm-right red-if-changed" size="4" placeholder="@upfrontline.Impressions.ToString("N2")">
+                                    }
+                                    else
+                                    {
+                                        @upfrontline.Impressions.ToString("N2")
+                                    }
+                                </td>
+
+                                <!--CPM-->
+                                <td class="d-none d-sm-table-cell text-right @CellStyle">
+                                    @{
+                                        decimal cpm = 0;
+                                        if (upfrontline.Impressions > 0)
+                                        {
+                                            cpm = upfrontline.RateAmt / upfrontline.Impressions;
+                                        }
+                                    }
+                                    @cpm.ToString("N2")
+                                </td>
+
+                                <!-- Do Not Buy Status-->
+                                @if (Model.UpfrontLinesEditableCount > 0 && Model.DoNotBuyStatusAvailable.Count() > 1)
+                                {
+                                    <td class="d-none d-sm-table-cell @CellStyle">
+                                        @if (Editable == true)
+                                        {
+                                            <select class="form-control CellDoNotBuyType" id="DropdownDNBS-@upfrontline.UpfrontLineId" name="DropdownDNBS-@upfrontline.UpfrontLineId">
+                                                @foreach (var DoNotBuyType in Model.DoNotBuyTypes)
+                                                {
+                                                    if (upfrontline.DoNotBuyTypeId == DoNotBuyType.DoNotBuyTypeId)
+                                                    {
+                                                        <option selected value="@CellStyle|@DoNotBuyType.ClientRequired|@DoNotBuyType.DoNotBuyTypeId">
+                                                            @DoNotBuyType.Description
+                                                        </option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="upfront-change|@DoNotBuyType.ClientRequired|@DoNotBuyType.DoNotBuyTypeId">@DoNotBuyType.Description</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                        }
+                                        else
+                                        {
+                                            @if (upfrontline.DoNotBuyTypeDescription == "BUY")
+                                            {
+                                                @:&nbsp;
+                                    }
+                                            else
+                                            {
+                                                @upfrontline.DoNotBuyTypeDescription
+                                            }
+                                        }
+                                    </td>
+                                }
+
+                                <!-- MandateClientName -->
+                                @if (Model.ClientMandatesAvailable.Count() > 0)
+                                {
+                                    <td class="d-none d-sm-table-cell @CellStyle">
+                                        @if (Editable == true)
+                                        {
+                                            string MandateClientStyle = "width:100px;";
+                                            if (upfrontline.DoNotBuyTypeClientRequired == true)
+                                            {
+                                                MandateClientStyle += "visibility:visible;";
+                                            }
+                                            else
+                                            {
+                                                MandateClientStyle += "visibility:hidden;";
+
+                                            }
+                                            <select style="@MandateClientStyle" class="form-control" id="DropdownClientName-@upfrontline.UpfrontLineId" name="DropdownClientName-@upfrontline.Id">
+                                                @foreach (var client in Model.Clients)
+                                                {
+                                                    @if (upfrontline.MandateClientId == client.ClientId)
+                                                    {
+                                                        <option selected value="@CellStyle|@client.ClientId">@client.ClientName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="upfront-change|@client.ClientId">@client.ClientName</option>
+                                                    }
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            @upfrontline.MandateClientName
+                                        }
+                                    </td>
+                                }
+                                <!-- Revision # -->
+                                <td class="d-none d-sm-table-cell text-center @CellStyle">@upfrontline.Revision</td>
+
+                                <!-- Revision Date -->
+                                <td class="d-none d-sm-table-cell text-center @CellStyle">@upfrontline.RateRevisedDate.ToShortDateString()</td>
+
+                                <!-- Effective Date -->
+                                <td class="d-none d-sm-table-cell text-center @CellStyle">
+                                    @if (Editable == true)
+                                    {
+                                        <select style="width:75px" class="form-control" id="material-select2" name="material-select2">
+                                            <!--<option></option> Required for data-placeholder attribute to work with Select2 plugin -->
+                                            @foreach (var eff in Model.EffectiveDates)
+                                            {
+                                                @if (upfrontline.EffectiveDate.ToShortDateString() == eff.ToShortDateString())
+                                                {
+                                                    <option selected value="@CellStyle|@eff.ToShortDateString()">@eff.ToShortDateString()</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="upfront-change|@eff.ToShortDateString()">@eff.ToShortDateString()</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        @upfrontline.EffectiveDate.ToShortDateString()
+                                    }
+                                </td>
+
+                                <!-- Expiration Date -->
+                                <td class="d-none d-sm-table-cell text-center @CellStyle">
+                                    @if (Editable == true)
+                                    {
+                                        <select style="width:75px" class="form-control" id="material-select2" name="material-select2">
+                                            <!--<option></option> Required for data-placeholder attribute to work with Select2 plugin -->
+                                            @foreach (var exp in Model.ExpirationDates)
+                                            {
+                                                @if (upfrontline.ExpirationDate.ToShortDateString() == exp.ToShortDateString())
+                                                {
+                                                    <option selected value="@CellStyle|@exp.ToShortDateString()">@exp.ToShortDateString()</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="upfront-change|@exp.ToShortDateString()">@exp.ToShortDateString()</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        @upfrontline.ExpirationDate.ToShortDateString()
+                                    }
+                                </td>
+                                <!--
+                                <td class="d-none d-sm-table-cell @CellStyle">
+                                    ADU or A cannot be deleted
+                                    @if (upfrontline.BuyTypeId != 1)
+                                    {
+                                        <button title="Delete" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                            <i class="fa fa-remove"></i>
+                                        </button>
+                                    }
+                                    Program Change must be 30, must not be A and must be original
+                                    @if (upfrontline.SpotLen == 30 && upfrontline.BuyTypeId != 1 && upfrontline.Revision != "PC")
+                                    {
+                                        <button type="button" class="btn btn-sm btn-secondary" id="test" data-toggle="modal" data-target="#modal-programchange" title="Program Change">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    }
+
+                                </td>
+                                -->
+
+                            </tr>
+                                        }
+        </tbody>
+    </table>
+
+</div>
+

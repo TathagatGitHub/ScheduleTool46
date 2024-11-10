@@ -1,0 +1,431 @@
+@model PostLogViewModel
+<style type="text/css">
+    .border {
+        border-color: black !important;
+        border-width: 2px !important;
+    }
+
+    .pl-55 {
+        padding-left: 55px !important;
+    }
+</style>
+<div class="block block-themed block-rounded">
+    <div class="block-header block-header-default bg-secondary">
+        <h3 class="block-title">POST LOG FOR @Model.PostLog.Schedule.ScheduleName</h3>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+        </div>
+    </div>
+    @{
+    var selectedCountryId = Context.Request.Query["SelectedCountry"];
+    }
+    <div class="block-content">
+        <div class="row gutters-tiny">
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label for="upfront_name">Client Name</label></td>
+                        <td>@Model.PostLog.Schedule.Client.ClientName  @(selectedCountryId == "2" ? " (CANADA)" : "") </td>
+
+                    </tr>
+                    <tr>
+                        <td><label>Week #</label></td>
+                        <td>@Model.PostLog.WeekNbr</td>
+                    </tr>
+                    <tr>
+                        <td><label>Week Date</label></td>
+                        <td id="WeekStartDate">@Model.PostLog.WeekDate.ToString("MM/dd/yyyy")</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <table class="dataTable display compact nowrap" style="width:100%">
+                    <tr>
+                        <td style="width:35%"><label>Last Modified By</label></td>
+                        <td>
+                            @Model.PostLog.UpdatedBy.DisplayName
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Last Modified On</label></td>
+                        <td>@Model.PostLog.UpdateDt</td>
+                    </tr>
+                    <tr>
+                        <td><label>Mode</label></td>
+                        <td>EDIT</td>
+                    </tr>
+                </table>
+            </div>
+            @if (Model.PostLog.ActualizedBy != null)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-3">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td style="width:35%"><label>Last Actualized By</label></td>
+                            <td>
+                                @Model.PostLog.ActualizedBy.DisplayName
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>Last Actualized On</label></td>
+                            <td>@Model.PostLog.Actualize_Date</td>
+                        </tr>
+                    </table>
+                </div>
+            }
+            <div class="col-lg-2 col-md-3 col-sm-3">
+                <div class="block-content" style="vertical-align:top">
+                    <table class="dataTable display compact nowrap" style="width:100%">
+                        <tr>
+                            <td class="table-primary text-center">Poor Separation</td>
+                        </tr>
+                        <tr>
+                            <td class="table-danger text-center">Out of Daypart</td>
+                        </tr>
+                        <tr>
+                            <td class="table-success text-center">Unplaced</td>
+                        </tr>
+                        <tr>
+                            <td class="bg-gray-lighter text-danger text-center">Pending Changes</td>
+                        </tr>
+                    </table>
+                    <br />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <table class="dataTable border compact display" style="width:100%">
+                    <thead>
+                        <tr class="border">
+                            <th class="text-right border"></th>
+                            <th class="text-center"><b>SPOTS</b></th>
+                            <th class="text-center"><b>FULL RATE</b></th>
+                            <th class="text-center"><b>RATE</b></th>
+                            <th class="text-center"><b>IMP</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>CLEARED</b></td>
+                            <td><label id="lblTotalClearedSpots"></label></td>
+                            <td><label id="lblTotalClearedFullRate"></label></td>
+                            <td><label id="lblTotalClearedRate"></label></td>
+                            <td><label id="lblTotalClearedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>UNCLEARED</b></td>
+                            <td><label id="lblTotalUnClearedSpots"></label></td>
+                            <td><label id="lblTotalUnClearedFullRate"></label></td>
+                            <td><label id="lblTotalUnClearedRate"></label></td>
+                            <td><label id="lblTotalUnClearedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td class="text-right border"><b>UNPLACED</b></td>
+                            <td><label id="lblTotalUnPlacedSpots"></label></td>
+                            <td><label id="lblTotalUnPlacedFullRate"></label></td>
+                            <td><label id="lblTotalUnPlacedRate"></label></td>
+                            <td><label id="lblTotalUnPlacedIMP"></label></td>
+                        </tr>
+                        <tr class="text-center border">
+                            <td class="text-right border"><b>TOTAL</b></td>
+                            <td><label id="lblTotalSpots"></label></td>
+                            <td><label id="lblTotalFullRate"></label></td>
+                            <td><label id="lblTotalRate"></label></td>
+                            <td><label id="lblTotalIMP"></label></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right border" colspan="1"><b>FILTERING ENABLED</b></td>
+                            <td class="pl-55" colspan="4"><label id="lblFilter" style="font-weight:bold"></label>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom:5px;">
+    <div class="col-12">
+        <div class="btn-group" role="group" aria-label="btnGroup5">
+            <div id="divNotes"
+                 title="Notes"
+                 data-toggle="popover"
+                 data-original-title="Notes"
+                 data-placement="top">
+                <button tooltip="Notes" onclick="GetPostLogNotes();"
+                        class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        data-toggle="modal"
+                        data-target="#modal-notes">
+                    <i class="fa fa-comments-o mr-5"></i>
+                </button>
+            </div>
+            <div id="divActualize"
+                 title="Actualize"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnActualizePostLog"
+                        style="margin-left:9px;"
+                        name="btnActualizePostLog"
+                        onclick="javascript: actualizePostLog();">
+                    Actualize
+                </button>
+            </div>
+            <div id="divExcelExport"
+                 title="Postlog Edit Export"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnPostlogEditExport"
+                        style="margin-left:9px;"
+                        name="btnPostlogEditExport">
+                    Excel Export
+                </button>
+            </div>
+            <div id="divViewValidISCI"
+                 title="View Valid ISCI"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnViewValidISCI"
+                        style="margin-left:9px;"
+                        name="btnViewValidISCI"
+                        data-target="#divValidISCIs"
+                        data-toggle="modal"
+                        onclick="PostLogGetValidISCIs();">
+                    View Valid ISCI
+                </button>
+            </div>
+
+            <div id="divAddNetworkLine"
+                 title="Add Network Log Line"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 style="display:none"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnActualizePostLog"
+                        style="margin-left:9px;"
+                        name="btnActualizePostLog"
+                        onclick="javascript: AddNetworkLine();">
+                    Add Network Line
+                </button>
+            </div>
+
+            <button tooltip="Copy Property Details" style="margin-left:5px; background-color:gainsboro" id="btnCopyPropertyDetails"
+                    onclick="PostLogGetPropertyDetails();"
+                    class="btn btn-default"
+                    type="button">
+                Copy Property Details
+            </button>
+
+            <button tooltip="Clear Spot Data" style="margin-left:5px; background-color:gainsboro" id="btnPostlogClearSpotData"
+                    onclick="PostLogClearSpotData();"
+                    class="btn btn-default"
+                    type="button">
+                Clear Spot Data
+            </button>
+
+            <button tooltip="PostLog Move Spot Data " style="margin-left:5px; background-color:gainsboro" id="btnPostLogMoveSpotData"
+                    onclick="PostLogMoveSpotData();"
+                    class="btn btn-default"
+                    disabled="disabled"
+                    type="button">
+                Move Spot Data
+            </button>
+
+
+        </div>
+    </div>
+</div>
+
+<input id="postLogParams" type="hidden" value="@Model.PostLog.PostLogId"
+       data-schedId="@Model.PostLog.SchedId"
+       data-weekNbr="@Model.PostLog.WeekNbr"
+       data-weekDate="@Model.PostLog.WeekDate"
+       data-clientId="@Model.PostLog.Schedule.ClientId" />
+<div class="modal hide fade" id="modal-notes" role="dialog" aria-labelledby="modal-notes" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">POST LOG FOR @Model.PostLog.Schedule.ScheduleName</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-12" for="txtNote">Add Note:</label>
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" id="txtNote" name="txtNote">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="tblNotes" name="tblNotes">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:20%">Date</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Creator</th>
+                                        <th class="d-none d-sm-table-cell" style="width:60%">Note</th>
+                                        <th class="d-none d-sm-table-cell"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-alt-success" onclick="javascript:SavePostLogNote(@Model.PostLog.PostLogId);">
+                    <i class="fa fa-check"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal hide fade" id="divValidISCIs" role="dialog" aria-labelledby="divValidISCIs" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Valid ISCIs</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="tblValidISCIs" name="tblValidISCIs">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:25%">ISCI</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Date Start</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Date End</th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Length</th>
+                                        <th class="d-none d-sm-table-cell" style="width:25%">Media Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div id="abc" style="display:none">
+        <!-- Popup Div Starts Here -->
+        <div id="popupContact">
+            <!-- Contact Us Form -->
+            <form action="/Logs/AddNetworkLine" id="form" method="post" name="form">
+                <h4>Add Network Line</h4>
+                <input type="hidden" id="nwClientId" name="nwClientId" value=@Model.PostLog.Schedule.Client.ClientId />
+                <select id="nwSelectNetwork" name="nwSelectNetwork">
+                    <option>Select network</option>
+                </select>
+                <select id="nwSelectCountry" name="nwSelectCountry">
+                    <option selected="selected" value="US">US</option>
+                    <option value="CA">Canada</option>
+                </select>
+                <input id="clientName" name="clientName" value=@Model.PostLog.Schedule.Client.ClientName disabled type="text">
+                <input id="nwProduct" name="nwProduct" placeholder="Product" type="text">
+                <input id="nwSpotDate" name="nwSpotDate" placeholder="Spot Date (2020-02-21)" type="text">
+                <input id="nwSpotTime" name="nwSpotTime" placeholder="Spot Time (22:00)" type="text">
+                <input id="nwSpotLen" style="width:85px" name="nwSpotLen" placeholder="Spot Length" type="text">
+                <input id="nwISCICode" name="nwISCICode" placeholder="ISCII" type="text">
+                <input id="nwSpotRate" style="width:75px" name="nwSpotRate" placeholder="Rate" type="text">
+                <input id="nwProgram" name="nwProgram" placeholder="Program Name" type="text">
+                <input id="nwWeekOf" name="nwWeekOf" value=@Model.PostLog.WeekDate.ToString("MM/dd/yyyy") disabled type="text">
+                <input id="hdnNwWeekOf" name="hdnNwWeekOf" value=@Model.PostLog.WeekDate.ToString("MM/dd/yyyy") type="hidden">
+                <a href="javascript:%20check_empty()" id="submit">Add</a>
+            </form>
+        </div>
+        <br /><br /><br /><br />
+        <!-- Popup Div Ends Here -->
+    </div>
+</div>
+
+<div class="modal hide fade" id="divPropertyDetails" role="dialog" aria-labelledby="divPropertyDetails" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Copy Property Details</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="tblPropertydetails" name="tblPropertydetails">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" style="width:1%"></th>
+                                        <th class="d-none d-sm-table-cell" style="width:15%">Property</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">M</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">T</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">W</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">T</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">F</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">Sa</th>
+                                        <th class="d-none d-sm-table-cell" style="width:3%">Su</th>
+                                        <th class="d-none d-sm-table-cell" style="width:10%">START TIME</th>
+                                        <th class="d-none d-sm-table-cell" style="width:10%">END TIME</th>
+                                        <th class="d-none d-sm-table-cell" style="width:5%">DP</th>
+                                        <th class="d-none d-sm-table-cell" style="width:5%">OMDP</th>
+                                        <th class="d-none d-sm-table-cell" style="width:5%">BUY TYPE</th>
+                                        <th class="d-none d-sm-table-cell" style="width:14%">FULL RATE</th>
+                                        <th class="d-none d-sm-table-cell" style="width:14%">IMP</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" onclick="PostLogCopyProprtyDetails();">Copy Property Details</button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

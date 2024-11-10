@@ -1,0 +1,123 @@
+﻿<!doctype html>
+<!--[if lte IE 9]>     <html lang="en" class="no-focus lt-ie10 lt-ie10-msg"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html lang="en" class="no-focus">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" contenteditable="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Ocean Media Scheduling Tool</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/codebase_notable.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/my-dt-button.css" />
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <link rel="stylesheet" href="~/js/plugins/sweetalert2/sweetalert2.min.css">
+    <link rel="stylesheet" href="~/js/plugins/jquery-auto-complete/jquery.auto-complete.min.css">
+
+    <!-- Codebase framework -->
+    <link rel="stylesheet" id="css-main" href="~/css/codebase_notable.min.css">
+
+    <!-- Schedule Tool Custom -->
+    <script asp-append-version="true" src="~/js/common.js"></script>
+
+
+
+
+</head>
+
+<body style="line-height:1">
+
+
+    <div id="page-loader" class="show"></div>
+    <div id="page-container">
+        @* Code Overlay BY Shariq 2022-08-31*@
+        <div id="DivOverLayMain" class="overlay" style="display: none; width: 100%!important;">
+            <div style="text-align:center;position:absolute;vertical-align:middle;color:blue;height:150px;width:150px;left:50%;top:50%;margin-left:-75px;margin-top:-75px;">
+                <img src="~/img/loadingImg.gif" style="height:60px;width:60px;" />
+            </div>
+        </div>
+        @RenderBody()
+    </div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="~/js/core/popper.min.js"></script>
+    <script src="~/js/core/bootstrap.min.js"></script>
+    <script src="~/js/core/jquery.slimscroll.min.js"></script>
+    <script src="~/js/core/jquery.scrollLock.min.js"></script>
+    <script src="~/js/codebase_notable.js"></script>
+
+    <script src="~/js/plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src="~/js/plugins/sweetalert2/es6-promise.auto.min.js"></script>
+    <script src="~/js/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="~/js/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/plugins/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/js/plugins/jquery-auto-complete/jquery.auto-complete.min.js"></script>
+
+    <script src="~/js/pages/be_forms_validation.js"></script>
+    <script src="~/js/pages/be_ui_activity.js"></script>
+    <script src="~/js/pages/be_forms_plugins.js"></script>
+
+    <link href="~/css/timeout-dialog.css" rel="stylesheet" />
+    <script asp-append-version="true" src="~/js/timeout-dialog.js"></script>
+
+    <!-- Page JS Code -->
+    @RenderSection("scripts", required: false)
+    <script language="javascript" type="text/javascript">
+        $(document).ready(function () {
+            setInterval("fnHeartBeat()", 5 * 60 * 1000); // every 5 min
+        });
+
+        $(document).on("click", ".btn-success", function (event) {
+            fnHeartBeat();
+        });
+
+        var fnHeartBeat = function () {
+            console.log('HEARTBEAT fnHeartBeat()');
+            $.get("@Url.Action("Keepalive", "Home")", function (data) {
+                console.log(data);
+                if (data === "ERROR") {
+                    window.location.href = '@Url.Action("408", "StatusCode")';
+                }
+                else {
+                    jQuery.timeoutDialog.setupDialogTimer({
+                        timeout: 1200,
+                        countdown: 60,
+                        logout_redirect_url: '@Url.Action("408", "StatusCode")',
+                        keep_alive_url: '@Url.Action("Keepalive", "Home")'
+                    });
+                }
+            });
+        };
+        // Code to Call Show and hide Overlay BY Shariq 2022-08-31
+        function ShowOverlayMain() {
+            document.getElementById("DivOverLayMain").style.display = "block";
+        }
+        function HideOverlayMain() {
+            document.getElementById("DivOverLayMain").style.display = "none";
+        }
+    </script>
+
+    <script>
+        jQuery(function () {
+            // Init page helpers (Table Tools helper)
+            Codebase.helpers('table-tools');
+            Codebase.helpers('notify');
+            Codebase.helpers('core-tooltip');
+            Codebase.helpers('select2');
+            Codebase.helpers('core-slimscroll');
+            Codebase.helpers('core-popover');
+            //Codebase.helpers('masked-inputs');
+        });
+    </script>
+
+
+</body>
+</html>

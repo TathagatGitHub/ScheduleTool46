@@ -1,0 +1,281 @@
+﻿<style>
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    a {
+        text-decoration: none;
+        color: #379937;
+    }
+
+    body {
+        margin: 40px;
+    }
+
+    .dropdown {
+        position: relative;
+        font-size: 14px;
+        color: #333;
+    }
+
+        .dropdown .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: absolute;
+            top: 30px;
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform 0.1s ease-in-out 0.1s;
+            max-height: 15vh;
+            overflow-y: scroll;
+            z-index: 100;
+        }
+
+        .dropdown .dropdown-option {
+            display: block;
+            /*padding: 8px 12px;*/
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .dropdown .dropdown-label {
+            display: block;
+            height: 34px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+            .dropdown .dropdown-label:before {
+                content: "▼";
+                float: right;
+                color: gray
+            }
+
+        .dropdown.on .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+        }
+
+            .dropdown.on .dropdown-list .dropdown-option {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+
+        .dropdown.on .dropdown-label:before {
+            content: "▼";
+            color: gray
+        }
+
+        .dropdown [type=checkbox] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+</style>
+<div id="mpCreateEditModal">
+    <div class="modal draggable fade" id="MediaPlanModal" tabindex="-1" role="dialog"
+         aria-labelledby="MediaPlanModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl" id="mediaPlanModalDialogue" role="document" style="max-width: 30%;margin-top:5%">
+            <div class="modal-content" style="height:100%;">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="modal-header block-header bg-primary-dark">
+                        <h3 class="block-title" id="CreateMediaPlanHeading" style="font-weight: bold;">Create Media Plan</h3>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Media Plan Name<span style="color:red;display: inline;">*</span></label>
+                                <input type="text" class="form-control" id="txtMediaPlanName" placeholder="">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-5">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Budget (Client Net)<span style="color:red;display: inline;">*</span></label>
+                                <input type="text" class="form-control" id="txtMediaPlanBudget" value="$">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="" style="font-size: 16px;font-weight: bold;">Budget Period<span style="color:red;display: inline;">*</span></label>
+                                <select class="form-control" id="ddlMediaPlanBudgetPeriod" placeholder="">
+                                    <option>Broadcast</option>
+                                    <option>Calendar</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label for="" style="font-size: 16px;font-weight: bold;">% :15</label>
+                                <input type="text" class="form-control" id="txtMediaPlanPercentage" placeholder="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Buy Type Group(s)<span style="color:red;display: inline;">*</span></label>
+                                    <table id="mpBtnGroup" border="0" cellspacing="0" cellpadding="0" width="100%">
+                                        <tr>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnAll" name="btnAll" class="btn btnAll" style="width:95%;border-radius: 25px;" value="all" onclick="return ToggleBTGroupSelection(this,'all');">All</button>
+                                            </td>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnUpfront" name="btnUpfront" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="upfront" onclick="return ToggleBTGroupSelection(this,'upfront');">Upfront</button>
+                                            </td>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnHighProfile" name="btnHighProfile" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="highprofile" onclick="return ToggleBTGroupSelection(this,'highprofile');">High Profile</button>
+                                            </td>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnScatter" name="btnScatter" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="scatter" onclick="return ToggleBTGroupSelection(this,'scatter');">Scatter</button>
+                                            </td>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnDR" name="btnDR" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="dr" onclick="return ToggleBTGroupSelection(this,'dr');">DR</button>
+                                            </td>
+                                            <td align="left" style="width:14%;">
+                                                <button type="button" id="btnIntegration" name="btnInt" class="btn btnBTG" style="width:95%;border-radius: 25px;" value="integration" onclick="return ToggleBTGroupSelection(this,'integration');">Int.</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="upfrontNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px; display:none;height:94px;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Upfront Networks</label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label id="uplbl" class="dropdown-label">Select</label>
+                                        <div id="mediaPlanUpfrontNetworks" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Upfront Demo(s)<span style="color:red;display: inline;">*</span></label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanUpfrontDemos" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" id="highprofileNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;height:94px;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">High Profile Networks</label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanHighProfileNetworks" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">High Profile Demo(s)<span style="color:red;display: inline;">*</span></label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanHighProfileDemos" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" id="scatterNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;height:94px;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Scatter Networks</label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanScatterNetworks" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Scatter Demo(s)<span style="color:red;display: inline;">*</span></label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanScatterDemos" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" id="drNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;height:94px;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">DR Networks</label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanDRNetworks" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">DR Demo(s)<span style="color:red;display: inline;">*</span></label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanDRDemos" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" id="integrationNetDemosDD" style="border:1px solid #e5e5e5;border-radius:8px;padding:10px;display:none;height:94px;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Int. Networks</label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanIntegrationNetworks" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="" style="font-size: 16px;font-weight: bold;">Int. Demo(s)<span style="color:red;display: inline;">*</span></label>
+                                    <div class="dropdown" data-control="checkbox-dropdown">
+                                        <label class="dropdown-label">Select</label>
+                                        <div id="mediaPlanIntegrationDemos" class="dropdown-list">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="width: 95%;margin-left: 20px;">
+                    <div style="width: 100%;">
+                        <button type="button" id="btnCancelMediaPlanPopup" class="btn btn-alt-secondary mr-auto float-left" style="margin-left: -18px;" onclick="btnCloseMediaPlanPopup();">Cancel</button>
+                        <button type="button" id="btnSaveMediaPlanPopup" class="btn btn-alt-secondary mr-auto float-right" style="margin-left: -122px;position: absolute;" onclick="createEditMediaPlan('save');">Save</button>
+                        <button type="button" id="btnCreateMediaPlanPopup" class="btn btn-alt-success mr-auto float-right" style="margin-left: -52px;position: absolute; display: none;" onclick="createEditMediaPlan('create');">Create</button>
+                        <button type="button" id="btnUpdateMediaPlanPopup" class="btn btn-alt-success mr-auto float-right" style="margin-left: -59px;position: absolute; display: none;" onclick="MediaPlanBTGCheckLock('update');">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

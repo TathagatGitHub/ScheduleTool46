@@ -1,0 +1,162 @@
+@model PreLogViewModel
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var unloadEvent = function (e) {
+            var prelogId = $('#prelogId').val();
+
+            $.ajax({
+                type: 'POST',
+                async: false,
+                url: '/Logs/UnLockPreLog',
+                data: { prelogId },
+                success: function (result) {
+                    opener.location.reload();
+                    window.close();                    
+                },
+                error: function (response) {
+                    window.close();
+                }
+            });
+        };
+
+        $("#btnCancel").click(function () {
+            unloadEvent();
+        });
+
+        function confirm(results, prelogId) {
+            var html = "<div>";
+            html += "<h4>Do you want to process the Network Logs in the following order?</h4>";
+            for (var i = 0; i < results.length; i++) {
+                var action = results[i].action;
+                var network = results[i].networkName;
+                html += "<div style='float:left;'>" + action + " data from New LogFile for " + network + " </div>";
+            }
+            html += "<div style='clear:both;'></div></div>";
+
+            swal({
+                html: html,
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!',
+                cancelButtonText: 'No',
+                preConfirm: function () {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(value => {
+                submitProcess(results, prelogId);
+            }).catch(value => {
+                console.log(value);
+            });
+        }
+
+        function submitProcess(results, prelogId) {
+            $.ajax({
+                url: '/Logs/PrelogNetworkUserAction',
+                data: { model: results },
+                type: 'POST',
+                success: function (result) {
+                    location.href = 'EditPreLog?prelogid=' + prelogId + "&logsSelectedCountryId=" + getParameterByName('logsSelectedCountryId');
+                },
+                error: function (response) {
+                    var notify = $.notify(response.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true,
+                    });
+                }
+            });
+        }
+
+        $("#btnProcessAll").click(function () {
+            
+            var results = [];
+            var prelogId = $('#prelogId').val();
+            $('#tblPreLogNetworkSummary > tbody > tr').each(function () {
+                
+                var result = {};
+                result.netWorkId = $(this).find(".networkId").text();
+                result.networkName = $(this).find(".networkName").text();
+                result.logFile = $(this).find(".logFile").text();
+                result.action = $(this).find("input[type='radio']:checked").val();
+                result.logId = prelogId;
+
+                results.push(result);
+            });
+
+            confirm(results, prelogId);
+        });
+
+
+    });
+</script>
+
+
+<main id="main-container">
+    <div class="content">
+        <input id="prelogId" name="prelogId" type="hidden" value="@Model.PrelogId" />
+        @if (Model.PreLogNetworkSummaryList.Count > 0)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Available Network Pre Logs</h1>
+                    <div>
+                        <button type="button" id="btnProcessAll" class="btn btn-alt-primary"><i class="fa fa-edit"></i> PROCESS ALL</button>
+                        <button type="button" id="btnCancel" class="btn btn-alt-primary"><i class="fa fa-edit"></i> CANCEL</button>
+                    </div>
+                    <table class="table table-striped" id="tblPreLogNetworkSummary">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Network Id</th>
+                                <th>Network Name</th>
+                                <th>Current Spots</th>
+                                <th>Current Date Received</th>
+                                <th>Current File Name</th>
+                                <th>New Spots</th>
+                                <th>New Date Received</th>
+                                <th>New File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        @for (int i = 0; i < Model.PreLogNetworkSummaryList.Count; i++)
+                        {
+                            <tr>
+                                <td class="networkId">@Model.PreLogNetworkSummaryList[i].NetWorkId</td>
+                                <td class="networkName">@Model.PreLogNetworkSummaryList[i].NetWorkName</td>
+                                <td>@Model.PreLogNetworkSummaryList[i].CurrentSpots</td>
+                                <td>@Model.PreLogNetworkSummaryList[i].CurrentDateReceived</td>
+                                <td>@Model.PreLogNetworkSummaryList[i].CurrentLogFileName</td>
+                                <td>@Model.PreLogNetworkSummaryList[i].NewSpots</td>
+                                <td>@Model.PreLogNetworkSummaryList[i].NewDateReceived</td>
+                                <td class="logFile">@Model.PreLogNetworkSummaryList[i].NewLogFileName</td>
+                                <td>
+                                    <label class="css-control css-control-success css-radio">
+                                        <input name="@i" class="css-control-input" type="radio" value="REPLACE">
+                                        <span class="css-control-indicator"></span> REPLACE
+                                    </label>
+
+                                    <label class="css-control css-control-success css-radio">
+                                        <input name="@i" class="css-control-input" type="radio" value="ADD">
+                                        <span class="css-control-indicator"></span> ADD
+                                    </label>
+
+                                    <label class="css-control css-control-success css-radio">
+                                        <input name="@i" class="css-control-input" type="radio" value="IGNORE" checked="checked">
+                                        <span class="css-control-indicator"></span> IGNORE
+                                    </label>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+        }
+    </div>
+</main>
+

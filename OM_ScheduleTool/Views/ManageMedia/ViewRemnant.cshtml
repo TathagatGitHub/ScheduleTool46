@@ -1,0 +1,25 @@
+﻿@model ViewUpfrontsViewModel
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width()-20);
+    });
+
+    //$(window).resize(function () {
+    //    $("#divHeader").width($(window).width()-20);
+    //});
+</script>
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-9">
+                @Html.Partial("~/Views/ManageMedia/_Remnant_Header.cshtml", Model)
+            </div>
+            <div class="col-md-3">
+                @Html.Partial("~/Views/ManageMedia/_Legend.cshtml", Model)
+            </div>
+        </div>
+        @Html.Partial("~/Views/ManageMedia/_Upfront_DataTable.cshtml", Model)
+    </div>
+</main>

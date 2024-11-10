@@ -1,0 +1,248 @@
+@model ViewUpfrontsViewModel
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#btnProgramChangeSubmit").click(function () {
+            $('#ProgramChangeTable .selected').each(function (i, obj) {
+                var _upfrontid = GetParameterValues('upfrontid');
+                var _upfrontlineid = this.id;
+                var params = [
+                    'height=' + (screen.height >= 975 ? 975 : screen.height - 25),
+                    'width=1100',
+                    'top=0',
+                    'left=' + (screen.width - 1100) / 2,
+                    'resizable=yes',
+                    'scrollbars=no',
+                    'directories=0',
+                    'titlebar=0',
+                    'toolbar=0',
+                    'location=0',
+                    'status=0',
+                    'menubar=0'             
+                ].join(',');
+
+                popupChangeProgram = window.open('/UpfrontRemnant/ProgramChange?UpfrontId=' + _upfrontid + '&UpfrontLineId=' + _upfrontlineid, 'chgprog_window', params);
+                setTimeout(function () {
+                    popupChangeProgram.focus();
+                }, 1000);
+            });
+        });
+    });
+
+
+    function PopulateProgramChange() {
+        if ($.fn.DataTable.isDataTable('#ProgramChangeTable')) {
+            return;
+        }
+        var programchangetable = $('#ProgramChangeTable').DataTable({
+            ajax: {
+                url: '/UpfrontRemnant/GetUpfrontData',
+                type: 'POST',
+                data: {
+                    upfrontId: getParameterByName('upfrontid'),
+                    sl: '30',
+                    rne: 'PC',
+                    bte: 'A'
+
+                }
+            },
+            searching: true,
+            info: false,
+            deferRender: true,
+            ordering: true,
+            createdRow: function (row, data, dataIndex) {
+                $(row).attr('id', data.upfrontLineId);
+                if (data.doNotBuyTypeId === 5) /* DO NOT BUY */ {
+                    $(row).addClass('table-danger');
+                }
+                else if (data.doNotBuyTypeId === 2) /* BUY AT YOUR RISK */ {
+                    $(row).addClass('table-info');
+                }
+                else if (data.doNotBuyTypeId === 3) /* CLIENT MANDATE */ {
+                    $(row).addClass('table-success');
+                }
+                else if (data.doNotBuyTypeId === 4) /* CLIENT SPECIFIC */ {
+                    $(row).addClass('table-warning');
+                }
+                else if (data.doNotBuyTypeId === 6) /* LOG ACTUAL */ {
+                    $(row).addClass('table-primary');
+                }
+
+                if (data.approved == true) {
+                    $(row).addClass('upfront-approved');
+                }
+            },
+            columns: [
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    searchable: false,
+                    orderable: false
+                },
+                {
+                    targets: 1,
+                    data: "demoName",
+                    class: "d-none d-sm-table-cell",
+                    visible: true,
+                    searchable: true,
+                    render: $.fn.dataTable.render.ellipsis(20, true),
+                    orderable: true
+                },
+                {
+                    targets: 2,
+                    data: "approvedDesc",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === "Approved") {
+                            return "<i class='fa fa-check'></i>";
+                        }
+                        else {
+                            return "<i class='fa fa-times'></i>";
+                        }
+                    },
+                    orderable: true
+                },
+                {
+                    targets: 3,
+                    data: "propertyName",
+                    class: "d-none d-sm-table-cell",
+                    render: $.fn.dataTable.render.ellipsis(20, true),
+                    orderable: true
+                },
+                {
+                    targets: 4,
+                    data: "startTime",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (d) {
+                        return moment(d).format("hh:mm a");
+                    },
+                    orderable: true
+                },
+                {
+                    targets: 5,
+                    data: "endTime",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (d) {
+                        return moment(d).format("hh:mm a");
+                    },
+                    orderable: true
+                },
+                {
+                    targets: 6,
+                    data: "buyTypeCode",
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: true
+                },
+                {
+                    targets: 7,
+                    data: "rateAmt",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 0, '$'),
+                    orderable: true
+                },
+                {
+                    targets: 8,
+                    data: "impressions",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 0, ''),
+                    orderable: true
+                },
+                {
+                    targets: 9,
+                    data: "cpm",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                    orderable: true
+                },
+                {
+                    targets: 10,
+                    data: "doNotBuyTypeDescription",
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: true,
+                },
+                {
+                    targets: 11,
+                    data: "mandateClientName",
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: true
+                }
+
+            ],
+            select: true,
+        });
+
+        $('#ProgramChangeTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                programchangetable.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            $("#btnProgramChangeSubmit").removeAttr("disabled");
+        });
+
+
+    }
+</script>
+<div class="modal fade" id="modal-programchange-select" tabindex="-1" role="dialog" aria-labelledby="modal-programchange-select" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Program Change</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <label class="col-12">Please select program to change.</label>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <table class="table-bordered table-hover table-vcenter js-dataTable-simple" id="ProgramChangeTable" name="ProgramChangeTable" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="d-none d-sm-table-cell">DEMO</th>
+                                        <th class="d-none d-sm-table-cell text-center">APPRV</th>
+                                        <th class="d-none d-sm-table-cell">PROPERTY NAME</th>
+                                        <th class="d-none d-sm-table-cell text-center">START TIME</th>
+                                        <th class="d-none d-sm-table-cell text-center">END TIME</th>
+                                        <th class="d-none d-sm-table-cell text-center">BUY TYPE</th>
+                                        <th class="d-none d-sm-table-cell text-right">RATE</th>
+                                        <th class="d-none d-sm-table-cell text-right">IMP</th>
+                                        <th class="d-none d-sm-table-cell text-right">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center">STATUS (DNB)</th>
+                                        <th class="d-none d-sm-table-cell text-center">CLIENT NAME</th>
+                                        <!--
+                                        <th class="d-none d-sm-table-cell text-center">STATUS (DNB)</th>
+                                        <th class="d-none d-sm-table-cell text-center">CLIENT NAME</th>
+                                        <th class="d-none d-sm-table-cell text-center">REV #</th>
+                                        <th class="d-none d-sm-table-cell text-center">REVISED DT</th>
+                                        <th class="d-none d-sm-table-cell text-center">EFF DT</th>
+                                        <th class="d-none d-sm-table-cell text-center">EXP DT</th>
+                                        -->
+                                    </tr>
+                                </thead>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" disabled class="btn btn-alt-success" data-dismiss="modal" id="btnProgramChangeSubmit" name="btnProgramChangeSubmit">
+                    <i class="fa fa-check"></i> Change Program
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

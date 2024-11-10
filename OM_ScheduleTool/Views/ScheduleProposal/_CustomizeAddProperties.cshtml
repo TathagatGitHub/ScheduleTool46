@@ -1,0 +1,171 @@
+﻿@model ProposalViewModel
+<style>
+
+    .child-prop-cross-icon {
+        color: #aaa4a4;
+        font-weight: 100;
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+        margin-top: -5px;
+    }
+
+    .child-prop-cross-icon:hover {
+        color: #a64b4b;
+    }
+
+    .cls-start-end-time-dropdown {
+        width: 130px;
+        display: block;
+        height: 25px;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 13px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+
+    .dropdown {
+        position: absolute;
+        font-size: 14px;
+        color: #333;        
+    }
+
+        .dropdown .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: fixed;
+            width:160px!important;
+          /*   top: 30px; */
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform 0.1s ease-in-out 0.1s;
+            max-height: 15vh;
+            overflow-y: scroll;
+            z-index: 100000;
+        }
+
+        .dropdown .dropdown-option {
+            display: block;
+            /*padding: 8px 12px;*/
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .dropdown .dropdown-label {
+            display: block;
+            height: 24px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 13px;
+            line-height: 1;
+            cursor: pointer;
+            width: 115px;
+        }
+
+        .dropdown .dropdown-label:before {
+            content: "▼";
+            float: right;
+            color: gray;
+            font-size: 10px;
+            padding-top: 2px;
+            
+
+    }
+
+        .dropdown.on .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+        }
+
+            .dropdown.on .dropdown-list .dropdown-option {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+
+        .dropdown.on .dropdown-label:before {
+            content: "▼";
+            color: gray
+        }
+
+        .dropdown [type=checkbox] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+
+    .childproptbl-even-row {
+        background-color: gray;
+    }
+
+    .childproptbl-odd-row {
+        background-color: #f2f2f2;
+    }
+
+    
+</style>
+
+<script language="javascript" type="text/javascript">
+    var checkboxSetFlag = false;
+    var initialLoadDone = false;
+    var addnewpropertytable;
+    $(document).ready(function () {
+
+
+
+    });
+    
+    
+</script>
+
+<div class="modal fade" id="modal_AddCustomizeProperty" tabindex="-1" role="dialog" aria-labelledby="modal_AddCustomizeProperty" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="width:1280px;max-width: 1350px;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Customize & Add Properties</h3>
+                </div>
+                <div class="block-content">
+                    <h3 class="block-title">The customizations you make here will not alter the original properties. </h3>
+                    <h3 class="block-title" id="DuplicatePropertyErrHdn" style="display:none;color:#D22B2B;">The property with these attributes already exists</h3>
+                    <div class="form-group row">
+                        <div class="block-content block-content-full" id="divAvailableProperties" style="width:1300px;max-width:1300px;max-height:650px;overflow-x:hidden;overflow-y:auto;">
+                            <table class="table display" cellspacing="0" cellpadding="0" id="AddNewPropertyTable" name="AddNewPropertyTable" style="width:1240px;max-width:1240px;">
+                                <thead style="background-color:#42A4F4;position:sticky;top:-20px;z-index:10000;">
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell text-left" style="color: white;width:400px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-left" style="color: white;width:140px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Start Time</th>
+                                        <th class="d-none d-sm-table-cell text-left" style="color: white;width:140px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">End Time</th>
+                                        <th class="d-none d-sm-table-cell text-left" style="color: white;width:180px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Days</th>
+                                        <th class="d-none d-sm-table-cell text-right" style="color: white;width:50px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Len</th>
+                                        <th class="d-none d-sm-table-cell text-right" style="color: white;width:110px!important;text-transform: capitalize;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-right" style="color: white;width:110px!important;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-right" style="color: white;width:110px!important;border-right: 1px solid #fff;border-bottom: 1px solid #42A4F4;padding-right:15px;">CPM</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="childPropertiesBody">                                  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" onclick="return ClearAndBack();" >Back</button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal" onclick="return CancelChildProperties();">Cancel</button>
+                <button type="button" class="btn btn-alt-success" onclick="return ProcessChildProperties(0);" id="btnAddChildProperties">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+

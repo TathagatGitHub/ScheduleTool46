@@ -1,0 +1,849 @@
+﻿@*@model ProposalReportViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+
+<!-- Data Table Buttons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css ">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+
+<!--<link rel="stylesheet" href="https://rawgit.com/wenzhixin/multiple-select/master/multiple-select.css">-->
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+<link href="~/css/ProposalReport.css" rel="stylesheet" />
+
+<style type="text/css">
+    #tblTotals thead th, #tblTotals tbody td{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    #ProposalReport thead th, #ProposalReport tbody td {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+</style>
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Invoice -->
+        <h2 class="content-heading d-print-none">
+            Export Proposal
+        </h2>
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">@Model.ReportName</h3>
+                <div class="block-options">
+                    <!-- Print Page functionality is initialized in Codebase() -> uiHelperPrint() -->
+                    
+                    <a id="ExcelLink" class="btn-block-option">
+                        <i class="fa fa-file-excel-o"></i> Excel
+                    </a>
+                    <button type="button" class="btn-block-option" onclick="Codebase.helpers('print-page');">
+                        <i class="si si-printer"></i> Print
+                    </button>
+                    <button type="button" class="btn-block-option" data-toggle="block-option" data-action="fullscreen_toggle"></button>
+                    <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo">
+                        <i class="si si-refresh"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="block-content">
+                <!-- Invoice Info -->
+                <div class="row my-20">
+                    <!-- Client Info -->
+                    <div class="col-6">
+                        <p class="h3">@Model.NetworkInfo.StdNetName</p>
+                        Client: @Model.Client <br />
+                        Quarter: @Model.Quarter.QuarterName<br />
+                        Media: @Model.Media<br />
+                        Feed: @Model.FeedType<br />
+                        Guaranteed: @Model.Guaranteed<br />
+                    </div>
+                    <!-- END Client Info -->
+                    <!-- Company Info -->
+                    <div class="col-6 text-right">
+                        <p class="h3">Ocean Media LLC</p>
+                        <address>
+                            17011 Beach Blvd, 15th Floor <br />
+                            Huntington Beach, CA 92647<br />
+                            714-969-5244<br>
+                            @Model.LoggedOnUser.EmailAddress
+                        </address>
+                    </div>
+                    <!-- END Company Info -->
+                </div>
+                <!-- END Invoice Info -->
+                <div class="row">
+                    <div class="col-12 text-right">
+                        <div class="push">
+                            <table class="table table-bordered table-hover" id="tblTotals" name="tblTotals">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell" width="110px">TOTALS</th>
+                                        <th class="d-none d-sm-table-cell text-center" width="110px">@Model.Quarter.QuarterName</th>
+                                        @if (Model.Quarter.Wk01_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk01_Date)</th>}
+                                        @if (Model.Quarter.Wk02_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk02_Date)</th>}
+                                        @if (Model.Quarter.Wk03_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk03_Date)</th>}
+                                        @if (Model.Quarter.Wk04_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk04_Date)</th>}
+                                        @if (Model.Quarter.Wk05_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk05_Date)</th>}
+                                        @if (Model.Quarter.Wk06_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk06_Date)</th>}
+                                        @if (Model.Quarter.Wk07_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk07_Date)</th>}
+                                        @if (Model.Quarter.Wk08_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk08_Date)</th>}
+                                        @if (Model.Quarter.Wk09_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk09_Date)</th>}
+                                        @if (Model.Quarter.Wk10_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk10_Date)</th>}
+                                        @if (Model.Quarter.Wk11_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk11_Date)</th>}
+                                        @if (Model.Quarter.Wk12_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk12_Date)</th>}
+                                        @if (Model.Quarter.Wk13_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk13_Date)</th>}
+                                        @if (Model.Quarter.Wk14_Date != null)
+                                        {
+                                            <th class="d-none d-sm-table-cell text-center" width="110px">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk14_Date)</th>
+                                        }
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="push">
+                    <table id="ProposalReport" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th class="text-center">M</th>
+                                <th class="text-center">T</th>
+                                <th class="text-center">W</th>
+                                <th class="text-center">T</th>
+                                <th class="text-center">F</th>
+                                <th class="text-center">S</th>
+                                <th class="text-center">S</th>
+                                <th class="text-right">StartTime-EndTime</th>
+                                <th class="text-center">Buy<br />Type</th>
+                                <th class="text-center">Day<br />Part</th>
+                                <th class="text-center">Len</th>
+                                <th class="text-center">Demo</th>
+                                <th class="text-right">Rate</th>
+                                <th class="text-right">Imp</th>
+                                <th class="text-right">CPM</th>
+                                <th class="text-center">Total Spots</th>
+                                @if (Model.Quarter.Wk01_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk01_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk02_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk02_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk03_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk03_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk04_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk04_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk05_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk05_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk06_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk06_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk07_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk07_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk08_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk08_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk09_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk09_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk10_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk10_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk11_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk11_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk12_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk12_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk13_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk13_Date)</th>
+                                }
+                                @if (Model.Quarter.Wk14_Date != null)
+                                {
+                                    <th class="text-center">@String.Format("{0:MM/dd/yyyy}", Model.Quarter.Wk14_Date)</th>
+                                }
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <strong class="text-danger">NATIONAL BREAKS</strong>
+                    </div>
+                    <div class="col-6 text-right">
+                    </div>
+                </div>
+                @if (Model.IsDRBuyType)
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="text-danger">
+                                No more than 1 spot per 30 minutes.<br />
+                                Notwithstanding anything herein or elsewhere contained to the company,<br />
+                                @Model.NetworkInfo.StdNetName acknowledges that Ocean Media is an agent for a disclosed principal and, accordingly, has no liability to<br />
+                                @Model.NetworkInfo.StdNetName unless and until said principal has paid Ocean Media
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row warning">
+                        <div class="col-2 text-danger">
+                            Billboard Added Value:
+                        </div>
+                        <div class="col-10 text-danger">
+                            @if (Model.DealPointInfo != null && Model.DealPointInfo.BillboardAddedValue != null)
+                            {
+                                @Model.DealPointInfo.BillboardAddedValue
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 text-danger">
+                            Upfront Sponsorship:
+                        </div>
+                        <div class="col-10 text-danger">
+                            @if (Model.DealPointInfo != null && Model.DealPointInfo.UpfrontSponsorship != null)
+                            {
+                                @Model.DealPointInfo.UpfrontSponsorship
+                            }
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <span class="signature">Signature</span>
+                    <span class="date">Date</span>
+                </div>
+                @if (!Model.IsDRBuyType)
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">UPFRONT CANCELLATION:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.UpfrontCancellation != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.UpfrontCancellation</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">SCATTER CANCELLATION:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.ScatterCancellation != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.ScatterCancellation</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">NETWORK SEPARATION POLICY:</strong><br />
+                                @if (Model.DealPointInfo != null && Model.DealPointInfo.NetworkSeparationPolicy != null)
+                                {
+                                    <span class="text-danger">@Model.DealPointInfo.NetworkSeparationPolicy</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="text-danger">
+                                All paid spots are non pre-emptible unless approved by Ocean Media prior to pre-emption.<br />
+                                No more than 1 spot per program.<br />
+                                Not withstanding anything herein or elsewhere contained to the company, @Model.NetworkInfo.StdNetName acknowledges that Ocean Media is an agent for a disclosed principal and, accordingly, has no liability to @Model.NetworkInfo.StdNetName unless and until said principal has paid Ocean Media<br />
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <p>
+                                <strong class="text-danger">
+                                    SCATTER CANCELLATION: Five Business Days Cancel
+                                </strong>
+                            </p>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <label class="col-12" for="example-textarea-input">Comments</label>
+                    <div class="col-12">
+                        <textarea name="example-textarea-input" class="form-control" id="example-textarea-input" placeholder="Content.." rows="6">@Model.QuaterlyClientNote</textarea>
+                    </div>
+                </div>
+
+
+                <!-- Footer -->
+                <p class="text-muted text-center">Thank you very much for doing business with us. We look forward to working with you again!<br />Proposal Generated on:  @DateTime.Now.ToLongDateString() @DateTime.Now.ToShortTimeString() by @Model.LoggedOnUser.DisplayName</p>
+                <!-- END Footer -->
+            </div>
+                </div>
+                <!-- END Invoice -->
+            </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+<!-- Auto Column Hiding-->
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+<script src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+<script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+<script type="text/javascript" src="~/datatable-editor/js/PageLoadMore.js?v=201907160718"></script>
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+
+<!--<script src="https://rawgit.com/wenzhixin/multiple-select/master/multiple-select.js"></script>-->
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#ExcelLink').removeAttr('href');
+        $('#ExcelLink').attr('href', "/ScheduleProposal/ExportToExcel?proposalId=@Model.ProposalInfo.ScheduleId&disc=" + getParameterByName('disc') + "&networkName=" + encodeURIComponent(getParameterByName('NetworkName')) + "&de=" + encodeURIComponent(getParameterByName('de')) + "&bt=" + encodeURIComponent(getParameterByName('bt')));
+        var reporttable = $('#ProposalReport').DataTable({
+            lengthMenu: [[6000], [6000]],
+            ajax: {
+                url: '/ScheduleProposal/GetProposalData',
+                type: 'POST',
+                data: function (d) {
+                    d.proposalId = @Model.ProposalInfo.ScheduleId,
+                    d.discountRate = parseFloat(getParameterByName('disc')),
+                        d.pageLength = 200,
+                        d.filterBuyTypes = getParameterByName('bt'),
+                    d.filterDemoNames = getParameterByName('de'),
+                    d.filterNetworkName = getParameterByName('NetworkName'),
+                    d.ViewOnly = true
+                }
+            },
+            paging: false,
+            searching: false,
+            info: false,
+            columns: [
+                {
+                    targets: 0,
+                    data: "propertyName",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.ellipsis(33, true)
+                },
+                {
+                    targets: 1,
+                    data: "monday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 2,
+                    data: "tuesday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 3,
+                    data: "wednesday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 4,
+                    data: "thursday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 5,
+                    data: "friday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 6,
+                    data: "saturday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 7,
+                    data: "sunday",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === true) {
+                            return "<i class='fa fa-circle'></i>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    targets: 8,
+                    data: "startToEndTime",
+                    class: "d-none d-sm-table-cell text-center"
+                },
+                {
+                    targets: 9,
+                    data: "buyTypeCode",
+                    class: "d-none d-sm-table-cell text-center"
+                },
+                {
+                    targets: 10,
+                    data: "dayPartCd",
+                    class: "d-none d-sm-table-cell text-center"
+                },
+                {
+                    targets: 11,
+                    data: "spotLen",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        if (data === 120) {
+                            return "<span class='badge badge-pill badge-danger'>" + data + "</span>";
+                        }
+                        else if (data === 60) {
+                            return "<span class='badge badge-pill badge-primary'>" + data + "</span>";
+                        }
+                        else if (data === 15) {
+                            return "<span class='badge badge-pill badge-warning'>" + data + "</span>";
+                        }
+                        else {
+                            return "<span class='badge badge-pill badge-success'>" + data + "</span>";
+                        }
+                    }
+                },
+                {
+                    targets: 12,
+                    data: "demoName",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: $.fn.dataTable.render.ellipsis(33, true)
+                },
+                {
+                    targets: 13,
+                    data: "rateAmt",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$')
+                },
+                {
+                    targets: 14,
+                    data: "impressions",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: '@Model.IsDRBT.ToString()' == 'True' ? false : true,
+                    render: $.fn.dataTable.render.number(',', '.', 2, '')
+                },
+                {
+                    targets: 15, /* CPM */
+                    data: "cpm",
+                    class: "d-none d-sm-table-cell text-right",
+                    visible: '@Model.IsDRBT.ToString()' == 'True' ? false : true,
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$')
+
+                },
+                {
+                    targets: 16,
+                    data: "totalSpots",
+                    class: "d-none d-sm-table-cell text-center",
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        $(td).attr('id', 'totalSpots_' + rowData.scheduleLineId);
+                    }
+                },
+                {
+                    targets: 17,
+                    data: "wk01_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk01_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 18,
+                    data: "wk02_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk02_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 19,
+                    data: "wk03_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk03_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 20,
+                    data: "wk04_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk04_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 21,
+                    data: "wk05_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk05_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 22,
+                    data: "wk06_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary table-secondary",
+                    visible: '@Model.Quarter.Wk06_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 23,
+                    data: "wk07_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk07_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 24,
+                    data: "wk08_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk08_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 25,
+                    data: "wk09_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk09_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 26,
+                    data: "wk10_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk10_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 27,
+                    data: "wk11_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk11_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 28,
+                    data: "wk12_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk12_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 29,
+                    data: "wk13_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk13_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+                {
+                    targets: 30,
+                    data: "wk14_Spots",
+                    class: "d-none d-sm-table-cell text-center table-secondary",
+                    visible: '@Model.Quarter.Wk14_Date.ToString()' == '' ? false : true,
+                    render: function (data, type, row, meta) {
+                        if (data == 0)
+                            return '';
+                        else
+                            return data;
+                    }
+                },
+
+
+
+            ],
+        });
+    
+        $('#tblTotals').DataTable({
+            lengthMenu: [[6000], [6000]],
+            ajax: {
+                url: '/ScheduleProposal/GetProposalData',
+                type: 'POST',
+                data: function (d) {
+                    d.proposalId = @Model.ProposalInfo.ScheduleId,
+                    d.discountRate = parseFloat(getParameterByName('disc')),
+                    d.filterBuyTypes = getParameterByName('bt'),
+                    d.filterDemoNames = getParameterByName('de'),
+                    d.filterNetworkName = getParameterByName('NetworkName'),
+                    d.ViewOnly = true,
+                    d.showTotals = true,
+                    d.proposalReportTotals = true,
+                    d.isDRBT="@Model.IsDRBT"=="True"?true:false
+                }
+            },
+            paging: false,
+            searching: false,
+            info: false,
+            ordering: false,
+            autoWidth: false,
+            columns: [
+                {
+                    targets: 0,
+                    data: "description",
+                    class: "d-none d-sm-table-cell text-left"
+                },
+                {
+                    targets: 1,
+                    data: "total",
+                    class: "d-none d-sm-table-cell text-center"
+                },
+                {
+                    targets: 2,
+                    data: "wk01",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk01_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 3,
+                    data: "wk02",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk02_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 4,
+                    data: "wk03",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk03_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 5,
+                    data: "wk04",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk04_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 6,
+                    data: "wk05",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk05_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 7,
+                    data: "wk06",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk06_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 8,
+                    data: "wk07",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk07_Date.ToString()' == '' ? false : true
+
+                },
+                {
+                    targets: 9,
+                    data: "wk08",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk08_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 10,
+                    data: "wk09",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk09_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 11,
+                    data: "wk10",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk10_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 12,
+                    data: "wk11",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk11_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 13,
+                    data: "wk12",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk12_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 14,
+                    data: "wk13",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk13_Date.ToString()' == '' ? false : true
+                },
+                {
+                    targets: 15,
+                    data: "wk14",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible:'@Model.Quarter.Wk14_Date.ToString()' == '' ? false : true
+                }
+            ],
+        });
+    });
+
+</script>*@
+

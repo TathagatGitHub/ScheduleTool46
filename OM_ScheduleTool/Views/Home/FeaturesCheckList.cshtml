@@ -1,0 +1,258 @@
+﻿@model HomeDeltaListViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<!-- Main Container -->
+<main id="main-container">
+    <div class="content">
+        <!-- Responsive Utility Classes -->
+        <div id="cb-grid-rutil" class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Features Checklist</h3>
+            </div>
+            <div class="block-content">
+                <p></p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="min-width-175"></div>
+                                </th>
+                                <th class="text-center">
+                                    Under Development<br>
+                                    <small class="text-capitalize font-w400 text-muted"></small>
+                                </th>
+                                <th class="text-center">
+                                    Ready for QA<br>
+                                    <small class="text-capitalize font-w400 text-muted"></small>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <code>Manage Media</code>
+                                </td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Upfronts</code>
+                                </td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Edit Upfronts</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Main Page</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Only top 100 rows displayed<br />Changes Pending: 2<br />Editable Rows<br />Save On Leave</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> <a href="https://1drv.ms/w/s!Ak7Z2R8oxqznsz2vYSwe7v_Pievp">Add Property</a></code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Changes: 1<br />StartTime/EndTime entries</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Notes</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Changes: 1<br />1) Allow addition of subnote from IE and Chrome<br /></small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> View Upfronts</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Main Page</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Pending Changes: 3<br />1) Server Side Info<br />2)  Server Side Filter<br />3)  Server Side Sorting</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Notes</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Changes: 2<br />1) Allow addition of subnote from IE and Chrome<br />2)  Permissions</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Create Upfront</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Manage Upfront</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Update Deal Point Data</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Changes: 1<br />Permissions</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Export</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Changes: 1<br />Permissions</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Remnants</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Edit Remnants</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Add Property</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Notes</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> View Remnants</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Notes</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Update Deal Point Data</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>> Export</code>
+                                </td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>Create Property</code></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i><br /><small class="text-capitalize font-w400 text-muted">Pending Changes: 2<br />StartTime/EndTime entries;Network Assignments;</small></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>Client Names</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>Networks</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>User Settings</code></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Client</code></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                            <tr>
+                                <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Network</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://1drv.ms/w/s!Ak7Z2R8oxqzns0Fk6B3OG231xa5z">Permissions</a></code></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>Demo Settings</code></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                                <td class="text-center"><i class="si si-close text-danger"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>Client Commission</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>CA Client Exchange Rate</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td><code>CA Actual Exchange Rate</code></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                                <td class="text-center"><i class="si si-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- END Responsive Utility Classes -->
+    </div>
+</main>

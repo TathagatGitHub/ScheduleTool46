@@ -1,0 +1,337 @@
+﻿@model UpfrontExpansionViewModel
+
+
+<style>
+    input[type=text].autoWidthInput {
+        display: inline;
+        width: auto;
+        text-align:center;
+    }
+</style>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        
+        $("#lblUsageTracker").text("Usage Tracker");
+        $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });
+        $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });
+
+        $("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });
+        $("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").maskMoney({ prefix: '$', bringCaretAtEndOnFocus: false, allowZero: true, precision: 0 });        
+
+        if ($("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").length == 0 || parseInt($("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").val().replace(/\$|,/g, '')) == 0 ||
+            $("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").length == 0 || parseInt($("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").val().replace(/\$|,/g, '')) == 0) {
+
+            DisableCurrentQuarterHeader();
+        }
+        else {
+            EnableCurrentQuarterHeader();
+        }
+        
+        $("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable, #CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").change(function () {
+            if (parseInt($("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").val().replace(/\$|,/g, '')) > 0 && parseInt($("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").val().replace(/\$|,/g, '')) > 0) {
+                EnableCurrentQuarterHeader();
+            }
+            else {
+                DisableCurrentQuarterHeader();
+            }
+        });
+
+
+        window.onbeforeunload = function (e) {
+            if (!NoExitPrompt && HeaderValuesChanged()) {
+                return "YOU HAVE UNSAVED CHANGES ON THIS PAGE!!!";
+            }
+        };
+
+        $(".quartertabs").on('click', function (event) {
+            if (HeaderValuesChanged()) {
+                NoExitPrompt = true;
+                event.preventDefault();
+                swal({
+                text: "Would you like to save your changes?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: "No"
+                }).then(
+                    function (result) {
+                    Save(event.currentTarget.href);
+                }, function (dismiss) {
+                    window.location = event.currentTarget.href;
+                }
+                );
+            }
+        });
+    });
+
+    function DisableCurrentQuarterHeader() {
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").style.backgroundColor = "transparent";
+        $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").removeClass("form-control");
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").style.border = "none";
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").disabled = true;
+
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").style.backgroundColor = "transparent";
+        $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").removeClass("form-control");
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").style.border = "none";
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").disabled = true;
+    }
+
+    function EnableCurrentQuarterHeader() {
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").style.backgroundColor = "#fff";
+        $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").addClass("form-control");
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").style.border = "";
+        document.getElementById("CurrentUpfrontExpansionTracking_UEDollarsAvailable").disabled = false;
+
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").style.backgroundColor = "#fff";
+        $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").addClass("form-control");
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").style.border = "";
+        document.getElementById("CurrentUpfrontExpansionTracking_TotalUpfrontDollars").disabled = false;
+    }
+
+    function HeaderValuesChanged() {
+        var TotalUpfrontDollars = $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").val().replace(/\$|,/g, '');        
+        var UEDollarsAvailable = $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").val().replace(/\$|,/g, '');        
+        var YearUEDollarsAvailable = $("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").val().replace(/\$|,/g, '');
+        var YearTotalUpfrontDollars = $("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").val().replace(/\$|,/g, '');
+
+        return (@Model.CurrentUpfrontExpansionTracking.TotalUpfrontDollars != TotalUpfrontDollars 
+            || @Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable != UEDollarsAvailable
+            || @Model.CurrentUpfrontExpansionTracking.YearlyTotalUpfrontDollars != YearTotalUpfrontDollars
+            || @Model.CurrentUpfrontExpansionTracking.YearlyUEDollarsAvailable != YearUEDollarsAvailable)
+    }
+
+    function Save(navigatetoLink) {
+        var CurrentUEDollarsAvailable, CurrentTotalUpfrontDollars, YearUEDollarsAvailable, YearTotalUpfrontDollars;
+        var allQuartersUEDollarsAvailable = 0, allQuartersUpfrontDollars = 0;
+        if ($("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").val().trim().length == 0)
+            CurrentUEDollarsAvailable = 0;
+        else
+            CurrentUEDollarsAvailable = $("#CurrentUpfrontExpansionTracking_UEDollarsAvailable").val().replace(/\$|,/g, '');
+        
+        if ($("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").val().trim().length == 0)
+            CurrentTotalUpfrontDollars = 0;
+        else
+            CurrentTotalUpfrontDollars = $("#CurrentUpfrontExpansionTracking_TotalUpfrontDollars").val().replace(/\$|,/g, '');
+
+        if ($("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").val().trim().length == 0)
+            YearUEDollarsAvailable = 0;
+        else
+            YearUEDollarsAvailable = $("#CurrentUpfrontExpansionTracking_YearlyUEDollarsAvailable").val().replace(/\$|,/g, '');
+        
+        if ($("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").val().trim().length == 0)
+            YearTotalUpfrontDollars = 0;
+        else
+            YearTotalUpfrontDollars = $("#CurrentUpfrontExpansionTracking_YearlyTotalUpfrontDollars").val().replace(/\$|,/g, '');        
+        
+        if (YearUEDollarsAvailable == 0 || YearTotalUpfrontDollars == 0) {
+            swal('Error!', "Annual Total Upfront and UE Dollars Available are required.", 'error');
+            return false;
+        }        
+
+        allQuartersUEDollarsAvailable = allQuartersUEDollarsAvailable + @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? 0 : Model.Quarter1.UEDollarsAvailable) : 0);
+        allQuartersUEDollarsAvailable = allQuartersUEDollarsAvailable + @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? 0 : Model.Quarter2.UEDollarsAvailable) : 0);
+        allQuartersUEDollarsAvailable = allQuartersUEDollarsAvailable + @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? 0 : Model.Quarter3.UEDollarsAvailable) : 0);
+        allQuartersUEDollarsAvailable = allQuartersUEDollarsAvailable + @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? 0 : Model.Quarter4.UEDollarsAvailable) : 0);
+
+        if (parseInt(allQuartersUEDollarsAvailable) + parseInt(CurrentUEDollarsAvailable) > parseInt(YearUEDollarsAvailable)) {
+            swal('Error!', "Sum of the quarters UE Dollars Available cannot exceed the annual amount.", 'error');
+            return false;
+        }
+        
+        allQuartersUpfrontDollars = allQuartersUpfrontDollars + @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? 0 : Model.Quarter1.TotalQuarterUpfrontDollars) : 0);
+        allQuartersUpfrontDollars = allQuartersUpfrontDollars + @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? 0 : Model.Quarter2.TotalQuarterUpfrontDollars) : 0);
+        allQuartersUpfrontDollars = allQuartersUpfrontDollars + @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? 0 : Model.Quarter3.TotalQuarterUpfrontDollars) : 0);
+        allQuartersUpfrontDollars = allQuartersUpfrontDollars + @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? 0 : Model.Quarter4.TotalQuarterUpfrontDollars) : 0);
+
+        if (parseInt(allQuartersUpfrontDollars) + parseInt(CurrentTotalUpfrontDollars) > parseInt(YearTotalUpfrontDollars)) {
+            swal('Error!', "Sum of the quarters Total Upfront cannot exceed the annual amount.", 'error');
+            return false;
+        }
+        
+        $.ajax({
+            url: "/UpfrontExpansion/GetYearUsageTracker",
+            data: {
+                UpfrontId: $("#UpfrontId").val()                
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result != null) {
+                    if (parseInt(result.fundsUsed) > parseInt(YearUEDollarsAvailable)) {
+                        swal('Error!', "You have UE Booked more than your UE Dollars Available for the year.", 'error');
+                        return false;
+                    }
+                    else {
+                        $.ajax({
+                            url: "/UpfrontExpansion/SaveHeaderYearly",
+                            data: {
+                                UpfrontId: $("#UpfrontId").val(),
+                                UpfrontExpansionTrackingId: $("#UpfrontExpansionTrackingId").val(),
+                                UEDollarsAvailable: CurrentUEDollarsAvailable,
+                                TotalUpfrontDollars: CurrentTotalUpfrontDollars,
+                                YearUEDollarsAvailable: YearUEDollarsAvailable,
+                                YearTotalUpfrontDollars: YearTotalUpfrontDollars
+                            },
+                            cache: false,
+                            type: "POST",
+                            success: function (result) {
+                                if (navigatetoLink != null)
+                                    window.location = navigatetoLink;
+                                else
+                                    window.location = "/UpfrontExpansion/Index?upfrontid=" + $("#UpfrontId").val();
+                            },
+                            error: function (response) {
+                                swal('Error!', response.responseText, 'error');
+                            }
+                        });
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });                        
+    }
+
+    function GetYearUsageTracker() {
+        $.ajax({
+            url: "/UpfrontExpansion/GetYearUsageTracker",
+            data: {
+                UpfrontId: $("#UpfrontId").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result != null) {
+                    $("#lblUsageTracker").text("Year Usage Tracker");
+                    $("#lblUEBooked").text("$" + result.fundsUsed.toLocaleString());
+                    $("#lblFundsRemaining").text("$" + result.fundsRemaining.toLocaleString());
+                }                
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });
+    }
+</script>
+
+<style>
+    .cursor-pointer:hover {
+        cursor:pointer
+    }
+</style>
+
+<form id="formManageUpfrontExpansion_Header" asp-action="Index" asp-controller="UpfrontExpansion" method="post" class="js-validation-bootstrap">
+    @Html.HiddenFor(m => m.UpfrontId)
+    @Html.HiddenFor(m => m.UpfrontExpansionTrackingId)
+
+    
+    <div class="block block-themed block-rounded">
+        <div class="block-header block-header-default bg-gd-sea">
+            <h3 class="block-title text-center" style="color:white; font-weight:bolder">
+                @if (Model.CurrentQuarter.UpfrontExpansionNetworkGroup != null && Model.CurrentQuarter.UpfrontExpansionNetworkGroup.Count() > 0)
+                {
+                    foreach (var group in Model.CurrentQuarter.UpfrontExpansionNetworkGroup)
+                    {
+                        @(group.Network.StdNetName.Replace("_", " ") +  (group == Model.CurrentQuarter.UpfrontExpansionNetworkGroup.Last() ? " " + Model.CurrentQuarter.QuarterName + " UPFRONT EXPANSION - YEARLY" : " / "))
+                    }
+                }
+                else
+                {
+                    @(Model.CurrentQuarter.UpfrontInfo.Name.Replace("_", " ") + " EXPANSION - YEARLY")
+                }                
+            </h3>
+            
+            @*<div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+        </div>*@
+        </div>
+        <div class="block-content block-content-full" id="resize_wrapper"> 
+            
+            <table class="table table-vcenter" id="HeaderTable">
+                <thead>
+                    <tr>
+                        <th class="d-none d-sm-table-cell" style="width:10%">TOTALS</th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter1 != null ? Model.Quarter1.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter1" class="quartertabs btn @(Model.Quarter1 != null ? Model.Quarter1.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter1 == null ? "none" : "inline-block")">@(Model.Quarter1 != null ? Model.Quarter1.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter2 != null ? Model.Quarter2.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter2" class="quartertabs btn @(Model.Quarter2 != null ? Model.Quarter2.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter2 == null ? "none" : "inline-block")">@(Model.Quarter2 != null ? Model.Quarter2.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter3 != null ? Model.Quarter3.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter3" class="quartertabs btn @(Model.Quarter3 != null ? Model.Quarter3.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter3 == null ? "none" : "inline-block")">@(Model.Quarter3 != null ? Model.Quarter3.QuarterName : "")</a></th>
+                        <th class="text-center" style="width:15%"><a href="@Url.Action("Index", new { UpfrontId = Model.Quarter4 != null ? Model.Quarter4.UpfrontInfo.UpfrontId : 0 })" id="linkQuarter4" class="quartertabs btn @(Model.Quarter4 != null ? Model.Quarter4.IsCurrent == true? "btn-primary" : "btn-outline-primary" : "")" type="button" style="display: @(Model.Quarter4 == null ? "none" : "inline-block")">@(Model.Quarter4 != null ? Model.Quarter4.QuarterName : "")</a></th>
+                        <th class="text-center bold align-middle navbar cursor-pointer" style="background-color:darkcyan; color:white" onclick="GetYearUsageTracker();">Year</th>
+                        <th class="text-center bold align-middle border-0" colspan="2"><label id="lblUsageTracker">Usage Tracker</label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">Total Upfront</td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter1.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter2.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter3.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.TotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter4.TotalQuarterUpfrontDollars)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">@Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.YearlyTotalUpfrontDollars, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })</td>
+                        <td class="nowrap text-right border-0"><i>Upfront Expansion Funds Used:</i></td>
+                        <td class="border-0 text-right"><label id="lblUEBooked" style="font-weight:normal">@String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UEBooked ?? 0))</label></td>
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">Booked Upfront Dollars</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter1 != null ? Model.Quarter1.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter2 != null ? Model.Quarter2.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter3 != null ? Model.Quarter3.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@Html.Raw(Model.Quarter4 != null ? Model.Quarter4.BookedUpfrontDollars.ToString("c0") : "&nbsp;")</td>
+                        <td class="d-none d-sm-table-cell text-center">@(String.Format("{0:c0}", (Model.Quarter1 != null ? Model.Quarter1.BookedUpfrontDollars : 0) + (Model.Quarter2 != null ? Model.Quarter2.BookedUpfrontDollars : 0) + (Model.Quarter3 != null ? Model.Quarter3.BookedUpfrontDollars : 0) + (Model.Quarter4 != null ? Model.Quarter4.BookedUpfrontDollars : 0)))</td>
+                        <td class="nowrap text-right border-0"><i>Upfront Expansion Funds Remaining:</i></td>
+                        <td class="border-0 text-right"><label id="lblFundsRemaining" style="font-weight:normal">
+                            @String.Format("{0:c0}", Model.CurrentUpfrontExpansionTracking.UEDollarsAvailable - Model.CurrentUpfrontExpansionTracking.UpfrontExpansionTradeDetails.Sum(x => x.UEBooked ?? 0))</label></td>
+                    </tr>
+                    <tr>
+                        <td class="d-none d-sm-table-cell">UE Dollars Available</td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter1 != null ? (Model.Quarter1.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter1.UEDollarsAvailable)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter2 != null ? (Model.Quarter2.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter2.UEDollarsAvailable)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter3 != null ? (Model.Quarter3.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter3.UEDollarsAvailable)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @(Model.Quarter4 != null ? (Model.Quarter4.IsCurrent == true ? Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.UEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })
+: Html.DisplayFor(m => m.Quarter4.UEDollarsAvailable)) : Html.Display(String.Format("{0:c}", 0)))
+                        </td>
+                        <td class="d-none d-sm-table-cell text-center align-middle">
+                            @Html.EditorFor(m => m.CurrentUpfrontExpansionTracking.YearlyUEDollarsAvailable, new { htmlAttributes = new { @class = "form-control autoWidthInput text-center", data_val = false } })                            
+                        </td>
+                        
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" style="border-top:none">
+                            <button name="btnSubmit" type="button" formnovalidate="formnovalidate" value="Save" class="btn btn-alt-primary" onclick="NoExitPrompt = true; Save();">Save Changes</button>
+                            &nbsp;&nbsp;<button name="btnCancel" value="Cancel" class="btn btn-alt-primary" type="reset">Cancel</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+                                        
+        </div>
+    </div>
+</form>
+

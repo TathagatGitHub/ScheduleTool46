@@ -1,0 +1,64 @@
+﻿@model DashboardViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<style type="text/css">
+    .fa-calendar {
+        font-size: 2.5rem;
+    }
+</style>
+            <!-- Main Container -->
+    <main id="main-container">
+
+        <!-- Page Content -->
+        <div class="content">
+            <!-- Appear ([data-toggle="appear"] is initialized in Codebase() -> uiHelperCoreAppear()) -->
+            <!-- For more info and examples you can check out https://github.com/bas2k/jquery.appear -->
+            @foreach (var afg in Model.AppFeatureGroups)
+            {
+                <h2 class="content-heading">@afg.Description <small>&nbsp;</small></h2>
+                <div class="row gutters-tiny">
+                    @foreach (var af in Model.FeaturePermissions)
+                    {
+                        @if (af.AppFeatureGroupId == afg.AppFeatureGroupId)
+                        {
+                            <div class="col-6 col-md-4 col-xl-2">
+                                <a class="block block-rounded block-bordered block-link-shadow text-center" href="@af.Link">
+                                    <div class="block-content">
+                                        <p class="mt-5">
+                                            <i class="@af.Icon"></i>
+                                        </p>
+                                        <p class="font-w600">@af.FeatureDescription</p>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+            <!-- END Appear -->
+        </div>
+        <!-- END Page Content -->
+    </main>
+<!-- END Main Container -->
+<script type="text/javascript">
+
+    function LoadExcelReport() {
+        $.ajax(
+            {
+                url: '@Url.Action("LoadReportFile", "Home")',
+                contentType: 'application/json; charset=utf-8',
+                datatype: 'json',
+                data: {
+                    
+                },
+                type: "GET",
+                success: function () {
+                   window.location = '@Url.Action("LoadReportFile", "Home")';
+                   
+                }
+            });
+    }
+    
+</script>

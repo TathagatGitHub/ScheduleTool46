@@ -1,0 +1,27 @@
+﻿@model CreateNewPropertyViewModel
+
+@if (Model.NoMenu == 0)
+{
+    @Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+}
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<style>
+   
+    #page-container.main-content-boxed > #main-container .content{
+        max-width:100%!important;
+    }
+
+  
+
+</style>
+<main id="main-container" style="min-height: 629.1px;">
+    <div class="content" style="width:90%!important;">
+        <input name="rateImpRequired" id="rateImpRequired" type="text" hidden />
+        <input name="rateFound" id="rateFound" type="text" hidden />
+        <input name="isModal" id="isModal" type="text" value="0" hidden />
+
+        @Html.Partial("_CreateNewProperty", Model)
+    </div>
+
+</main>

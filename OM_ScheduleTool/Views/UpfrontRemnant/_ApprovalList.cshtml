@@ -1,0 +1,269 @@
+﻿@model ViewUpfrontsViewModel
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+
+        $('#modal-approvalprogress').on('shown.bs.modal', function () {
+
+            var url = "/UpfrontRemnant/ApproveProperty";
+            var statusText = "";
+            $('.selected').each(function (i, obj) {
+                if ($(this).hasClass('upfront-approved')) {
+                    // do nothing
+                }
+                else {
+                    var _UpfrontLineId = $(this).attr('id');
+
+                    $.ajax({
+                        url: url,
+                        data: { upfrontlineid: _UpfrontLineId },
+                        cache: false,
+                        type: "POST",
+                        success: function (result) {
+                            if (result.success) {
+                                try {
+                                    statusText = statusText + "<a class='text-success'><i class='fa fa-check-circle'></i></a> " + result.responseText.replace('/', ' ') + "<br/>";
+                                    $("#StatusText").html(statusText);
+                                } catch (err) {
+                                    swal('Error!', err.message, 'warning');
+                                }
+                            }
+                            else {
+                                try {
+                                    statusText = statusText + "<a class='text-danger'><i class='fa fa-times-circle'></i></a> " + result.responseText.replace('/', ' ') + "<br/>";
+                                    $("#StatusText").html(statusText);
+                                } catch (err) {
+                                    swal('Error!', err.message, 'warning');
+                                }
+                            }
+
+                        },
+                        error: function (response) {
+                            swal('Error1!', response.responseText, 'warning');
+                        }
+                    });
+                }
+            });
+
+            setTimeout(function () {
+                $("#myApprovalHeader").html("Approval Complete.");
+            }, 2000);
+        });
+
+        $('#modal-unapprovalprogress').on('shown.bs.modal', function () {
+            var url = "/UpfrontRemnant/UnapproveProperty";
+            var statusText = "";
+            $('.selected').each(function (i, obj) {
+                if ($(this).hasClass('upfront-approved')) {
+                    var _UpfrontLineId = $(this).attr('id');
+
+                    $.ajax({
+                        url: url,
+                        data: { upfrontlineid: _UpfrontLineId },
+                        cache: false,
+                        type: "POST",
+                        success: function (result) {
+                            if (result.success) {
+                                try {
+                                    statusText = statusText + "<a class='text-success'><i class='fa fa-check-circle'></i></a> " + result.responseText.replace('/', ' ') + "<br/>";
+                                    $("#StatusTextUnapproval").html(statusText);
+                                } catch (err) {
+                                    swal('Error!', err.message, 'warning');
+                                }
+                            }
+                            else {
+                                try {
+                                    statusText = statusText + "<a class='text-danger'><i class='fa fa-times-circle'></i></a> " + result.responseText.replace('/', ' ') + "<br/>";
+                                    $("#StatusTextUnapproval").html(statusText);
+                                } catch (err) {
+                                    swal('Error!', err.message, 'warning');
+                                }
+                            }
+
+                        },
+                        error: function (response) {
+                            swal('Error1!', response.responseText, 'warning');
+                        }
+                    });
+                }
+            });
+
+            setTimeout(function () {
+                $("#myUnapprovalHeader").html("Unapproval Complete.");
+            }, 2000);
+        });
+    });
+
+    function sleep(delay) {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+    }
+
+    function PopulateApprovalProgress() {
+        try {           
+            $('#modal-approvalprogress').modal();
+        }
+        catch (err) {
+            var notify = $.notify(err.message, {
+                type: 'info',
+                allow_dismiss: true,
+            });
+        }
+    }
+
+    function PopulateUnapprovalProgress() {
+        try {
+            $("#StatusTextUnapproval").html("");
+            $('#modal-unapprovalprogress').modal();
+        }
+        catch (err) {
+            var notify = $.notify(err.message, {
+                type: 'info',
+                allow_dismiss: true,
+            });
+        }
+    }
+
+    function PopulateApprove() {
+        var ConfirmQuestionText = '';
+        var CountApprove = 0;
+        var CountUnapprove = 0;
+        var markup = "";
+
+        $('.selected').each(function (i, obj) {
+            var table = $('#UpfrontTable').DataTable();
+            var rowData = table.row(this).data();
+            if ($(this).hasClass('upfront-approved')) {
+                CountUnapprove = CountUnapprove + 1;
+            }
+            else {
+                CountApprove = CountApprove + 1;
+                markup += "<tr>";
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.demoName + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.propertyName + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + formatTime(new Date(rowData.startTime)) + ' - ' + formatTime(new Date(rowData.endTime)) + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.buyTypeCode + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.spotLen + ((rowData.splitNo === 1 || rowData.splitNo === 2) ? '(' + rowData.splitNo + ')' : '') + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + formatCurrency(rowData.rateAmt) + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.impressions + '</td>';
+                markup += '<td class="d-none d-sm-table-cell text-center">' + rowData.doNotBuyTypeDescription + '</td>';
+                markup += "</tr>";
+            }
+        });
+
+        $("#ApproveList").html(markup).show();
+
+        if (CountApprove == 0) {
+            ConfirmQuestionText = 'No unapproved properties selected.';
+            swal('Stop', ConfirmQuestionText, 'warning');
+            return;
+        }
+
+        try {
+            $('#modal-approvallist').modal();
+        }
+        catch (err) {
+            var notify = $.notify(err.message, {
+                type: 'info',
+                allow_dismiss: true,
+            });
+        }
+
+        if (CountApprove == 1) {
+            ConfirmQuestionText = 'The following ' + CountApprove + ' property will be approved.';
+        }
+        else {
+            ConfirmQuestionText = 'The following ' + CountApprove + ' properties will be approved.';
+        }
+
+        if (CountUnapprove == 1) {
+            ConfirmQuestionText = ConfirmQuestionText + '  ' + CountUnapprove + ' property that was already approved is selected.  It will be ignored.';
+        }
+        else if (CountUnapprove > 1) {
+            ConfirmQuestionText = ConfirmQuestionText + '  There are ' + CountUnapprove + ' properties that have already been approved selected.  Those rows will be ignored.';
+        }
+        $("#ApproveListHeader").html(ConfirmQuestionText).show();
+    }
+</script>
+
+<div class="modal fade" id="modal-approvallist" tabindex="-1" role="dialog" aria-labelledby="modal-approvallist" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a id="ApproveListHeader"></a>
+                        </div>
+                        <div class="block-content block-content-full">
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-striped table-vcenter js-dataTable-simple" id="ApproveTable" name="ApproveTable">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell text-center">Demo Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Start - End</th>
+                                        <th class="d-none d-sm-table-cell text-center">BT</th>
+                                        <th class="d-none d-sm-table-cell text-center">Len</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ApproveList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button id="btnApproveSubmit" type="button" class="btn btn-alt-success" data-dismiss="modal">
+                    Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-approvalprogress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myApprovalHeader"><i class="fa fa-clock-o"></i>Please Wait.  Approval In Progress ...</h4>
+            </div>
+            <div class="modal-body center-block">
+                <p id='StatusText'></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="modal-unapprovalprogress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myUnapprovalHeader"><i class="fa fa-clock-o"></i> Please Wait. Unapproval In Progress ...</h4>
+            </div>
+            <div class="modal-body center-block">
+                <p id='StatusTextUnapproval'></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

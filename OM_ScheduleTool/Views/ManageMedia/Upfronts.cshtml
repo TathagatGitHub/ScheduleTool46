@@ -1,0 +1,446 @@
+﻿@model ManageMediaViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript">
+    function GetNetworksAndClients(_countryid, _countryshort) {
+        GetNetworks(_countryid, _countryshort);
+        GetClients(_countryid, _countryshort);
+    }
+
+    function GetNetworks(_countryid, _countryshort) {
+        var url = "/ManageMedia/GetNetworkByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<option value=" + result[x].value + ">" + "(" + _countryshort + ") "  + result[x].text + "</option>";
+                }
+                $("#ddlnetwork").html(markup).show();
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+    function GetClients(_countryid, _countryshort) {
+        var url = "/ManageMedia/GetClientsByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<option value=" + result[x].value + ">" + "(" + _countryshort + ") " + result[x].text + "</option>";
+                }
+                $("#ddlclients").html(markup).show();
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+    function SetupQuarters(_year) {
+        $("#Q4").html("Q4 " + (_year-1)).show();
+        $("#Q1").html("Q1 " + _year).show();
+        $("#Q2").html("Q2 " + _year).show();
+        $("#Q3").html("Q3 " + _year).show();
+    }
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Mega Form -->
+        <!--
+        <h2 class="content-heading">Mega Form</h2>
+        -->
+        <div class="block block-themed">
+            <div class="block-header @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                <h3 class="block-title">Manage Media</h3>
+            </div>
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-country">Country</label><br />
+                                    @foreach (var country in Model.Countries)
+                                    {
+                                        if (country.CountryShort == "US")
+                                        {
+                                            <label class="css-control css-control-primary css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" checked="checked" onclick="javascript:GetNetworksAndClients(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control css-control-primary css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" onclick="javascript:GetNetworksAndClients(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label for="mega-lastname">Plan Year Type</label><br />
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" checked="checked">
+                                        <span class="css-control-indicator"></span> Broadcast
+                                    </label>
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio">
+                                        <span class="css-control-indicator"></span> Calendar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-lastname">Plan Year</label>
+                                    <select name="PlanYear" class="form-control" size="1" onchange="javascript: SetupQuarters(this.value);">
+                                        @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 1; idx++)
+                                        {
+                                            @if (idx == DateTime.Now.Year)
+                                            {
+                                                <option value="@idx" selected>@idx</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idx">@idx</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlnetwork">Network Name</label>
+                                    <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="1"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlclients">Client Name</label>
+                                    <select class="form-control" id="ddlclients" name="ddlclients" size="1"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-alt-primary">
+                                <i class="fa fa-check mr-5"></i> Complete Profile
+                            </button>
+                        </div>
+                    </div>
+                    -->
+                }
+            </div>
+        </div>
+        <!-- END Mega Form -->
+        <div class="row gutters-tiny js-appear-enabled animated fadeIn" data-toggle="appear">
+            <!-- Row #1 -->
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-center bg-gd-leaf" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="si si-wallet fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600 js-count-to-enabled" data-toggle="countTo" data-to="1500" data-speed="1000">1500</div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase">Upfronts</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-right" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="si si-wallet fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600">$<span class="js-count-to-enabled" data-toggle="countTo" data-to="780" data-speed="1000">780</span></div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase text-muted">Remnants</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-right" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="si si-calendar fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600 js-count-to-enabled" data-toggle="countTo" data-to="15" data-speed="1000">15</div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase text-muted">Schedules</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-right" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="fa fa-file-o fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600 js-count-to-enabled" data-toggle="countTo" data-to="4252" data-speed="1000">4252</div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase text-muted">Proposals</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-right" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="si si-list fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600 js-count-to-enabled" data-toggle="countTo" data-to="4252" data-speed="1000">4252</div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase text-muted">Logs</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-5 col-xl-2">
+                <a class="block block-link-shadow text-right" href="javascript:void(0);">
+                    <div class="block-content block-content-full clearfix">
+                        <!--
+                        <div class="float-left mt-10 d-none d-sm-block">
+                            <i class="si si fa-3x text-body-bg-dark"></i>
+                        </div>
+                        <div class="font-size-h3 font-w600 js-count-to-enabled" data-toggle="countTo" data-to="4252" data-speed="1000">&nbsp;&nbsp;</div>
+                        -->
+                        <div class="font-size-sm font-w600 text-uppercase text-muted">&nbsp;&nbsp;</div>
+                    </div>
+                </a>
+            </div>
+            <!-- END Row #1 -->
+        </div>
+        <div class="block">
+            @using (Html.BeginForm())
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group-row">
+                            <div class="col-12">
+                                <!-- Block Tabs Animated Slide Up -->
+                                <div class="block">
+                                    <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                        </li>
+                                        <li class="nav-item ml-auto">
+                                            <a class="nav-link" href="#btabs-animated-slideup-4q"><i class="si si-settings"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="block-content tab-content overflow-hidden">
+                                        <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-4q" role="tabpanel">
+                                            <h4 class="font-w400"></h4>
+                                            <p>
+                                                <div class="block-content">
+                                                    <table class="table table-bordered table-vcenter">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center" style="width: 50px;">#</th>
+                                                                <th>Name</th>
+                                                                <th class="d-none d-sm-table-cell" style="width: 15%;">Access</th>
+                                                                <th class="text-center" style="width: 100px;">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">1</th>
+                                                                <td>Judy Ford</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-info">Business</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">2</th>
+                                                                <td>Alice Moore</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-warning">Trial</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">3</th>
+                                                                <td>Jose Wagner</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-danger">Disabled</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">4</th>
+                                                                <td>Laura Carr</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-warning">Trial</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">5</th>
+                                                                <td>Melissa Rice</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-primary">Personal</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="text-center" scope="row">6</th>
+                                                                <td>Susan Day</td>
+                                                                <td class="d-none d-sm-table-cell">
+                                                                    <span class="badge badge-primary">Personal</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="btn-group">
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Edit" data-toggle="tooltip">
+                                                                            <i class="fa fa-pencil"></i>
+                                                                        </button>
+                                                                        <button title="" class="btn btn-sm btn-secondary js-tooltip-enabled" type="button" data-original-title="Delete" data-toggle="tooltip">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </p>
+                                        </div>
+                                        <div class="tab-pane fade fade-up" id="btabs-animated-slideup-1q" role="tabpanel">
+                                            <h4 class="font-w400"></h4>
+                                            <p></p>
+                                        </div>
+                                        <div class="tab-pane fade fade-up" id="btabs-animated-slideup-2q" role="tabpanel">
+                                            <h4 class="font-w400">Profile Content</h4>
+                                            <p>Content slides up..</p>
+                                        </div>
+                                        <div class="tab-pane fade fade-up" id="btabs-animated-slideup-3q" role="tabpanel">
+                                            <h4 class="font-w400">Profile Content</h4>
+                                            <p>Content slides up..</p>
+                                        </div>
+                                        <div class="tab-pane fade fade-up" id="btabs-animated-slideup-settings" role="tabpanel">
+                                            <h4 class="font-w400">Settings Content</h4>
+                                            <p>Content slides up..</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END Block Tabs Animated Slide Up -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="form-group row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-alt-primary">
+                            <i class="fa fa-check mr-5"></i> Complete Profile
+                        </button>
+                    </div>
+                </div>
+                    -->
+            }
+        </div>
+
+        <div class="block block-themed">
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+<script language="javascript" type="text/javascript">
+
+    GetNetworksAndClients(5, 'US');
+    SetupQuarters(2017);
+</script>

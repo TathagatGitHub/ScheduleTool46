@@ -1,0 +1,342 @@
+@model ViewUpfrontsViewModel
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+       
+        $('#btnReviseDRRatesSubmit').click(function () {
+            try {
+                var ids = "";
+                $("#ReviseEstimateTable tr.selected").each(function () {
+                    ids += this.id + ',';
+                });
+                ReviseDRRates(ids);
+            }
+            catch (err) {
+
+            }
+
+        });
+    });
+
+    function PopulateReviseEstimate(DRRateRevision) {
+        if (DRRateRevision === true) {
+            $("#ReviseEstimateHeader").html("Revise DR Rates");
+            $("#btnReviseDRRatesSubmit").attr("hidden", false);
+            $("#btnReviseEstimateSubmit").attr("hidden", true);
+            $("#InfoReviseDRRates").attr("hidden", false);
+            $("#InfoReviseEstimate").attr("hidden", true);
+
+        }
+        else {
+            $("#ReviseEstimateHeader").html("Revise Estimates");
+            $("#btnReviseDRRatesSubmit").attr("hidden", true);
+            $("#btnReviseEstimateSubmit").attr("hidden", false);
+            $("#InfoReviseDRRates").attr("hidden", true);
+            $("#InfoReviseEstimate").attr("hidden", false);
+        }
+        if ($.fn.DataTable.isDataTable('#ReviseEstimateTable')) {
+            $("#ReviseEstimateTable").dataTable().fnDestroy();
+            $('#ReviseEstimateTable tbody').off('click');
+        }
+        var reviseestimatetable = $('#ReviseEstimateTable').DataTable({
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            ajax: {
+                url: '/UpfrontRemnant/GetUpfrontRemnantReviseLines',
+                type: 'POST',
+                data: {
+                    upfrontId: getParameterByName('upfrontid'),
+                    dRRateRevise: DRRateRevision
+                },
+            },
+            searching: true,
+            info: false,
+            deferRender: true,
+            ordering: true,
+            language: {
+                emptyTable: "No properties found that can be revised for this remnant.  Please click INFO button below for more details."
+            },
+            initComplete: function (settings, result) {
+                if (result.success) {
+                    $('#modal-reviseestimate').modal();
+                }
+                else {
+                    swal("Wait", result.responseText, "warning");
+                }
+            },
+            createdRow: function (row, data, dataIndex) {
+                $(row).attr('id', data.upfrontLineId);
+                console.log(data);
+                if (data.approved == true) {
+                    $(row).addClass('upfront-approved');
+                }
+            },
+            columns: [
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    searchable: false,
+                    orderable: false
+                },
+                {
+                    targets: 1,
+                    data: "demoName",
+                    class: "d-none d-sm-table-cell",
+                    visible: true,
+                    searchable: true,
+                    render: $.fn.dataTable.render.ellipsis(20, true),
+                    orderable: true
+                },
+                {
+                    targets: 2,
+                    data: "propertyName",
+                    class: "d-none d-sm-table-cell",
+                    render: $.fn.dataTable.render.ellipsis(20, true),
+                    orderable: true
+                },
+                {
+                    targets: 3,
+                    data: {
+                        monday: "monday",
+                        tuesday: "tuesday",
+                        wednesday: "wednesday",
+                        thursday: "thursday",
+                        friday: "friday",
+                        saturday: "saturday",
+                        sunday: "sunday",
+                    },
+                    mRender: function (data, type, full) {
+                        return (
+                            (data.monday == true ? 'M' : '-') +
+                            (data.tuesday == true ? 'T' : '-') +
+                            (data.wednesday == true ? 'W' : '-') +
+                            (data.thursday == true ? 'T' : '-') +
+                            (data.friday == true ? 'F' : '-') +
+                            (data.saturday == true ? 'S' : '-') +
+                            (data.sunday == true ? 'S' : '-')
+                        )
+                    },
+                    class: "d-none d-sm-table-cell",
+                    orderable: true
+                },
+                {
+                    targets: 4,
+                    data: "startTime",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (d) {
+                        return moment(d).format("hh:mm a");
+                    },
+                    orderable: true
+                },
+                {
+                    targets: 5,
+                    data: "endTime",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (d) {
+                        return moment(d).format("hh:mm a");
+                    },
+                    orderable: true
+                },
+                {
+                    targets: 6,
+                    data: "buyTypeCode",
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: true
+                },
+                {
+                    targets: 7,
+                    data: "rateAmt",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                    orderable: true
+                },
+                {
+                    targets: 8,
+                    data: "impressions",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 0, ''),
+                    orderable: true
+                },
+                {
+                    targets: 9,
+                    data: "cpm",
+                    class: "d-none d-sm-table-cell text-right",
+                    render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                    orderable: true
+                },
+                {
+                    targets: 10,
+                    data: "revision",
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: true
+                },
+            ],
+            select: true,
+        });
+
+        $('#ReviseEstimateTable tbody').on('click', 'tr', function () {
+            $(this).toggleClass('selected');
+        });
+
+
+    }
+
+    function ReviseEstimate(_UpfrontLineIds) {
+
+        $.ajax({
+            url: "/UpfrontRemnant/ReviseEstimate",
+            data: {
+                UpfrontLineIds: _UpfrontLineIds
+            },
+            cache: false,
+            async: false,
+            type: "POST",
+            success: function (result) {
+                RefreshTable(true, true, true);
+                if (result.success) {
+                    swal({
+                        title: "Success",
+                        text: result.responseText,
+                        type: 'success',
+                        showCancelButton: false,
+                        preConfirm: function () {
+                            return new Promise(function (resolve) {
+                                setTimeout(function () {
+                                    resolve();
+                                }, 50);
+                            });
+                        }
+                    }).then(
+                        function (result) {
+                            //RefreshTable();
+                            // window.location.reload();
+                        });
+
+
+                }
+                else {
+                    swal("Wait", result.responseText, "warning");
+                }
+
+            },
+            error: function (response) {
+                $('#modal-reviseestimate').modal('toggle');
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+
+    function ReviseDRRates(_UpfrontLineIds) {
+
+        $.ajax({
+            url: "/UpfrontRemnant/ReviseDRRates",
+            data: {
+                UpfrontLineIds: _UpfrontLineIds
+            },
+            cache: false,
+            async: false,
+            type: "POST",
+            success: function (result) {
+                RefreshTable(true, true, true);
+                if (result.success) {
+                    swal({
+                        title: "Success",
+                        text: result.responseText,
+                        type: 'success',
+                        showCancelButton: false,
+                        preConfirm: function () {
+                            return new Promise(function (resolve) {
+                                setTimeout(function () {
+                                    resolve();
+                                }, 50);
+                            });
+                        }
+                    }).then(
+                        function (result) {
+                            //window.location.reload();
+                        });
+
+
+                }
+                else {
+                    swal("Wait", result.responseText, "warning");
+                }
+
+            },
+            error: function (response) {
+                $('#modal-reviseestimate').modal('toggle');
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+</script>
+<div class="modal fade" id="modal-reviseestimate" tabindex="-1" role="dialog" aria-labelledby="modal-reviseestimate" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="ReviseEstimateHeader"></h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="row">
+                        <label class="col-12">
+                            Please select the properties to be revised.  <br />
+                        </label>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="ReviseEstimateTable" name="ReviseEstimateTable" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="d-none d-sm-table-cell">Demo Name</th>
+                                        <th class="d-none d-sm-table-cell">Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Days</th>
+                                        <th class="d-none d-sm-table-cell text-center">Start</th>
+                                        <th class="d-none d-sm-table-cell text-center">EndTime</th>
+                                        <th class="d-none d-sm-table-cell text-center">BT</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rev#</th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="InfoReviseEstimate" type="button" class="btn btn-alt-secondary" data-toggle="popover" title="About Revising Estimates" data-placement="top" data-content="Only properties that meet the following criteria can be revised: 1) Buy Type should be GR (Guaranteed Remnant), NR (Non-Guaranteed Remnant) or UE (Upfront Expansion); 2) The latest version's Rate and Imp are not equal to 0; 3) Spot Len 30 of original is approved; 4) Status is not equal to DONOTBUY">
+                    <i class="fa fa-info-circle"></i> Info
+                </button>
+                <button id="InfoReviseDRRates" hidden type="button" class="btn btn-alt-secondary" data-toggle="popover" title="About Revising DR Rates" data-placement="top" data-content="Only properties that meet the following criteria can be revised: 1) Buy Type should be Pre-emptible DR (PE) or Premium DR (PDR); 2) The latest version's Rate and Imp are not equal to 0; 3) Spot Len 30 of original is approved; 4) Status is not equal to DONOTBUY">
+                    <i class="fa fa-info-circle"></i> Info
+                </button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnReviseEstimateSubmit" name="btnReviseEstimateSubmit">
+                    <i class="fa fa-check"></i> Revise Estimate
+                </button>
+                <button type="button" hidden class="btn btn-alt-success" data-dismiss="modal" id="btnReviseDRRatesSubmit" name="btnReviseDRRatesSubmit">
+                    <i class="fa fa-check"></i> Revise DR Rates
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,161 @@
+@model ProposalViewModel
+
+<div class="modal fade" id="modal-copytoschedule" tabindex="-1" role="dialog" aria-labelledby="modal-copytoschedule" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Copy To Schedule</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert">
+                            <p class="mb-0"><strong>Please select networks to be copied to schedule.</strong><br />If no specific network(s) are chosen, none will be copied to schedule.</p>
+                        </div>
+                        <div class="block block-themed block-bordered">
+                            <div class="block-header bg-success">
+                                <h3 class="block-title">Available to be Copied to Schedule</h3>
+                            </div>
+                            <div class="block-content">
+                                <p>Once copied to schedule - proposal and schedule totals should match excluding weeks that are actualized due to post log information.</p>
+                                <div class="block">
+                                    <select name="ddlAvailable" class="form-control" multiple id="ddlAvailable" size="5">
+                                        @foreach (var available in Model.NetworksAvailable)
+                                        {
+                                            <option value="@available.NetworkId">@available.StdNetName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <!--
+        <div class="col-md-6">
+            <div class="block block-themed block-bordered">
+                <div class="block-header bg-warning">
+                    <h3 class="block-title">Need Attention Before Copying Can Occur</h3>
+                </div>
+                <div class="block-content">
+                    <p>Networks that have one or more property that is UNAPPROVED and HAS UNITS.</p>
+                    <div class="block">
+                        <select name="ddlNeedAttention" class="form-control" id="ddlNeedAttention" size="5">
+                            @foreach (var needattention in Model.NetworksNeedAttention)
+                            {
+                                <option value="@needattention.NetworkId">@needattention.StdNetName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+                    <div class="col-md-12">
+                        <div class="block block-themed block-bordered">
+                            <div class="block-header bg-danger">
+                                <h3 class="block-title">Not Available for Copy To Schedule</h3>
+                            </div>
+                            <div class="block-content">
+                                <p>Networks that are APPROVED or UNAPPROVED that DO NOT HAVE UNITS.</p>
+                                <select name="ddlNotAvailable" class="form-control" id="ddlNotAvailable" size="5">
+                                    @foreach (var notavailable in Model.NetworksNotAvailable)
+                                    {
+                                        <option value="@notavailable.NetworkId">@notavailable.StdNetName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @if (Model.ProposalInfo.ScheduleTypeId == 1)
+                {
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="block block-themed block-bordered">
+                                <div class="block-header bg-danger">
+                                    <h3 class="block-title">Network exists in Schedule but not in Proposal</h3>
+                                </div>
+                                <div class="block-content">
+                                        <select name="ddlScheduleNetworkNotInProposal" class="form-control" id="ddlScheduleNetworkNotInProposal" size="5">
+                                            @foreach (var item in Model.ScheduleNetworkNotInProposal.GroupBy(x=>new {x.NetworkId, x.StdNetName }).Select(x=>x.FirstOrDefault()).ToList())
+                                            {
+                                                <option value="@item.NetworkId">@item.StdNetName</option>
+                                            }
+                                        </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <!--
+                <div class="block-content bg-success-light">
+                    <p align="left">By selecting COPY, you will copy the selected networks to the schedule.  To correct/adjust the proposals that need attention or are unavailable, select CANCEL and return to the proposal to adjust those networks.</p>
+                </div>
+                -->
+                <button type="button" class="btn btn-alt-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnCopy" onclick="javascript: CopyToSchedule();">
+                    <i class="fa fa-check"></i>Copy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+    function CopyToSchedule() {
+        var _NetworkIds = '';
+        $("#ddlAvailable :selected").each(function () {
+            if (_NetworkIds != '') {
+                _NetworkIds = _NetworkIds + ',';
+            }
+            _NetworkIds = _NetworkIds + $(this).val();
+        });
+        $("#ddlScheduleNetworkNotInProposal option").each(function () {
+            if (_NetworkIds != '' && $(this).val() != null) {
+                _NetworkIds = _NetworkIds + ',';
+            }
+            if ($(this).val() != null) {
+                _NetworkIds = _NetworkIds + $(this).val();
+            }
+        });
+
+        $.ajax({
+            url: '/ScheduleProposal/CopyToSchedule',
+            data: {
+                ProposalId: _UniqueId,
+                NetworkIds: _NetworkIds
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    swal('Success!', result.responseText, 'success');
+                    $("#ddlScheduleNetworkNotInProposal").val("");
+                }
+                else {
+                    swal('Error!', result.responseText, 'error');
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+        });
+    }
+</script>
+
+

@@ -1,0 +1,679 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = OM_ScheduleTool
+build_property.RootNamespace = OM_ScheduleTool
+build_property.ProjectDir = C:\Users\tathagat.dwivedi\source\repos\TathagatGitHub\ScheduleTool46\OM_ScheduleTool\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\tathagat.dwivedi\source\repos\TathagatGitHub\ScheduleTool46\OM_ScheduleTool
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/BroadcastYearManagement/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnJvYWRjYXN0WWVhck1hbmFnZW1lbnRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/CanadianExchange/ExchangeRateActuals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FuYWRpYW5FeGNoYW5nZVxFeGNoYW5nZVJhdGVBY3R1YWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/CanadianExchange/ExchangeRateDemo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FuYWRpYW5FeGNoYW5nZVxFeGNoYW5nZVJhdGVEZW1vLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/CanadianExchange/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FuYWRpYW5FeGNoYW5nZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ClientCommission/ExportPostLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50Q29tbWlzc2lvblxFeHBvcnRQb3N0TG9nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ClientCommission/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50Q29tbWlzc2lvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Client/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/CreateNewProperty/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JlYXRlTmV3UHJvcGVydHlcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/DemographicSettings/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVtb2dyYXBoaWNTZXR0aW5nc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/DeltaList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxEZWx0YUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/FeaturesCheckList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxGZWF0dXJlc0NoZWNrTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/LockUnlock.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2NrVW5sb2NrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2dvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Home/SetSession.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZXRTZXNzaW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/EditPostLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xFZGl0UG9zdExvZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/EditPostLogNetworkUserAction.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xFZGl0UG9zdExvZ05ldHdvcmtVc2VyQWN0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/EditPreLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xFZGl0UHJlTG9nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/EditPreLogNetworkUserAction.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xFZGl0UHJlTG9nTmV0d29ya1VzZXJBY3Rpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/ViewPostLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xWaWV3UG9zdExvZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/ViewPreLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xWaWV3UHJlTG9nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_LogsWeeks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfTG9nc1dlZWtzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_Menu_Postlog_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfTWVudV9Qb3N0bG9nX1ZpZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_Menu_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfTWVudV9WaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PostLogDataTable_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUG9zdExvZ0RhdGFUYWJsZV9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PostLogDataTable_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUG9zdExvZ0RhdGFUYWJsZV9WaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PostLogHeader_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUG9zdExvZ0hlYWRlcl9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PostLogHeader_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUG9zdExvZ0hlYWRlcl9WaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PostLogWeeks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUG9zdExvZ1dlZWtzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PreLogDataTable_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUHJlTG9nRGF0YVRhYmxlX0VkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PreLogDataTable_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUHJlTG9nRGF0YVRhYmxlX1ZpZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PreLogHeader.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUHJlTG9nSGVhZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Logs/_PreLogWeeks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9nc1xfUHJlTG9nV2Vla3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/DisplayRemants.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcRGlzcGxheVJlbWFudHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/DisplayRemnants.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcRGlzcGxheVJlbW5hbnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/DisplayUpfronts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcRGlzcGxheVVwZnJvbnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Logs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcTG9ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Planning.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcUGxhbm5pbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Proposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcUHJvcG9zYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Remnants.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcUmVtbmFudHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Schedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcU2NoZWR1bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/Upfronts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcVXBmcm9udHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/ViewRemnant.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcVmlld1JlbW5hbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_CreatePropertyModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX0NyZWF0ZVByb3BlcnR5TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_ManageMediaSel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX01hbmFnZU1lZGlhU2VsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_Notes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX05vdGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_ProposalNotes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1Byb3Bvc2FsTm90ZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_Proposal_DataTableTest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1Byb3Bvc2FsX0RhdGFUYWJsZVRlc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_Proposal_Menu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1Byb3Bvc2FsX01lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_ReviseEstmate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1JldmlzZUVzdG1hdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_ScheduleTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1NjaGVkdWxlVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_Schedule_Header.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1NjaGVkdWxlX0hlYWRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ManageMedia/_Schedule_Menu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlTWVkaWFcX1NjaGVkdWxlX01lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/BuyTypeGroupSummary.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXEJ1eVR5cGVHcm91cFN1bW1hcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/Summary.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXFN1bW1hcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_AllMediaPlans.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9BbGxNZWRpYVBsYW5zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_CopyMediaPlan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9Db3B5TWVkaWFQbGFuLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_CreateEditMediaPlan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9DcmVhdGVFZGl0TWVkaWFQbGFuLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_LongPlanNetwork.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9Mb25nUGxhbk5ldHdvcmsuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_LongPlanNetworkEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9Mb25nUGxhbk5ldHdvcmtFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_MediaPlanDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9NZWRpYVBsYW5EYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_MediaPlanNotes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9NZWRpYVBsYW5Ob3Rlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/MediaPlan/_QuickPlanNetwork.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFQbGFuXF9RdWlja1BsYW5OZXR3b3JrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Network/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV0d29ya1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/DisplayProposals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxEaXNwbGF5UHJvcG9zYWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/DisplaySchedules.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxEaXNwbGF5U2NoZWR1bGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/EditProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxFZGl0UHJvcG9zYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/EditSchedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxFZGl0U2NoZWR1bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/ExchangeRates.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxFeGNoYW5nZVJhdGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/GrossIncome.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxHcm9zc0luY29tZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/ProposalReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxQcm9wb3NhbFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/ViewProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxWaWV3UHJvcG9zYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/ViewSchedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxWaWV3U2NoZWR1bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/ViewSP.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxWaWV3U1AuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_AddNewProperty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQWRkTmV3UHJvcGVydHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_AddNewPropertyProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQWRkTmV3UHJvcGVydHlQcm9wb3NhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_AddNewProperty_AvailableProperties.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQWRkTmV3UHJvcGVydHlfQXZhaWxhYmxlUHJvcGVydGllcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_AddNewProperty_AvailablePropertiesProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQWRkTmV3UHJvcGVydHlfQXZhaWxhYmxlUHJvcGVydGllc1Byb3Bvc2FsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_Calculator.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ2FsY3VsYXRvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_Calculator_View1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ2FsY3VsYXRvcl9WaWV3MS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_CopySpotsRight.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ29weVNwb3RzUmlnaHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_CopyToSchedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ29weVRvU2NoZWR1bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_CreateProposal_Copy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ3JlYXRlUHJvcG9zYWxfQ29weS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_CreateProposal_Wiz1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ3JlYXRlUHJvcG9zYWxfV2l6MS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_CustomizeAddProperties.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfQ3VzdG9taXplQWRkUHJvcGVydGllcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_DataTable_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfRGF0YVRhYmxlX0VkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_DataTable_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfRGF0YVRhYmxlX1ZpZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_DropdownPartialView.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfRHJvcGRvd25QYXJ0aWFsVmlldy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_ExportProposal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfRXhwb3J0UHJvcG9zYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_Header.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfSGVhZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_Menu_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfTWVudV9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_Menu_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfTWVudV9WaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_RemoveSelected.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfUmVtb3ZlU2VsZWN0ZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_ScheduleProposalNetwoks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfU2NoZWR1bGVQcm9wb3NhbE5ldHdva3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_UnAllocatedProposals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfVW5BbGxvY2F0ZWRQcm9wb3NhbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_UnAllocatedProposalsConfirmMatch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfVW5BbGxvY2F0ZWRQcm9wb3NhbHNDb25maXJtTWF0Y2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_UnAllocatedProposalsImportMatching.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfVW5BbGxvY2F0ZWRQcm9wb3NhbHNJbXBvcnRNYXRjaGluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_UnAllocatedProposalsLoadImport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfVW5BbGxvY2F0ZWRQcm9wb3NhbHNMb2FkSW1wb3J0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/ScheduleProposal/_UnAllocatedProposalsPotentialMatch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVQcm9wb3NhbFxfVW5BbGxvY2F0ZWRQcm9wb3NhbHNQb3RlbnRpYWxNYXRjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/TestPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXFRlc3RQYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_CreateNewProperty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DcmVhdGVOZXdQcm9wZXJ0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9EZXRhaWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutFull.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRGdWxsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutFullNoMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRGdWxsTm9NZW51LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutFullNoMenuMasked.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRGdWxsTm9NZW51TWFza2VkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutFullNoMenuv2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRGdWxsTm9NZW51djIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutNoLogout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXROb0xvZ291dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_LayoutPlainWithMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRQbGFpbldpdGhNZW51LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_Logon - Copy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dvbiAtIENvcHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_Logon.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_NavigationMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9OYXZpZ2F0aW9uTWVudS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_Plain.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QbGFpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/StatusCode/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhdHVzQ29kZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/ManageGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxNYW5hZ2VHcm91cC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_CreateExpansionModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfQ3JlYXRlRXhwYW5zaW9uTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfRGV0YWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_ExampleDataTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfRXhhbXBsZURhdGFUYWJsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_Header.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfSGVhZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_HeaderYearly.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfSGVhZGVyWWVhcmx5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_NetworkGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfTmV0d29ya0dyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_NetworkGroupSelected.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfTmV0d29ya0dyb3VwU2VsZWN0ZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontExpansion/_YearlyQuarterlyExpansionModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udEV4cGFuc2lvblxfWWVhcmx5UXVhcnRlcmx5RXhwYW5zaW9uTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/AddProperty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcQWRkUHJvcGVydHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/EditUR.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcRWRpdFVSLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/ProgramChange.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcUHJvZ3JhbUNoYW5nZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/UpfrontReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcVXBmcm9udFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/ViewUR.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcVmlld1VSLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_ApprovalList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0FwcHJvdmFsTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_CheckDRPropertyCreation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0NoZWNrRFJQcm9wZXJ0eUNyZWF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_CheckQuarterlyPropertyCreation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0NoZWNrUXVhcnRlcmx5UHJvcGVydHlDcmVhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_CreateUpfrontByDemo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0NyZWF0ZVVwZnJvbnRCeURlbW8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_CreateUpfrontByDemoCA.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0NyZWF0ZVVwZnJvbnRCeURlbW9DQS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DataTable_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RhdGFUYWJsZV9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DataTable_Editor_Inline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RhdGFUYWJsZV9FZGl0b3JfSW5saW5lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DataTable_Editor_Test.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RhdGFUYWJsZV9FZGl0b3JfVGVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DataTable_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RhdGFUYWJsZV9WaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DeleteUpfrontLine.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RlbGV0ZVVwZnJvbnRMaW5lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DRPriorEstimatesTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RSUHJpb3JFc3RpbWF0ZXNUYWJsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DRPropertyCreation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RSUHJvcGVydHlDcmVhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_DRPropertyCreation_AvailablePropertiesTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0RSUHJvcGVydHlDcmVhdGlvbl9BdmFpbGFibGVQcm9wZXJ0aWVzVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_ExportSelect.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0V4cG9ydFNlbGVjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_Header.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0hlYWRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_Legend.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX0xlZ2VuZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_Menu_Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX01lbnVfRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_Menu_View.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX01lbnVfVmlldy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_ProgramChangeSelect.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1Byb2dyYW1DaGFuZ2VTZWxlY3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_QuarterlyPropertyCreation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1F1YXJ0ZXJseVByb3BlcnR5Q3JlYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_QuarterlyPropertyCreation_AvailableProperties.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1F1YXJ0ZXJseVByb3BlcnR5Q3JlYXRpb25fQXZhaWxhYmxlUHJvcGVydGllcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_ReviseEstimate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1JldmlzZUVzdGltYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_UnapprovalList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1VuYXBwcm92YWxMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UpfrontRemnant/_UpfrontNotes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXBmcm9udFJlbW5hbnRcX1VwZnJvbnROb3Rlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/UserSettings/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclNldHRpbmdzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/User/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxEZXRhaWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/User/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/User/Logon.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMb2dvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/User/ManageDefaultActions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNYW5hZ2VEZWZhdWx0QWN0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/_DemographicSettingsUniverse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX0RlbW9ncmFwaGljU2V0dGluZ3NVbml2ZXJzZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/tathagat.dwivedi/source/repos/TathagatGitHub/ScheduleTool46/OM_ScheduleTool/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-kunlrf2c2a

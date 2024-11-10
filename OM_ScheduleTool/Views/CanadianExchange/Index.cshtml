@@ -1,0 +1,207 @@
+@model CanadianExchangeViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        ChangeYear();
+        $("#CanadianExchange_SelectedPlanYear")[0].selectedIndex = 0;
+        $("#CanadianExchange_SelectedClient")[0].selectedIndex = 0;
+        $("#CanadianExchange_SelectedQuarter")[0].selectedIndex = 0;
+        $("#CanadianExchange_Rate").val(0);
+        $("#CanadianExchange_SelectedQuarter").attr("disabled", "disabled");
+       
+        $("#btnExportExchangeRate").on("click", function () {       
+            BeFormValidation.resetValidationBootstrap();
+            if ($('.js-validation-bootstrap').validate().element("#CanadianExchange_SelectedPlanYear")) {
+                window.location.href = '/CanadianExchange/ExportToExcel?PlanYear=' + $("#CanadianExchange_SelectedPlanYear option:selected").val();                
+            }
+            return false;
+        });
+    });
+
+    $(function () {
+        $("#btnReset").bind("click", function () {
+            $("#CanadianExchange_SelectedPlanYear")[0].selectedIndex = 0;
+            $("#CanadianExchange_SelectedClient")[0].selectedIndex = 0;
+            $("#CanadianExchange_SelectedQuarter")[0].selectedIndex = 0;
+            $("#CanadianExchange_Rate").val (0);
+            $("#CanadianExchange_SelectedQuarter").attr("disabled", "disabled");
+            ChangeYear();
+            BeFormValidation.resetValidationBootstrap();
+        });
+    });
+
+    function ChangeYear() {
+        PopulateQuarter();
+    }
+
+    function PopulateQuarter() {
+        if ($("#CanadianExchange_SelectedPlanYear").val() > 0) {
+
+            $("#CanadianExchange_SelectedQuarter").removeAttr("disabled");
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#CanadianExchange_SelectedQuarter").html(procemessage).show();
+            var url = "/CreateNewProperty/GetQuarters";
+
+            $.ajax({
+                url: url,
+                data: {
+                    Year: $("#CanadianExchange_SelectedPlanYear").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option>Please select ...</option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#CanadianExchange_SelectedQuarter").html(markup).show();
+                },
+                error: function (response, exception) {
+                    var msg = '';
+                    if (response.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (response.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (response.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + response.responseText;
+                    }
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: msg,
+                    })
+                }
+            });
+        }
+        else {
+            $("#CanadianExchange_SelectedQuarter").attr("disabled", "disabled");
+        }
+        //$("#text-propertyname").val('');
+    }
+
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Bootstrap Forms Validation -->
+        <h2 class="content-heading">Client Specific Planning</h2>
+        <div class="block block-rounded block-themed">
+            <div class="block-header block-header-default bg-gd-sea">
+                <h3 class="block-title">Canadian Exchange Rate</h3>
+            </div>
+            @if (Model.ErrMessage.ResponseText.Length > 0)
+            {
+                @if (Model.ErrMessage != null && Model.ErrMessage.Success == true)
+                {
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="alert-heading font-size-h4 font-w400">Success</h3>
+                        <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger alert-dismissable" role="alert">
+                        <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="alert-heading font-size-h4 font-w400">Error</h3>
+                        <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                    </div>
+                }
+            }
+            <div class="block-content">
+                <div class="row justify-content-center py-20">
+                    <div class="col-xl-6">
+                        <!-- jQuery Validation (.js-validation-bootstrap class is initialized in js/pages/be_forms_validation.js) -->
+                        @using (Html.BeginForm("Index",
+                           "CanadianExchange",
+                           FormMethod.Post,
+                           new { @class = "js-validation-bootstrap" }
+                           )) {
+                            <div class="form-group row">
+                                <label class="col-lg-4 col-form-label" for="CanadianExchange_SelectedPlanYear">Plan Year <span class="text-danger">*</span></label>
+                                <div class="col-lg-6">
+                                    @Html.DropDownListFor(m => m.CanadianExchange_SelectedPlanYear
+                                            , new SelectList(Model.PlanYears, "Text", "Value")
+                                            , "Please select ..."
+                                            , new
+                                            {
+                                                @class = "form-control",
+                                                @onchange = "ChangeYear();"
+                                            }
+                                    )
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-4 col-form-label" for="CanadianExchange_SelectedQuarter">Quarter <span class="text-danger">*</span></label>
+                                <div class="col-lg-6">
+                                    @Html.DropDownListFor(m => m.CanadianExchange_SelectedQuarter
+                                              , Enumerable.Empty<SelectListItem>()
+                                              , new
+                                              {
+                                                  @class = "form-control"
+                                                 ,@size = "1"
+                                              }
+                                    )
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-4 col-form-label" for="CanadianExchange_SelectedClient">Client <span class="text-danger">*</span></label>
+                                <div class="col-lg-6">
+                                    @Html.DropDownListFor(m => m.CanadianExchange_SelectedClient
+                                              , new SelectList(Model.Clients, "ClientId", "ClientName")
+                                              , "Please select ..."
+                                              , new
+                                              {
+                                                  @class = "form-control"
+                                                 , @size = "1"
+                                              }
+                                    )
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-4 col-form-label" for="CanadianExchange_Rate">Rate <span class="text-danger">*</span></label>
+                                <div class="col-lg-6">
+                                    @Html.TextBoxFor(m => m.CanadianExchange_Rate, new { @class = "form-control", @maxlength = "7" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                    <label class="col-12 col-form-label text-danger" id="errorMessage" name="errorMessage"></label>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-lg-12 ml-auto">
+                                    <button type="submit" class="btn btn-alt-primary">
+                                        <i class="fa fa-save mr-5"></i> Save Exchange Rate
+                                    </button>
+                                    <input type="button" id="btnReset" class="btn btn-alt-primary" value="Reset" />
+                                    <button type="submit" class="btn btn-alt-primary" id="btnExportExchangeRate">
+                                        <i class="fa fa-file-text mr-5"></i> Export Exchange Rate
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap Forms Validation -->
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->

@@ -1,0 +1,19 @@
+@model ScheduleProposalViewModel
+
+<script src="~/js/Proposal.js"></script>
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-6">
+                @Html.Partial("~/Views/ScheduleProposal/_Header.cshtml", Model)
+            </div>
+            <div class="col-md-6">
+                @* @Html.Partial("~/Views/ManageMedia/_Proposal_Calculator.cshtml", Model) *@
+            </div>
+        </div>
+
+        @* @Html.Partial("~/Views/ManageMedia/_Proposal_DataTable.cshtml", Model) *@
+    </div>
+</main>
+

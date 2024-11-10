@@ -1,0 +1,532 @@
+﻿@model ManageMediaViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+@{
+    string PL = Model.LoggedOnUser.PermissionLevel.Description.ToLower();
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript">
+
+    function GetClients(_countryid) {
+        var procemessage = "<option value='0'> Loading clients...</option>";
+        $("#ddlclients").html(procemessage).show();
+
+        var url = "/ManageMedia/GetClientsByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+                for (var x = 0; x < result.length; x++) {
+                    if (@Model.LastSelectedClientId == result[x].value) {
+                        if (_countryid == 5)
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                    else {
+                        if (_countryid == 5)
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                }
+                $("#ddlclients").html(markup).show();
+                GetSchedule();
+            },
+            error: function (response) {
+                 swal("error : " + response.responseText);
+            }
+        });
+    }
+
+    function DeleteSchedule(_ScheduleName, _scheduleId) {
+        swal({
+            title: _ScheduleName,
+            text: 'Are you sure?  This schedule will be permanently deleted along with related pre logs and post logs.',
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        $(".form-group a").hide();
+                        $(".form-group span").show();
+                        resolve();
+                    }, 50);
+                });
+            }
+        }).then(
+            function (result) {              
+                $.ajax({
+                    url: "/ScheduleProposal/DeleteScheduleProposal",
+                    type: 'POST',
+                    data: {
+                        scheduleProposalId: _scheduleId
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            swal({
+                                title: 'Success',
+                                text: result.responseText + '  Click OK to refresh page.',
+                                type: 'success',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'OK',
+                                preConfirm: function () {
+                                    return new Promise(function (resolve) {
+                                        setTimeout(function () {
+                                            resolve();
+                                        }, 50);
+                                    });
+                                }
+                            }).then(
+                                function (result) {
+                                    window.location.reload();
+                                });
+                        }
+                        else {
+                           $(".form-group span").hide();
+                        $(".form-group a").show();
+                            swal('Error!', result.responseText, 'warning');
+                            return;
+                        }
+
+                    },
+                    error: function (response) {
+                        $(".form-group span").hide();
+                        $(".form-group a").show();
+                        swal('Error1!', response.responseText, 'warning');
+                        return;
+                    }
+                });
+            });
+    }
+
+
+    function UnlockSchedule(_scheduleId) {
+        var url = "/ScheduleProposal/Unlock/";
+
+        $.ajax({
+            url: url,
+            data: { ScheduleProposalId: _scheduleId },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success !== true) {
+                    swal('Wait!', result.responseText, 'warning');
+                }
+                else {
+                    window.location.reload();
+                }
+            },
+            error: function (response) {
+                swal('Stop!', response.responseText, 'error');
+            }
+        });
+
+    }
+
+    function OpenSchedule(_scheduleid, link, linkParent) {
+        var url = "/ScheduleProposal/LockSchedule/";
+
+        $.ajax({
+            url: url,
+            data: { scheduleId: _scheduleid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    OpenNewWindow(screen.height, screen.width, link, linkParent);
+                }
+                else {
+                    if (result.success == undefined) {
+                        swal('Error!', "Unknown error.  Please retry.", 'error');
+                    }
+                    else {
+                        swal('Wait!', result.responseText, 'warning');
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+    }
+
+    function GetSchedule() {
+        var url = "/ScheduleProposal/GetScheduleByClient/";
+
+        $.ajax({
+            url: url,
+            data: {
+                clientid: $("#ddlclients").val(),
+                broadcastyr: $("#ddlplanyear").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                $("#btabs-animated-slideup-4q").html("");
+                $("#btabs-animated-slideup-1q").html("");
+                $("#btabs-animated-slideup-2q").html("");
+                $("#btabs-animated-slideup-3q").html("");
+
+                if (result) {
+                    for (var x = 0; x < result.length; x++) {
+                        markup = "";
+                        markup += "<h4 class='font-w400'>" + $("#ddlplanyear :selected").text() + " " + $("#ddlclients :selected").text() + "</h4>";
+                        markup += "<p>";
+                        markup += "<table class='table table-bordered table-vcenter'>";
+                        markup += "<tbody>";
+                        markup += "<tr><th scope='row' width='125'>Quarter</th><td>" + result[x].broadcastQuarterNbr + "</td ></tr > ";
+                        markup += "<tr><th scope='row'>Schedule Name</th><td>" + result[x].scheduleName + "</td></tr>";
+                        markup += "<tr><th scope='row'>Demo Name</th><td>" + result[x].demoName + "</td></tr>";
+                        markup += "<tr><th scope='row'>Network Name</th><td>" + result[x].networkName + "</td></tr>";
+                        if (result[x].lockedByUser != null) {
+                            markup += "<tr><th scope='row'>Locked</th><td><button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'><i class='fa fa-lock'></i></button> </td></tr>";
+                            markup += "<tr><th scope='row'>Lock Date</th><td><span class='badge badge-success'>" + formatDate(new Date(result[x].lockedDt)) + "</span></td></tr>";
+                            markup += "<tr><th scope='row'>Locked By</th><td>" + result[x].lockedByUser.displayName + "</td></tr>";
+                        }
+                        markup += "<tr><th scope='row'>Creation Date</th><td>" + result[x].createDtString + "</td></tr>";
+                        markup += "<tr><th scope='row'>Last Updated</th><td>" + result[x].updateDtString + " ";
+                        if (result[x].updatedByUser != null) {
+                            markup += result[x].updatedByUser.displayName;
+                        }
+                        markup += "</td></tr>";
+                        markup += "</tbody>";
+                        markup += "</table>";
+                        markup += "</p>";
+
+                        markup += "<div class=\"form-group row\">";
+                        markup += "<div class=\"col-12\">";
+
+                        console.log(result[x]);
+                        markup += "<span style='display:none;'>Please wait while action is completed...</span>";
+                        if (result[x].canEditSchedule === 1) {
+                            //markup += "<a onclick=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + screen.Width + ", this.href); return false; \" onkeypress=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + @Model.LastWindowWidth + ", this.href); return false;\" class=\"btn btn-alt-danger\" href=\"/ManageMedia/EditSchedule?scheduleid=" + result[x].scheduleId + "\"><i class=\"fa fa-edit mr-5\"></i>Edit</a>&nbsp;";
+                            markup += "<a id='ancEditSchedule' onclick=\"OpenSchedule (" + result[x].scheduleId + ", this.href, '/ManageMedia/Schedule?ScheduleId=" + result[x].scheduleId + "'); localStorage.removeItem('DataTables_/ScheduleProposal/EditSchedule_" + result[x].scheduleId +"'); return false; \" onkeypress=\"OpenSchedule (" + result[x].scheduleId + ", this.href, '/ManageMedia/Schedule?ScheduleId=" + result[x].scheduleId + "'); return false; \" class=\"btn btn-alt-danger\" href=\"/ScheduleProposal/EditSchedule?ScheduleId=" + result[x].scheduleId + "\"><i class=\"fa fa-edit mr-5\"></i>Edit</a>&nbsp;";
+                        }
+
+                        if (result[x].canViewSchedule === 1) {
+                            markup += "<a id='ancViewSchedule' onclick=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + screen.Width + ", this.href, '/ManageMedia/Schedule?ScheduleId=" + result[x].scheduleId + "'); localStorage.removeItem('DataTables_/ScheduleProposal/ViewSchedule_" + result[x].scheduleId +"'); return false; \" onkeypress=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + @Model.LastWindowWidth + ", this.href, '/ManageMedia/Schedule?ScheduleId=" + result[x].scheduleId + "'); return false;\" class=\"btn btn-alt-danger\" href=\"/ScheduleProposal/ViewSchedule?ScheduleId=" + result[x].scheduleId + "\"><i class=\"fa fa-edit mr-5\"></i>View</a>&nbsp;";
+                        }
+
+                        // If admin, allow user to unlock locked schedules
+                        if (result[x].lockedByUser != null && (@Model.LoggedOnUser.PermissionLevelId === 1|| ((@Model.LoggedOnUser.PermissionLevelId === 2 || @Model.LoggedOnUser.PermissionLevelId === 3) && @Model.LoggedOnUser.UserId === result[x].lockedByUser.userId))) {
+                            markup += "<a id='ancUnlockSchedule' href=\"javascript: UnlockSchedule(" + result[x].scheduleId + ");\" class=\"btn btn-alt-danger\"><i class=\"fa fa-edit mr-5\"></i>Unlock</a>&nbsp;";
+                        }
+                        if (result[x].lockedByUser == null && "@PL" == "admin") {
+                            markup += "<a id='ancDeleteSchedule' href=\"javascript: DeleteSchedule('" + result[x].scheduleName + "', " + result[x].scheduleId + ");\" class=\"btn btn-alt-danger\"><i class=\"fa fa-remove mr-5\"></i>Delete</a>&nbsp;";
+                        }
+
+                        markup += "</div>";
+                        markup += "</div>";
+
+                        if (result[x].broadcastQuarterNbr == 1) {
+                            $("#btabs-animated-slideup-4q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 2) {
+                            $("#btabs-animated-slideup-1q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 3) {
+                            $("#btabs-animated-slideup-2q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 4) {
+                            $("#btabs-animated-slideup-3q").html(markup);
+                        }
+                    }
+                }
+
+                if ($("#btabs-animated-slideup-4q").html() == "") {
+                    markup = "<p>No schedule for this quarter.";
+                    $("#btabs-animated-slideup-4q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-1q").html() == "") {
+                    markup = "<p>No schedule for this quarter.";
+                    $("#btabs-animated-slideup-1q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-2q").html() == "") {
+                    markup = "<p>No schedule for this quarter.";
+                    $("#btabs-animated-slideup-2q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-3q").html() == "") {
+                    markup = "<p>No schedule for this quarter.";
+                    $("#btabs-animated-slideup-3q").html(markup);
+                }
+
+            },
+            error: function (response) {
+                swal('Wait ...', response, 'error');
+            }
+        });
+
+    }
+
+    function ChangeCountry(_countryid, _countryshort) {
+        GetClients (_countryid);
+        SaveSettings("ScheduleProposalLog_CountryId", _countryid);
+    }
+
+    function ChangePlanYear(_year) {
+        GetSchedule();
+        SetupQuarters(_year);
+        SaveSettings("ScheduleProposalLog_PlanYear", _year);
+    }
+
+    function ChangeClient(_clientid) {
+        GetSchedule();
+        SaveSettings("ScheduleProposalLog_ClientId", _clientid);
+    }
+
+
+    function SetupQuarters(_year) {
+        $("#Q4").html("Q4 " + (_year-1)).show();
+        $("#Q1").html("Q1 " + _year).show();
+        $("#Q2").html("Q2 " + _year).show();
+        $("#Q3").html("Q3 " + _year).show();
+    }
+        
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!--
+        <div class="block block-themed">
+            <div class="block-header @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                <h3 class="block-title">Manage Media</h3>
+            </div>
+        </div>
+            -->
+        @Html.Partial("~/Views/ManageMedia/_ManageMediaSel.cshtml", Model)
+        <div class="block block-themed">
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-country">Country</label><br />
+                                    @foreach (var country in Model.Countries)
+                                    {
+                                        if (country.CountryId == Model.LastSelectedCountryId)
+                                        {
+                                            <label class="css-control css-control-danger css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" checked="checked" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control css-control-danger css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label for="mega-lastname">Plan Year Type</label><br />
+                                    <label class="css-control css-control-danger css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" checked="checked">
+                                        <span class="css-control-indicator"></span> Broadcast
+                                    </label>
+                                    <!--
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" >
+                                        <span class="css-control-indicator"></span> Calendar
+                                    </label>
+                                        -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="mega-lastname">Plan Year</label>
+                                    <select name="ddlplanyear" id="ddlplanyear" class="form-control" size="1" onchange="javascript: ChangePlanYear(this.value);">
+                                        @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 2; idx++)
+                                        {
+                                            @if (idx == Model.LastSelectedPlanYear)
+                                            {
+                                                <option value="@idx" selected>@idx</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idx">@idx</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlnetwork">Network Name</label>
+                                    <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="1" onchange='javascript: ChangeNetwork(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlclients">Client Name</label>
+                                    <select class="form-control" id="ddlclients" name="ddlclients" size="1" onchange='javascript: ChangeClient(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <a class="btn btn-danger"
+                               asp-controller="ScheduleProposal"
+                               asp-action="DisplaySchedules">
+                                Display List of all Schedules
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="block">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group-row">
+                                <div class="col-12">
+                                    <!-- Block Tabs Animated Slide Up -->
+                                    <div class="block">
+                                        <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 1)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 2)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 3)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 4)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+
+                                            </li>
+                                            <li class="nav-item ml-auto">
+                                                <a class="nav-link" href="#btabs-animated-slideup-4q"><i class="si si-settings"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="block-content tab-content overflow-hidden">
+                                            @if (Model.LastQuarter == 1)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 2)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 3)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 4)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            <div class="tab-pane fade fade-up" id="btabs-animated-slideup-settings" role="tabpanel">
+                                                <h4 class="font-w400">Settings Content</h4>
+                                                <p>Content slides up..</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END Block Tabs Animated Slide Up -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="block block-themed">
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+<script language="javascript" type="text/javascript">
+    GetClients(@Model.LastSelectedCountryId);
+    SetupQuarters(@Model.LastSelectedPlanYear);
+    $("#Q1, #Q2, #Q3, #Q4").on('click', function (e) {
+        SaveSettings("ScheduleProposalLog_BroadcastQuarterNbr", parseInt(this.id.slice(1)) == 4 ? 1 : parseInt(this.id.slice(1)) + 1);
+    });
+</script>

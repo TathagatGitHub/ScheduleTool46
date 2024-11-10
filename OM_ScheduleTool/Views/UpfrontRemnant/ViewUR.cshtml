@@ -1,0 +1,51 @@
+﻿@model ViewUpfrontsViewModel
+<style type="text/css">
+    div.cb-dropdown-wrap:hover {
+        z-index: 2;
+    }    
+    #UpfrontTable_wrapper {
+        overflow-y: scroll;
+        height: 580px;
+        background-color: white;
+    }
+
+    #UpfrontTable thead th {
+        position: sticky;
+        top: 0px !important;
+        z-index: 1;
+        background-color: white;
+    }
+    #UpfrontTable thead th:hover {
+        z-index: 2;
+    }
+    body {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .HeaderPropertyName .cb-dropdown-wrap:hover {
+        width: 350px !important;
+    }
+    .HeaderStartTime .cb-dropdown-wrap:hover, .HeaderEndTime .cb-dropdown-wrap:hover {
+        width: 120px !important;
+    }
+
+    .HeaderSPBuy span:empty {
+        display: inline-block;
+    }
+</style>
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/UpfrontRemnant/_Header.cshtml", Model)
+            </div>
+        </div>
+        @Html.Partial("~/Views/UpfrontRemnant/_DataTable_View.cshtml", Model)
+    </div>
+</main>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width()-20);
+    });
+</script>

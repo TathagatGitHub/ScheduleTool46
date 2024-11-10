@@ -1,0 +1,275 @@
+﻿@*<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+
+<!-- Data Table Buttons -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css ">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+
+<!--<link rel="stylesheet" href="https://rawgit.com/wenzhixin/multiple-select/master/multiple-select.css">-->
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">*@
+<style type="text/css">
+    .bg-color {
+        background-color: #F79646;
+    }
+    
+    table.display {
+        margin: 0 auto;
+        width: 100%;
+        clear: both;
+        border-collapse: collapse;
+        table-layout: fixed;
+        word-wrap:break-word;
+    }
+    .dataTables_filter {
+       width: 50%;
+       float: right;
+       text-align: right;
+    }
+    .HeaderPropertyName {
+        min-width: 300px !important;
+        max-width: 300px !important;
+    }
+      .HeaderWeekDOW {
+        min-width: 88px !important;
+        max-width: 88px !important;
+      }
+      .HeaderStartToEnd {
+        min-width: 165px !important;
+        max-width: 165px !important;
+      }
+       .HeaderBuyType ,.HeaderDP 
+      {
+          min-width: 35px !important;
+          max-width: 35px !important;
+      }
+      .HeaderSpotLen
+      {
+        min-width: 65px !important;
+        max-width: 65px !important;
+      }
+
+    .HeaderDemoNameImport {
+        min-width: 122px!important;
+        max-width: 122px!important;
+    }
+
+    .HeaderImps, .HeaderCPM {
+         min-width: 100px!important;
+        max-width: 100px !important;
+    }
+    .HeaderRate,.HeaderWeekDay {
+        min-width: 105px !important;
+        max-width: 105px !important;
+    }
+
+    .hideThis {
+        display: none;
+    }
+
+    .potential-match {
+        background-color: #d3eafd;
+    }
+    /*ST-720*/
+    .fully-actualized-header {
+        background-color: #F79646!important;
+    }
+
+    .actualized-week-text {
+        font-weight: 600!important;
+        font-size: 1.557143rem!important;
+        color: #F79646 !important;
+    }
+
+    .fully-actualized {
+        background-color: #899499 !important;
+    }
+
+    .fully-actualized-text {
+        color: #899499 !important;
+    }
+</style>
+
+<div class="modal fade" id="modal-ImportUnAllocatedProposals" tabindex="-1" role="dialog"
+     aria-labelledby="modal-ImportUnAllocatedProposals" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width: 198%;max-height: 95%;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0" style="height:100%;overflow-y:auto;">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="ImportHeadingData"></h3>
+                    <div class="block-options">
+                        <button type="button" id="btnCloseImport" class="btn-block-option" 
+                        data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="DivOverLayPopoupImport" class="overlay" style="display: none; width: 100%!important;z-index:10000000;">
+                    <div style="text-align:center;position:absolute;vertical-align:middle;color:blue;height:150px;width:150px;left:50%;top:50%;margin-left:-75px;margin-top:-75px;">
+                        <img src="~/img/loadingImg.gif" style="height:60px;width:60px;" />
+                    </div>
+                </div>
+                <div class="block-content" style="max-width: 100%;Overflow:scroll;max-height: 95%;padding:0;margin:0;">
+                    <div class="form-group row gutters-tiny">
+                        <div class="block-content block-content-full" id="divUnAllocatedNetworks">
+                            <div id="divTotalSectionData" style="display:inline-block;"> 
+                                <div style="float:left;">
+                                    <span id="spnCurNetworkName" style="font-size:16px;font-weight:bold;"></span>
+                                    <p id="divFullyActualizedWarning" style="display:none;" class="actualized-week-text">Deal file only contains spot data for actualized weeks.<br /> Please Ignore to open the Proposal.</p>
+                                </div>
+                                        <table id="TotalData" class="compact table-bordered nowrap importtotal"  cellpadding="0" cellspacing="0">
+                                            <thead id="thTotalData">
+                                            </thead>
+                                            <tbody id="tbTotalData">
+                                            </tbody>
+                                        </table>
+                            </div>
+                            <div class="propheading cleafix" style="width:100%;border:2px solid #000; text-align:center;background-color:#9ccc65;color:black; font-size:18px;font-weight:bold;padding:3px 0;margin-top:10px;text-transform: uppercase;">
+                                Matched Properties
+                            </div>
+                                    <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap"
+                                   id="SingleMatchedProposals" name="SingleMatchedProposals" style="width:95%;border: 1px solid #e5e5e5;">
+                                    <thead id="thSingleMatchedProposals">
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderPropertyName dtBackgroundColor filterhead highZindex">Property Name</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderWeekDOW dtBackgroundColor filterhead highZindex">DOW</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderStartToEnd dtBackgroundColor filterhead highZindex">Start - End</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderBuyType dtBackgroundColor filterhead highZindex">BT</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDP dtBackgroundColor filterhead highZindex" >DP</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderSpotLen dtBackgroundColor filterhead highZindex">SpotLen</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDemoNameImport dtBackgroundColor filterhead highZindex">Demo Name</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderRate dtBackgroundColor filterhead highZindex">Rate</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderImps dtBackgroundColor filterhead highZindex">IMP</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">CPM</th>
+                                        <th></th>
+                                        <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">Tot Spots</th>
+                                    </thead>
+                                    <tbody id="tbSingleMatchedProposals">
+                                    </tbody>
+                                </table>
+                                <br />
+                            <div class="propheading clearfix" style="width:100%;border:2px solid #000; text-align:center;background-color:#D7E4BC;color:black; font-size:18px;font-weight:bold;padding:3px 0;margin-top:10px;text-transform: uppercase;">
+                                MULTIPLE MATCHED PROPERTIES
+                            </div>
+                                <table width="100%" class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap"
+                                   style="width:100%;border: 1px solid #e5e5e5;" id="MultiMatchedProposals" name="MultiMatchedProposals">
+                                    <thead id="thMultiMatchedProposals">
+                                         <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderPropertyName dtBackgroundColor filterhead highZindex">Property Name</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderWeekDOW dtBackgroundColor filterhead highZindex">DOW</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderStartToEnd dtBackgroundColor filterhead highZindex">Start - End</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderBuyType dtBackgroundColor filterhead highZindex">BT</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDP dtBackgroundColor filterhead highZindex" >DP</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderSpotLen dtBackgroundColor filterhead highZindex">SpotLen</th>
+                                            <th></th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDemoNameImport dtBackgroundColor filterhead highZindex">Demo Name</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderRate dtBackgroundColor filterhead highZindex">Rate</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderImps dtBackgroundColor filterhead highZindex">IMP</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">Tot Spots</th>
+                                            <th></th>
+                                    </thead>
+                                    <tbody id="tbMultiMatchedProposals">
+                                    </tbody>
+                                </table>
+                            <div style="width:100%;height:45px;text-align:right;padding:5px;" id="divChooseMaches">
+                                @*<input type="button" id="btnChooseMatches" style="float: right;"
+                                       value="Choose Matches"
+                                       class="btn btn-alt-success"
+                                       onclick="return ChooseMatches();" data-type="view">*@
+                            </div>
+                            <div id="divUnMatchedHeading" class="propheading clearfix" style="width:100%;height:40px;border:2px solid #000; text-align:center;background-color:#f8ff70;color:black; font-size:18px;font-weight:bold;padding:3px 0;margin-top:10px;text-transform: uppercase;">
+                                NO MATCHED PROPERTIES - PLEASE CREATE PROPERTIES TO COMPLETE THE MATCH (N/A TO ACTUALIZED WEEKS)
+                            </div>
+                            
+                                <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap"
+                                   style="width:100%;border: 1px solid #e5e5e5;" id="UnMatchedProposals" name="UnMatchedProposals">
+                                    <thead id="thUnMatchedProposals">
+                                         <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderPropertyName dtBackgroundColor filterhead highZindex">Property Name</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderWeekDOW dtBackgroundColor filterhead highZindex">DOW</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderStartToEnd dtBackgroundColor filterhead highZindex">Start - End</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderBuyType dtBackgroundColor filterhead highZindex">BT</th>
+                                            <th></th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDP dtBackgroundColor filterhead highZindex" >DP</th>
+                                            <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderSpotLen dtBackgroundColor filterhead highZindex">SpotLen</th>
+                                            <th></th>
+                                        <th class="d-none d-sm-table-cell text-center align-text-top HeaderType HeaderDemoNameImport dtBackgroundColor filterhead highZindex">Demo Name</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderRate dtBackgroundColor filterhead highZindex">Rate</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderImps dtBackgroundColor filterhead highZindex">IMP</th>
+                                            <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">CPM</th>                                       
+                                            <th></th>
+                                        <th class="d-none d-sm-table-cell text-center text-right align-text-top HeaderType HeaderCPM dtBackgroundColor filterhead highZindex">Tot Spots</th>
+                                    </thead>
+                                    <tbody id="tbUnMatchedProposals">
+                                    </tbody>
+                                </table>
+                            
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">                
+                <input type="button" id="btnbackImport" value="Back" class="btn btn-alt-secondary" onclick="BacktoUnAllocatedProposals(0)" data-type="view" />
+                <button type="button" id="btnCloseImport2"  class="btn btn-alt-secondary" onclick="ClosedImportPopup();">Close</button>                
+                <input type="button" id="btnIgnoreImport" value="Ignore" class="btn btn-alt-danger" data-type="view" onclick="IgnoreImportingNetwork();" />
+                <input type="button" id="btnChooseMatches" style="float: right;display:none;"
+                       value="Choose Matches"
+                       class="btn btn-alt-success"
+                       onclick="return ChooseMatches();" data-type="view">
+                <input type="button" id="btnConfirmMatches2" style="float: right;display:none;"
+                       value="Confirm Matches"
+                       class="btn btn-alt-success"
+                       onclick="return GotoConfirmMatches();" data-type="view">
+
+            </div>
+        </div>
+    </div>
+</div>
+

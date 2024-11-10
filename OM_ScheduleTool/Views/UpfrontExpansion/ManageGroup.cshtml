@@ -1,0 +1,89 @@
+
+@model UpfrontExpansionGroupingViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script type="text/javascript">
+
+    function GetNetworkGroups() {
+        $.ajax({
+            url: "/UpfrontExpansion/GetNetworkGroups",
+            data: {
+                Year: $("#selectedYear").val(),
+                CountryId: $("#CountryId option:selected").val(),
+                Country: $("#CountryId option:selected").text()
+            },
+            cache: false,
+            type: "GET",
+            success: function (result) {
+                $("#divNetworkGroups").html(result);
+                if ($("#selectedYear").val() >= new Date().getFullYear()) {
+                    
+                    document.getElementById("btnAddNewNetworkGroup").style.visibility = "visible";
+                }
+                else
+                    document.getElementById("btnAddNewNetworkGroup").style.visibility = "hidden";
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });
+
+    }
+
+    function ShowError() {
+        swal('Error!', 'Error encountered', 'error');
+    }
+
+</script>
+
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Manage Upfront Expansion Groups</h3>
+            </div>
+            
+            <div class="block-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <div class="col-12 col-lg-2">
+                                <label>Select Plan Year</label>
+                                @Html.DropDownListFor(m => m.selectedYear, new SelectList(Model.Year), new { @class = "form-control", @onchange = "GetNetworkGroups();" })
+                            </div>
+
+                            <div class="col-12 col-lg-3">
+                                <label>Select Country to List Networks</label>
+                                @Html.DropDownListFor(m => m.CountryId, new SelectList(Model.Countries, "CountryId", "CountryShort"), new { @class = "form-control", @onchange = "GetNetworkGroups();" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <div class="col-11">
+                                <label>Network Groupings</label>
+                                <div id="divNetworkGroups">
+                                    @await Html.PartialAsync("_NetworkGroup", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group row">
+                    <div class="col-12">
+                        <button id="btnAddNewNetworkGroup" type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-network-group"><i class="fa fa-object-group mr-5"></i> Add New Network Group</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>        
+    </div>
+</main>

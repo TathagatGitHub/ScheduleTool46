@@ -1,0 +1,510 @@
+﻿@model DemographicSettingsViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript">
+
+    $("document").ready(function () {
+        PopulateYears();
+
+        $("#btnSaveUpdate").click(function () {
+
+            if ($('.js-validation-bootstrap').validate().element("#textEditDemographicName") == true && $('.js-validation-bootstrap').validate().element("#textEditUniverse") == true) {
+
+                var settingsId = 0;
+                // var sortOrder = 0;
+                var demographicName = $('#textEditDemographicName').val();
+                var universe = $('#textEditUniverse').val();
+                // Clicks the add button
+                if ($('#textEditSettingsId').val() != "") {
+                    settingsId = $('#textEditSettingsId').val();
+                    // sortOrder = $('#tblDemoUniverse > tbody > tr').length + 1;
+                }
+                SaveDemoUniverse(settingsId, sortOrder, demographicName, universe);
+            }
+        });
+    });
+
+    var sortOrder = 0;
+    
+    function ChangeCountry() {
+        PopulateYears();
+        if ($("#ddlYear").val() > 0) {
+            $("#divDemoUniverse").removeAttr("hidden");
+        }
+        else {
+            $("#divDemoUniverse").attr("hidden", "hidden");
+        }
+    }
+
+    function ChangeYear(_actionid) {
+        if ($("#ddlYear").val() > 0) {
+            $("#btnAddRow").removeAttr("hidden");
+            $("#divDemoUniverse").removeAttr("hidden");
+            PopulateDemoUniverse(1, 4);
+            $.ajax({
+                url: "/CreateNewProperty/GetQuarters",
+                data: {
+                    Year: $("#ddlYear").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {                    
+                    var year = $("#ddlYear").val();
+                    var quarter4 = "4Q" + (year - 1);
+                    var quarter1 = "1Q" + year;
+                    var quarter2 = "2Q" + year;
+                    var quarter3 = "3Q" + year;
+
+                    if (result.findIndex(x => x.text == quarter4) == -1 || result.findIndex(x => x.text == quarter1) == -1
+                        || result.findIndex(x => x.text == quarter2) == -1 || result.findIndex(x => x.text == quarter3) == -1) {
+                        $("#btnAddRow").attr("hidden", "hidden");
+                    }
+                },
+                error: function (response, exception) {
+                    $("#btnAddRow").attr("hidden", "hidden");
+                }
+            });
+        }
+        else {
+            $("#btnAddRow").attr("hidden", "hidden");
+            $("#divDemoUniverse").attr("hidden", "hidden");
+        }
+    }
+
+    function Move(_sortorder, idx) {
+        var downSortOrder, downSettingsId, downDemoName, downUniverse, downButtons;
+        var upSortOrder, upSettingsId, upDemoName, upUniverse, upButtons;
+
+        var table = document.getElementById("tblDemoUniverse");
+        if (idx < 0) {
+            downSortOrder = _sortorder + 1;
+            upSortOrder = _sortorder;
+        }
+        else {
+            downSortOrder = _sortorder-1;
+            upSortOrder = _sortorder;
+        }
+
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            if (row.cells[0].innerHTML == downSortOrder) {
+                downSettingsId = row.cells[1].innerHTML;
+                downDemoName = row.cells[2].innerHTML;
+                downUniverse = row.cells[3].innerHTML;
+                downButtons = row.cells[5].innerHTML;
+            }
+            else if (row.cells[0].innerHTML == upSortOrder) {
+                upSettingsId = row.cells[1].innerHTML;
+                upDemoName = row.cells[2].innerHTML;
+                upUniverse = row.cells[3].innerHTML;
+                upButtons = row.cells[5].innerHTML;
+            }
+        }
+
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            if (row.cells[0].innerHTML == upSortOrder) {
+                row.cells[1].innerHTML = downSettingsId;
+                row.cells[2].innerHTML = downDemoName;
+                row.cells[3].innerHTML = downUniverse;
+                row.cells[4].innerHTML = "<button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type= 'button'><i class='fa fa-check'></i></button>";
+                row.cells[5].innerHTML = downButtons;
+            }
+            else if (row.cells[0].innerHTML == downSortOrder) {
+                row.cells[1].innerHTML = upSettingsId;
+                row.cells[2].innerHTML = upDemoName;
+                row.cells[3].innerHTML = upUniverse;
+                row.cells[4].innerHTML = "<button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type= 'button'><i class='fa fa-check'></i></button>";
+                row.cells[5].innerHTML = upButtons;
+            }
+        }
+
+
+    }
+
+    function UpdateDemoUniverse() { 
+
+        var table = document.getElementById("tblDemoUniverse");
+        if ($("#textEditSettingsId").val() == "")
+        {
+            var rows = "<tr>"
+                + "<td class='text-center'>" + table.rows.length + "</td>"
+                + "<td class='text-center' hidden>" + "</td>"
+                + "<td>" + $("#textEditDemographicName").val() + "</td>"
+                + "<td class='text-center' id='tdUniverse' name='tdUniverse'>" + $("#textEditUniverse").val() + "</td>";
+
+                rows = rows + "<td class='d-none d-sm-table-cell text-center'>NEW</td>";
+
+                rows = rows + "<td class='text-center'>";
+
+                rows = rows
+                    + "<button type='button' class='btn btn-sm btn-secondary' data-toggle='tooltip' title='Delete' disabled>"
+                    + "<i class='fa fa-times'></i>"
+                    + "</button>"
+                    + "</div>";
+
+                rows = rows
+                    + "</td>";
+
+            rows = rows
+                + "</tr>";
+            $('#tblDemoUniverse tbody').append(rows);
+        }
+        else {
+            for (var i = 0, row; row = table.rows[i]; i++) {
+                if (row.cells[1].innerHTML == $("#textEditSettingsId").val()) {
+                    row.cells[2].innerHTML = $("#textEditDemographicName").val();
+                    row.cells[3].innerHTML = $("#textEditUniverse").val();
+                    row.cells[4].innerHTML = "<button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type= 'button'><i class='fa fa-check'></i></button>";
+                    break;
+                }
+            }
+        }
+
+    }
+
+    function EditDemographicName(_settingsid, _sortOrder, _demoname, _universe) {
+        BeFormValidation.resetValidationBootstrap();
+        sortOrder = _sortOrder;
+        if (_settingsid != 0) {
+            $('#textEditSettingsId').val(_settingsid);
+            $('#textEditDemographicName').val(_demoname);
+            $('#textEditUniverse').val(_universe);
+            $('#btnSaveUpdate').html("<i class='fa fa- check'></i> Update Demo");
+            $('#hDemographicText').text('Edit Demographic');
+            $('#textEditDemographicName').attr("disabled", "disabled");
+            $('#modal-edit-demographic-name').modal('show');               
+        }
+        else {
+            $('#textEditSettingsId').val("");
+            $('#textEditDemographicName').val("");
+            $('#textEditUniverse').val("");
+            $('#btnSaveUpdate').html("<i class='fa fa- check'></i> Add Demo");
+            $('#hDemographicText').text('Add Demographic');
+            $('#textEditDemographicName').removeAttr("disabled");
+            $('#modal-edit-demographic-name').modal('show');
+        }
+    }
+
+    function PopulateYears() {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlYear").html(procemessage).show();
+
+        var url = "/DemographicSettings/GetPlanYears";
+
+        $.ajax({
+            url: url,
+            data: {
+                CountryId: $("#ddlCountry").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "<option value='0'> Please select </option>";
+                for (var x = 0; x < result.length; x++) {
+                    markup += "<option value=" + result[x].text + ">" + result[x].text + "</option>";
+                }
+                $("#ddlYear").html(markup).show();
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+    }
+
+    function PopulateDemoUniverse(_sort, _actionid) {
+        $("#tblDemoUniverse tbody tr").remove();
+
+        var url = "/DemographicSettings/GetDemoUniverse";
+
+        $.ajax({
+            url: url,
+            data: {
+                CountryId: $("#ddlCountry").val(),
+                PlanYr: $("#ddlYear").val(),
+                Sort: _sort
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+
+                for (var x = 0; x < result.length; x++) {
+                    var rows = "<tr>"
+                        + "<td class='text-center'>" + result[x].sortOrder + "</th>"
+                        + "<td class='text-center' hidden>" + result[x].demographicSettingsId + "</th>"
+                        + "<td>" + result[x].demographicName + "</td>"
+                        + "<td class='text-center' id='tdUniverse' name='tdUniverse'>" + result[x].universe + "</td>";
+
+                    if (_actionid == 4) {
+                        // rows = rows + "<td class='d-none d-sm-table-cell text-center'></td>";
+
+                        rows = rows
+                            + "<td class='text-center'>";
+
+                        if (x > 0) {
+                             rows = rows
+                                + "<div class='btn-group'>"
+                                //+ "<button type='button' class='btn btn-sm btn-secondary' data-toggle='tooltip' title='Move Up' onclick='javascript: Move(" + result[x].sortOrder + ", 1); '>"
+                                //+ "<i class='fa fa-arrow-up'></i>"
+                                //+ "</button>";
+                        }
+
+                        if (x < result.length - 1) {
+                            //rows = rows
+                                //+ "<button type='button' class='btn btn-sm btn-secondary' data-toggle='tooltip' title='Move Down' onclick='javascript: Move(" + result[x].sortOrder + ", -1); '>"
+                                //+ "<i class='fa fa-arrow-down'></i>"
+                                //+ "</button>";
+                        }
+
+                        rows = rows
+                            + "<button type='button' class='btn btn-sm btn-secondary' data-toggle='tooltip' title='Edit' onclick='javascript: EditDemographicName(" + result[x].demographicSettingsId + ',' + result[x].sortOrder + ',"' + result[x].demographicName + '", "' + result[x].universe + '"' + ");'>"
+                            + "<i class='fa fa-pencil'></i>"
+                            + "</button>";
+
+                        rows = rows
+                            //+ "<button type='button' class='btn btn-sm btn-secondary' data-toggle='tooltip' title='Delete' disabled>"
+                            //+ "<i class='fa fa-times'></i>"
+                            //+ "</button>"
+                            + "</div>";
+
+                        rows = rows
+                            + "</td>";
+                    }
+
+                    rows = rows
+                        + "</tr>";
+                    $('#tblDemoUniverse tbody').append(rows);
+                }
+                $("#divErrorMessage").attr("hidden", "hidden");
+            },
+            error: function (response) {
+                $("#divErrorMessage").removeAttr("hidden");
+                $("#labelErrorMessage").text(responseText);
+            }
+        });
+    }
+
+    function SaveAllDemoUniverse()
+    { 
+        var table = document.getElementById("tblDemoUniverse");
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            //for (var j = 0, col; col = row.cells[j]; j++) {
+            if (row.cells[4].innerHTML != "" ) {
+                SaveDemoUniverse(row.cells[1].innerHTML
+                    , row.cells[0].innerHTML
+                    , row.cells[2].innerHTML
+                    , row.cells[3].innerHTML);
+                row.cells[4].innerHTML = "";
+            }
+            //}
+        }
+    }
+
+    function SaveDemoUniverse(_settingsid, _sortorder, _demoname, _universe) {
+        var url = "/DemographicSettings/SaveDemoNameUniverse";
+
+        $.ajax({
+            url: url,
+            data: {
+                SettingsId: _settingsid,
+                SortOrder: _sortorder, 
+                DemoName: _demoname,
+                Universe: _universe,
+                CountryId: $("#ddlCountry").val(),
+                PlanYr: $("#ddlYear").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    var notify = $.notify(result.responseText, {
+                        type: 'success',
+                        allow_dismiss: true,
+                        z_index : 9999
+                    });
+                    $('#modal-edit-demographic-name').modal('hide');
+                    ChangeYear(0);
+
+                }
+                else {
+                    var notify = $.notify(result.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true,
+                        z_index: 9999
+                    });
+                }
+            },
+            error: function (response) {
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true,
+                    z_index: 9999
+                });
+            }
+        });
+
+        // $("#btnSaveUpdate").attr("disabled", "disabled");
+
+    }
+
+    function ValidateInputs() {
+        var intRegex = /^\d+$/;
+        var floatRegex = /^((\d+(\.\d *)?)|((\d*\.)?\d+))$/;
+
+        var strUniverse = $('#textEditUniverse').val();
+        if (intRegex.test(strUniverse) && $("#textEditDemographicName").val().length > 0) {
+             $('#btnSaveUpdate').removeAttr("disabled");
+            // return true;
+        }
+        else {
+             $("#btnSaveUpdate").attr("disabled", "disabled");
+            // return false;
+        }
+    }
+
+    function ExporttoExcel() {
+        if ($("#ddlYear option:selected").val() == 0) {
+            alert('Please select Plan Year');
+        }
+        else {
+            window.location.href = '/DemographicSettings/ExportToExcel?countryId=' + $("#ddlCountry option:selected").val() + "&planYr=" + $("#ddlYear option:selected").val();
+        }
+    }
+
+
+</script>
+<main id="main-container" style="min-height: 629.1px;">
+    <div class="content">
+        <div class="row row-deck gutters-tiny">
+            <div class="col-lg-12">
+                <div class="block">
+                    <div class="block block-themed block-rounded">
+                        <div class="block-header bg-primary">
+                            <h3 class="block-title">Demographic Settings</h3>
+                        </div>
+                        <div class="block-content">
+                            <div class="alert alert-danger" id="divErrorMessage" name="divErrorMessage" hidden>
+                                <h3 class="alert-heading font-size-h4 font-w400">Error</h3>
+                                <p class="mb-0"><label id="labelErrorMessage" name="labelErrorMessage"></label></p>
+                            </div>
+                            <div class="alert alert-success" id="divSuccessMessage" name="divSuccessMessage" hidden>
+                                <h3 class="alert-heading font-size-h4 font-w400">Success</h3>
+                                <p class="mb-0"><label id="labelSuccessMessage" name="labelSuccessMessage"></label></p>
+                            </div>
+                            <input id="textCanEditPermission" name="textCanEditPermission" value="@Model.DemographicSettingsAction" hidden />
+                            @using (Html.BeginForm())
+                            { 
+                                <div class="form-group row gutters-tiny">
+                                    <div class="col-6">
+                                        <label for="ddlCountry" id="labelCountry" name="labelCountry">Country</label>
+                                        <select name="ddlCountry" class="form-control" id="ddlCountry" onchange="javascript: ChangeCountry();">
+                                            @*@if (Model.LoggedOnUser.US_User == true)
+                                            {*@
+                                            <option value="5" selected>US</option>
+                                                @*}*@
+                                            @*@if (Model.LoggedOnUser.CA_User == true)
+                                            {*@
+                                            <option value="2">CA</option>
+                                            @*}*@
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="ddlYear" id="labelPlanYear" name="labelPlanYear">Plan Year</label>
+                                        <select name="ddlYear" class="form-control" id="ddlYear" onchange="javascript: ChangeYear($('#textCanEditPermission').val());">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="block" id="divNoPlanYear" name="divNoPlanYear">
+                                    <p>Please select plan year to view Demographic Settings.</p>
+                                </div>
+                                <div class="block" id="divDemoUniverse" name="divDemoUniverse" hidden>
+                                    <table class="table table-bordered table-striped table-vcenter " id="tblDemoUniverse" name="tblDemoUniverse">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;" onclick="javascript: PopulateDemoUniverse(0, 4);">#</th>
+                                                <th class="text-center" style="width: 50px;" hidden>#</th>
+                                                <th onclick="javascript: PopulateDemoUniverse(1, 4);">Demo</th>
+                                                <th class="d-none d-sm-table-cell text-center" style="width: 15%;" onclick="javascript: PopulateDemoUniverse(2, 4);">Universe</th>
+                                                @*@if (Model.DemographicSettingsAction == 4)
+                                                {*@
+                                                @*<th class="d-none d-sm-table-cell text-center" style="width: 15%;">Updated</th>*@
+                                                <th class="text-center" style="width: 15%;">Actions</th>
+                                                @*}*@
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                                <div class="block">
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                             @*@if (Model.DemographicSettingsAction == 4)
+                                             {*@
+                                                @*<button type="button" class="btn btn-alt-success" data-toggle='tooltip' title='Save Updated Changes' onclick="javascript: SaveAllDemoUniverse();"><i class="fa fa-check mr-5"></i> Save Changes</button>*@
+                                                <button id="btnAddRow" name="btnAddRow" class="btn btn-alt-primary" type="button" data-toggle='tooltip' title='Add New Demographic' hidden onclick="javascript: EditDemographicName(0,0, 0, 0);"><i class="fa fa-plus mr-5"></i> Add Demographic</button>
+                                             @*}*@
+                                             <button type="button" class="btn btn-alt-primary" data-toggle='tooltip' title='Export to Excel' onclick="javascript: ExporttoExcel();"><i class="fa fa-file-text mr-5"></i> Export to Excel</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-edit-demographic-name" tabindex="-1" role="dialog" aria-labelledby="modal-edit-demographic-name" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            @using (Html.BeginForm("btnSaveUpdate", "DemographicSettings", FormMethod.Post, new { @class = "js-validation-bootstrap" }))
+            {
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title" id="hDemographicText" >Edit Demographic</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @*<div class="block-content">
+                        <h5 class="font-w300">Demographic information is not saved until you press <strong>SAVE CHANGES</strong> on the main Demographic Settings screen. </h5>
+                    </div>*@
+                    <div class="block-content">
+                        <div class="form-group row" hidden>
+                            <label class="col-12" for="textEditDemographicName">Demographic Settings Id</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="textEditSettingsId" name="textEditSettingsId">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="textEditDemographicName">Demographic Name (Required)</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="textEditDemographicName" name="textEditDemographicName" >
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="textEditUniverse">Universe</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="textEditUniverse" name="textEditUniverse" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success"  id="btnSaveUpdate" name="btnSaveUpdate" >
+                        <i class="fa fa-check"></i> Update
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+</main>
+

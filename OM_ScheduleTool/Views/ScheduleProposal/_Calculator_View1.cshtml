@@ -1,0 +1,164 @@
+@model ProposalViewModel
+
+<style type="text/css">
+    .CanadaQNameWidth{
+        min-width:370px!important
+    }
+
+    .USQNameWidth {
+        min-width: 290px !important
+    }
+
+    .ViewCanadaQNameWidth {
+        min-width: 370px !important
+    }
+
+    .ViewUSQNameWidth {
+        min-width: 290px !important
+    }
+   
+</style>
+
+<div class="block block-themed block-rounded" id="divCalculatorEdit">
+    @if (Model.ProposalInfo.ScheduleType.ScheduleTypeId == 1)
+    {
+        <div class="block-header block-header-default bg-success">
+            <h3 class="block-title">Totals for @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                @if (Model.ProposalInfo.CountryId == 2)
+                {
+                    <button id="ShowHideUSDRates" class="btn-block-option" type="button">
+                        <i class="fa fa-dollar"></i>
+                    </button>
+                }
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="block-header block-header-default bg-pulse">
+            <h3 class="block-title">Totals for @Model.ProposalInfo.ScheduleName</h3>
+            <div class="block-options">
+                @if (Model.ProposalInfo.CountryId == 2)
+                {
+                    <button id="ShowHideUSDRates" class="btn-block-option" type="button">
+                        <i class="fa fa-dollar"></i>
+                    </button>
+                }
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"></button>
+            </div>
+        </div>
+    }
+    <div class="block-content" id="resize_wrapper">
+        <input id="showgi" value="-1" type="hidden" />
+        <input id="countryid" value="@Model.ProposalInfo.CountryId" type="hidden" />
+        <input id="CalcExch" value="0" type="hidden" />
+        <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+        <!--<table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="UpfrontTable" name="UpfrontTable">-->
+        <table class="display compact nowrap" border="1" id="CalculatorEditTable" name="CalculatorEditTable">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell dtBackgroundColor calculatorEditTableTotalsHeader" style='max-width:350px!important'>TOTALS</th>
+
+
+                    @*<th class="d-none d-sm-table-cell dtBackgroundColor" >TOTALS</th>*@
+
+                    @if ((@Context.Request.Path.ToString().Contains("ViewSchedule") || @Context.Request.Path.ToString().Contains("ViewProposal")) ? true : false)
+                    {
+                        <th class="d-none d-sm-table-cell text-center dtBackgroundColor @(Model.ProposalInfo.CountryId == 2 ? "ViewCanadaQNameWidth" : "ViewUSQNameWidth")">@Model.ProposalQuarter.QuarterName</th>
+                    }
+                    else
+                    {
+                        <th class="d-none d-sm-table-cell text-center dtBackgroundColor @(Model.ProposalInfo.CountryId == 2 ? "CanadaQNameWidth" : "USQNameWidth")">@Model.ProposalQuarter.QuarterName</th>
+                    }
+
+                    @*<th class="d-none d-sm-table-cell text-center dtBackgroundColor">@Model.ProposalQuarter.QuarterName</th>*@
+
+                    @if (Model.ProposalQuarter.Wk01_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk01_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk01_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk02_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk02_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk02_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk03_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk03_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk03_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk04_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk04_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk04_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk05_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk05_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk05_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk06_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk06_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk06_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk07_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk07_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk07_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk08_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk08_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk08_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk09_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk09_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk09_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk10_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk10_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk10_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk11_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk11_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk11_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk12_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk12_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk12_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk13_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk13_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk13_Date)</th>
+                    }
+                    @if (Model.ProposalQuarter.Wk14_Date != null)
+                    {
+                        <th class="d-none d-sm-table-cell text-center @(Model.ProposalInfo.ScheduleType.ScheduleTypeId == 2 && Model.SchedWeekLock.Wk14_Lock ? "bg-color" : "")" style='min-width:105px!important'>@String.Format("{0:MM/dd/yy}", Model.ProposalQuarter.Wk14_Date)</th>
+                    }
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<script asp-append-version="true" src="~/js/scheduleproposal/Calculator.js"></script>
+
+<script language="javascript" type="text/javascript">
+    var calctable = null;
+    var bViewOnly = true;
+    $(document).ready(function () {
+        // Summary Table
+       
+
+        $("#ShowHideUSDRates").click(function () {
+            ShowHideExchangeRates();
+        });
+
+        $("#reset").click(function () {
+            if (calctable != null) {
+                $.fn.dataTable.ext.search.pop();
+                calctable.draw();
+            }
+        });
+    });
+
+
+
+</script>

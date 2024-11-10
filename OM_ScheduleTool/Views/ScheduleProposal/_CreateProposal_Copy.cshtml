@@ -1,0 +1,254 @@
+@model ManageMediaViewModel
+<link rel="stylesheet" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/css/dataTables.checkboxes.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.css" />
+
+
+<div class="modal fade" id="modal-createproposal-copy" tabindex="-1" role="dialog" aria-labelledby="modal-createproposal-copy" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm())
+            {
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Copy Proposal for <a id="CopyProposal_ClientName"></a>&nbsp;<a id="CopyProposal_QuarterName"></a></h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="block block-themed">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="ddlDemoCopy">Proposal Name:</label>
+                                    <input name="txtProposalNameCopy" class="form-control" id="txtProposalNameCopy" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="block block-themed">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="ddlDemoCopy">Select Demo:</label>
+                                    <select name="ddlDemoCopy" class="form-control" id="ddlDemoCopy" size="1"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="block block-themed">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="tblAvailableNetworksCopy">Select Network(s):</label>
+                                    <table class="display compact table-condensed nowrap" id="tblAvailableNetworksCopy" name="tblAvailableNetworksCopy" width="98%">
+                                        <thead>
+                                            <tr>
+                                                <th class="d-none d-sm-table-cell text-center"></th>
+                                                <th class="d-none d-sm-table-cell text-center">Network Name</th>
+                                                <th class="d-none d-sm-table-cell text-center">Geo</th>
+                                                <th class="d-none d-sm-table-cell text-center">Feed</th>
+                                                <th class="d-none d-sm-table-cell text-center">Media</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-alt-success" id="btnProcessCopy" onclick="javascript: ProcessCopy();">
+                    <i class="fa fa-check"></i> Create Proposal
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.js"></script>
+<script src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/js/dataTables.checkboxes.min.js"></script>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#ddlDemoCopy").change(function () {
+            GetNetworksCopy(_UniqueId);
+        });
+    });
+
+
+    function SetProposalName(_clientname, _quartername, _scheduleid) {
+        var url = "/ManageMedia/GetProposalVersion/";
+
+        $.ajax({
+            url: url,
+            data: {
+                scheduleid: _scheduleid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                $('#txtProposalNameCopy').val(_clientname + ' ' + _quartername + ' P 0 ' + result.data);
+            },
+            error: function (response) {
+                swal("error : " + response);
+            }
+        });
+
+    }
+    function CopyProposal(_quartername, _scheduleid) {
+        var procemessage = "<option value='0'> Loading demos...</option>";
+        $("#ddlDemoCopy").html(procemessage).show();
+
+        var _countryid = 5;
+        if ($('#US').is(':checked')) {
+            _countryid = 5;
+        }
+        else if ($('#CA').is(':checked')) {
+            _countryid = 2;
+        }
+
+        var url = "/ManageMedia/GetDemoByProposal/";
+
+        $.ajax({
+            url: url,
+            data: {
+                scheduleid: _scheduleid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.length > 0) {
+                    var markup = "";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlDemoCopy").html(markup).show();
+                    GetNetworksCopy(_scheduleid);
+
+                    if ($("#ddlclients")) {
+                        $("#CopyProposal_ClientName").html($("#ddlclients :selected").text());
+                    }
+                    $('#CopyProposal_QuarterName').html(_quartername);
+                    SetProposalName($("#ddlclients :selected").text(), _quartername, _scheduleid);
+                    $('#modal-createproposal-copy').modal();
+
+                }
+                else {
+                    swal({
+                        title: $("#ddlclients :selected").text() + ' ' + _quartername,
+                        text: 'There are currently no known demos for this quarter.  This should not be possible.  Please contact admin.',
+                        type: 'warning',
+                    });
+                }
+            },
+            error: function (response) {
+                swal("erroraa : " + response);
+            }
+        });
+    }
+
+    function GetNetworksCopy(_scheduleid) {
+        var _countryid = 5;
+        if ($('#US').is(':checked')) {
+            _countryid = 5;
+        }
+        else if ($('#CA').is(':checked')) {
+            _countryid = 2;
+        }
+
+        var _clientid = $("#ddlclients :selected").val()
+
+        var networktable = $('#tblAvailableNetworksCopy').DataTable({
+            dom: 'tifr',
+            scrollX: "100%",
+            scrollY: 150,
+            scrollCollapse: true,
+            paging: false,
+            destroy: true,
+            processing: true,
+            language: {
+                infoFiltered: "",
+                processing: "<i class='fa fa-refresh fa-spin'></i>"
+            },
+            ajax: {
+                url: '/ManageMedia/GetNetworksForDemoProposal',
+                type: 'POST',
+                data: function (d) {
+                    d.demographicSettingsId = $('#ddlDemoCopy').val(),
+                    d.proposalId = _scheduleid
+
+                }
+            },
+            order: [[1, 'asc']],
+            columns: [
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return '<input type="checkbox" class="editor-active" id="' + data.networkId + '">';
+                        }
+                        return data;
+                    },
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 1,
+                    data: "stdNetName",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 2,
+                    data: "country.countryShort",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 3,
+                    data: "feedType.description",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 4,
+                    data: "mediaType.mediaTypeCode",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                }
+            ],
+            fixedColumns: true,
+            initComplete: function () {
+            }
+        });
+    }
+
+    function ProcessCopy() {
+        var _networkids = '';
+        var oTable = $('#tblAvailableNetworksCopy').dataTable();
+        var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+        rowcollection.each(function (index, elem) {
+            var checkbox_value = $(elem).val();
+            var checkbox_rateId = $(elem).attr('id');
+            //Do something with 'checkbox_value
+            _networkids = _networkids + checkbox_rateId + ',';
+        });
+
+        alert(_networkids);
+
+    }
+</script>
+
+

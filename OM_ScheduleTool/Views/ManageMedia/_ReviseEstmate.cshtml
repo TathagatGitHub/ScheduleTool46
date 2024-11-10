@@ -1,0 +1,181 @@
+@model EditUpfrontsViewModel
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#btnRevise').click(function () {
+            $("#ReviseEstimateTable tr:has(:input)").each(function () {
+                $('td:has(:input)', this).each(function () {
+                    if ($(this).find(":input").is(':checked')) {
+                        var id = $(this).find(":input").attr('id');
+                        var res = id.split('-');
+                        alert(res[1]);
+                        ReviseEstimate(res[1]);
+                    }
+                });
+            });
+        });
+
+        var reviseEstimateTable = $('#ReviseEstimateTable').DataTable({
+            autoWidth: false,
+            paging: true,
+            searching: false,
+            lengthChange: false
+        });
+    });
+
+    function formatTime(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
+    function PopulateReviseEstimate(_UpfrontId) {
+
+            $.ajax({
+                url: "/ManageMedia/GetUpfrontRemnantReviseLines",
+                data: {
+                    UpfrontId: _UpfrontId
+                },
+                cache: false,
+                async: false,
+                type: "POST",
+                success: function (result) {
+                    if (result.success) {
+                        if (result.responseText.length > 0) {
+                            var retable = $('#ReviseEstimateTable').DataTable();
+                            retable.clear();
+                            for (var x = 0; x < result.responseText.length; x++) {
+                                retable.row.add([
+                                    '<label class="css-control css-control-sm css-control-primary css-checkbox"><input type="checkbox" class="css-control-input checkbox-select" id="chkRevise-' + result.responseText[x].upfrontLineId + '"/><span class="css-control-indicator"></span></label>',
+                                    result.responseText[x].demoName,
+                                    result.responseText[x].propertyName ,
+                                    (result.responseText[x].monday === true ? 'M' : '-') +
+                                    (result.responseText[x].tuesday === true ? 'T' : '-') +
+                                    (result.responseText[x].wednesday === true ? 'W' : '-') +
+                                    (result.responseText[x].thursday === true ? 'Th' : '-') +
+                                    (result.responseText[x].friday === true ? 'F' : '-') +
+                                    (result.responseText[x].saturday === true ? 'Sa' : '-') +
+                                    (result.responseText[x].sunday === true ? 'Su' : '-'),
+                                    formatTime(new Date(result.responseText[x].startTime)),
+                                    formatTime(new Date(result.responseText[x].endTime)),
+                                    result.responseText[x].buyTypeCode ,
+                                    result.responseText[x].dayPartCd,
+                                    '$' + result.responseText[x].rateAmt.toFixed(0),
+                                    result.responseText[x].impressions,
+                                    result.responseText[x].cpm.toFixed(2),
+                                    result.responseText[x].revision
+                                ]).draw(false);
+                            }
+                            $('#modal-reviseestimate').modal();
+                        }
+                    }
+                    else {
+                        swal("Wait", result.responseText, "warning");
+                    }
+
+                },
+                error: function (response) {
+                    $('#modal-reviseestimate').modal('toggle');
+                    var notify = $.notify(response.responseText, {
+                        type: 'danger',
+                        allow_dismiss: true
+                    });
+                }
+
+        });
+    }
+
+    function ReviseEstimate(_UpfrontLineId) {
+
+        $.ajax({
+            url: "/ManageMedia/ReviseEstimate",
+            data: {
+                UpfrontLineId: _UpfrontLineId
+            },
+            cache: false,
+            async: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success) {
+                    ReloadPage();
+                }
+                else {
+                    swal("Wait", result.responseText, "warning");
+                }
+
+            },
+            error: function (response) {
+                $('#modal-reviseestimate').modal('toggle');
+                var notify = $.notify(response.responseText, {
+                    type: 'danger',
+                    allow_dismiss: true
+                });
+            }
+
+        });
+    }
+</script>
+
+<div class="modal fade" id="modal-reviseestimate" tabindex="-1" role="dialog" aria-labelledby="modal-reviseestimate" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Revise Estimate</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <p>Please select the properties to be revised.</p>
+                            @*<input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId"><input id="CannotBeRevisedReason" name="CannotBeRevisedReason" value="@Model.CannotBeRevisedReason" type="hidden" />*@
+                            <input type="hidden" class="form-control" id="txtUpfrontLineId" name="txtUpfrontLineId"><input id="CannotBeRevisedReason" name="CannotBeRevisedReason" value="0" type="hidden" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="block-content block-content-full">                            
+                            <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                            <table class="table table-bordered table-vcenter js-dataTable-simple" id="ReviseEstimateTable" name="ReviseEstimateTable">
+                                <thead>
+                                    <tr>
+                                        <th class="d-none d-sm-table-cell text-center"></th>
+                                        <th class="d-none d-sm-table-cell text-center">Demo Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Property Name</th>
+                                        <th class="d-none d-sm-table-cell text-center">Days</th>
+                                        <th class="d-none d-sm-table-cell text-center">Start</th>
+                                        <th class="d-none d-sm-table-cell text-center">EndTime</th>
+                                        <th class="d-none d-sm-table-cell text-center">BT</th>
+                                        <th class="d-none d-sm-table-cell text-center">DP</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                        <th class="d-none d-sm-table-cell text-center">Imp</th>
+                                        <th class="d-none d-sm-table-cell text-center">CPM</th>
+                                        <th class="d-none d-sm-table-cell text-center">Rev#</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ReviseList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnRevise" name="btnRevise">
+                    <i class="fa fa-check"></i> OK
+                </button>
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal" id="btnReviseCancel" name="btnReviseCancel">
+                    <i class="fa fa-check"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

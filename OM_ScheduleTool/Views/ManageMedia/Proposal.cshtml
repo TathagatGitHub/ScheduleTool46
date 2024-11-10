@@ -1,0 +1,684 @@
+﻿@model ManageMediaViewModel
+<style type="text/css">
+    .dropdown-menu {
+        margin-left:-80px!important;
+    }
+
+    .dropdown-menu ul li {
+        cursor:pointer;
+    }
+
+        .dropdown-menu ul li a{
+            cursor: pointer;
+        }
+    </style>
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+@Html.Partial("~/Views/ScheduleProposal/_CreateProposal_Wiz1.cshtml", Model)
+@{
+    string PL = Model.LoggedOnUser.PermissionLevel.Description.ToLower();
+}
+<script language="javascript">
+    var _UniqueId = getParameterByName('ProposalId');
+    if (!_UniqueId || parseInt(_UniqueId) === 0) {
+        _UniqueId = getParameterByName('ScheduleId');
+    }
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!--
+        <div class="block block-themed">
+            <div class="block-header @Model.LoggedOnUser.PermissionLevel.ThemeBackground">
+                <h3 class="block-title">Manage Media</h3>
+            </div>
+        </div>
+            -->
+        @Html.Partial("~/Views/ManageMedia/_ManageMediaSel.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_UnAllocatedProposals.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_UnAllocatedProposalsLoadImport.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_UnAllocatedProposalsImportMatching.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_UnAllocatedProposalsConfirmMatch.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_UnAllocatedProposalsPotentialMatch.cshtml", Model)
+        @Html.Partial("~/Views/ScheduleProposal/_ScheduleProposalNetwoks.cshtml", Model)
+        <div class="block block-themed">
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-country">Country</label><br />
+                                    @foreach (var country in Model.Countries)
+                                    {
+                                        if (country.CountryId == Model.LastSelectedCountryId)
+                                        {
+                                            <label class="css-control css-control-success css-radio">
+                                                <input name="radio-group-country" id="@country.CountryShort" class="css-control-input" type="radio" checked="checked" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control css-control-success css-radio">
+                                                <input name="radio-group-country" id="@country.CountryShort" class="css-control-input" type="radio" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label for="mega-lastname">Plan Year Type</label><br />
+                                    <label class="css-control css-control-success css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" checked="checked">
+                                        <span class="css-control-indicator"></span> Broadcast
+                                    </label>
+                                    <!--
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" >
+                                        <span class="css-control-indicator"></span> Calendar
+                                    </label>
+                                        -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="mega-lastname">Plan Year</label>
+                                    <select name="ddlplanyear" id="ddlplanyear" class="form-control" size="1" onchange="javascript: ChangePlanYear(this.value);">
+                                        @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 2; idx++)
+                                        {
+                                            @if (idx == Model.LastSelectedPlanYear)
+                                            {
+                                                <option value="@idx" selected>@idx</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idx">@idx</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlnetwork">Network Name</label>
+                                    <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="1" onchange='javascript: ChangeNetwork(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlclients">Client Name</label>
+                                    <select class="form-control" id="ddlclients" name="ddlclients" size="1" onchange='javascript: ChangeClient(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <a class="btn btn-success"
+                               asp-controller="ScheduleProposal"
+                               asp-action="DisplayProposals">
+                                Display List of all Proposals
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="block">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group-row">
+                                <div class="col-12">
+                                    <!-- Block Tabs Animated Slide Up -->
+                                    <div class="block">
+                                        <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 1)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-4q" name="Q4" id="Q4">4Q 2017</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 2)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-1q" name="Q1" id="Q1">1Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 3)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-2q" name="Q2" id="Q2">2Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.LastQuarter == 4)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-3q" name="Q3" id="Q3">3Q 2018</a>
+                                                }
+
+                                            </li>
+                                            <li class="nav-item ml-auto">
+                                                <a class="nav-link" href="#btabs-animated-slideup-4q"><i class="si si-settings"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="block-content tab-content overflow-hidden">
+                                            @if (Model.LastQuarter == 1)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 2)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 3)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.LastQuarter == 4)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            <div class="tab-pane fade fade-up" id="btabs-animated-slideup-settings" role="tabpanel">
+                                                <h4 class="font-w400">Settings Content</h4>
+                                                <p>Content slides up..</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END Block Tabs Animated Slide Up -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="block block-themed">
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script language="javascript" type="text/javascript">
+    var _UnAllocatedImportScreenOpen = false;
+    var UnAllocatedProposalsJson;  
+    function GetClients(_countryid) {
+        var procemessage = "<option value='0'> Loading clients...</option>";
+        $("#ddlclients").html(procemessage).show();
+
+        var url = "/ManageMedia/GetClientsByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+               for (var x = 0; x < result.length; x++) {
+                    if (@Model.LastSelectedClientId == result[x].value) {
+                        if (_countryid == 5)
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                    else {
+                        if (_countryid == 5)
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                }
+                $("#ddlclients").html(markup).show();
+                GetProposal();
+            },
+            error: function (response) {
+                 swal("error : " + response.responseText);
+            }
+        });
+    }
+
+    function DeleteProposal(_ProposalName, _proposalId) {
+        swal({
+            title: _ProposalName,
+            text: 'Are you sure?  This proposal will be permanently deleted.',
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        $("#ancDeleteProposal").closest("div").find("a").hide();
+                        $("#ancDeleteProposal").closest("div").find("span").show();
+                        resolve();
+                    }, 50);
+                });
+            }
+        }).then(
+            function (result) {
+                $.ajax({
+                    url: "/ScheduleProposal/DeleteScheduleProposal",
+                    type: 'POST',
+                    data: {
+                        scheduleProposalId: _proposalId
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            swal({
+                                title: 'Success',
+                                text: result.responseText + '  Click OK to refresh page.',
+                                type: 'success',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'OK',
+                                preConfirm: function () {
+                                    return new Promise(function (resolve) {
+                                        setTimeout(function () {
+                                            resolve();
+                                        }, 0);
+                                    });
+                                }
+                            }).then(
+                                function (result) {
+                                    window.location.reload();
+                                });
+                        }
+                        else {
+                            $("#ancDeleteProposal").closest("div").find("a").show();
+                            $("#ancDeleteProposal").closest("div").find("span").hide();
+                            swal('Error!', result.responseText, 'warning');
+                            return;
+                        }
+
+                    },
+                    error: function (response) {
+                        $("#ancDeleteProposal").closest("div").find("a").show();
+                        $("#ancDeleteProposal").closest("div").find("span").hide();
+                        swal('Error1!', response.responseText, 'warning');
+                        return;
+                    }
+                })
+            });
+    }
+
+    function UnlockProposal(_proposalId) {
+        var url = "/ScheduleProposal/Unlock/";
+
+        $.ajax({
+            url: url,
+            data: { ScheduleProposalId: _proposalId, IsCalledFromBtn: true }, //HM ST-798
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success !== true) {
+                    swal('Wait!', result.responseText, 'warning');
+                }
+                else {
+                    window.location.reload();
+                }
+            },
+            error: function (response) {
+                swal('Stop!', response.responseText, 'error');
+            }
+        });
+
+    }
+
+    function OpenProposalPartial(_proposalId, link, linkParent) {
+        if (alreadyLocked == 1) {
+            OpenNewWindow(screen.height, screen.width, link, linkParent);
+        }
+        else {
+        var url = "/ScheduleProposal/LockProposal/";
+
+        $.ajax({
+            url: url,
+            data: { proposalId: _proposalId },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    OpenNewWindow(screen.height, screen.width, link, linkParent);
+                }
+                else {
+                    if (result.success == undefined) {
+                        swal('Error!', "Unknown error.  Please retry.", 'error');
+                    }
+                    else {
+                        swal('Wait!', result.responseText, 'warning');
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'warning');
+            }
+        });
+        }
+    }
+
+    function OpenProposal(_proposalId, link, linkParent) {    
+        if(alreadyLocked == 1){
+            OpenNewWindow(screen.height, screen.width, link, linkParent);
+        }
+        else{
+             var url = "/ScheduleProposal/FullyLockProposal/";
+
+        $.ajax({
+            url: url,
+            data: { proposalId: _proposalId },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.value.success == true) {
+                    OpenNewWindow(screen.height, screen.width, link, linkParent);
+                }
+                else {
+                    if (result.value.success == undefined) {
+                        swal('Error!', "Unknown error.  Please retry.", 'error');
+                    }
+                    else {
+                        swal('Wait!', result.value.responseText, 'warning');
+                    }
+                }
+            },
+            error: function (response) {
+                swal('Error!', response.value.responseText, 'warning');
+            }
+        });
+        }       
+    }
+
+    function GetProposal() {
+        $("#btabs-animated-slideup-1q,#btabs-animated-slideup-2q,#btabs-animated-slideup-3q,#btabs-animated-slideup-4q").html("");
+        var url = "/ScheduleProposal/GetProposalByClient/";
+
+        $.ajax({
+            url: url,
+            data: {
+                clientid: $("#ddlclients").val(),
+                broadcastyr: $("#ddlplanyear").val()
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                $("#btabs-animated-slideup-4q").html("");
+                $("#btabs-animated-slideup-1q").html("");
+                $("#btabs-animated-slideup-2q").html("");
+                $("#btabs-animated-slideup-3q").html("");
+
+                if (result) {
+                    for (var x = 0; x < result.length; x++) {
+                        markup = "";
+                        markup += "<h4 class='font-w400'>" + $("#ddlplanyear :selected").text() + " " + $("#ddlclients :selected").text() + "</h4>";
+                        markup += "<p>";
+                        markup += "<table class='table table-bordered table-vcenter'>";
+                        markup += "<tbody>";
+                        markup += "<tr><th scope='row' width='125'>Quarter</th><td>" + result[x].broadcastQuarterNbr + "</td ></tr > ";
+                        markup += "<tr><th scope='row'>Proposal Name</th><td>" + result[x].scheduleName + "</td></tr>";
+                        markup += "<tr><th scope='row'>Demo Name</th><td>" + result[x].demoName + "</td></tr>";
+                        markup += "<tr><th scope='row'>Network Name</th><td>" + result[x].networkName + "</td></tr>";
+                        
+                        if (result[x].proposalLockedByName != null && result[x].proposalLockedByName != undefined && result[x].proposalLockedByName != "")
+                        {
+                            markup += "<tr><th scope='row'>Locked</th><td><button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'><i class='fa fa-lock'></i></button> </td></tr>";
+                            markup += "<tr><th scope='row'>Lock Date</th><td><span class='badge badge-success'>" + formatDate(new Date(result[x].proposalLockedDate)) + "</span></td></tr>";
+                            markup += "<tr><th scope='row'>Locked By</th><td>" + result[x].proposalLockedByName + "</td></tr>";
+                        }
+                        else
+                        {
+                            if (result[x].lockedByUser != null && result[x].lockedByUser.displayName != null && result[x].lockedByUser.displayName != undefined && result[x].lockedByUser.displayName != "") {
+                            markup += "<tr><th scope='row'>Locked</th><td><button class='btn btn-lg btn-circle btn-alt-success mr-5 mb-5' type='button'><i class='fa fa-lock'></i></button> </td></tr>";
+                            markup += "<tr><th scope='row'>Lock Date</th><td><span class='badge badge-success'>" + formatDate(new Date(result[x].lockedDt)) + "</span></td></tr>";
+                            markup += "<tr><th scope='row'>Locked By</th><td>" + result[x].lockedByUser.displayName + "</td></tr>";
+                        }
+                        }
+                        markup += "<tr><th scope='row'>Creation Date</th><td>" + result[x].createDtString + "</td></tr>";
+                        markup += "<tr><th scope='row'>Last Updated</th><td>" + result[x].updateDtString + " ";
+                        if (result[x].updatedByUser != null) {
+                            markup += result[x].updatedByUser.displayName;
+                        }
+                        markup += "</td></tr>";
+                        markup += "</tbody>";
+                        markup += "</table>";
+                        markup += "</p>";
+
+                        markup += "<div class=\"form-group row\">";
+                        markup += "<div class=\"col-12\" style=\"display:flex;min-height:100px;\">";
+
+                        markup += "<span style='display:none;'>Please wait while action is completed...</span>";
+                        if (result[x].canEditSchedule === 1) {
+                            if (!result[x].isFullProposalLocked)
+                            {
+                                 if (result[x].editButtonHidden)
+                                    markup += "<span id='ancEditProposal' disabled class=\"btn btn-alt-secondary\"><i class=\"fa fa-edit mr-5\"></i>Edit&nbsp;&nbsp;</span>&nbsp;";
+                                else
+                                    markup += "<a id='ancEditProposal' schedule-id='" + result[x].scheduleId + "'  onclick=\"proceedToUnallocatedProposals(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit',0); localStorage.removeItem('DataTables_/ScheduleProposal/EditProposal_" + result[x].scheduleId + "'); return false; \" onkeypress=\"CheckUnAllocationProposals(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit'); return false; \" class=\"btn btn-alt-success\" href=\"/ScheduleProposal/EditProposal?ProposalId=" + result[x].scheduleId + "\"><i class=\"fa fa-edit mr-5\"></i>Edit&nbsp;&nbsp;</a>&nbsp;";
+                                if (result[x].editDDLButtonHidden)
+                                {
+                                    markup += "<div class='dropdown' id='ancEditProposalddl' style='display:none;'>";
+                                    markup += "<button class='btn btn-alt-success dropdown' type='button' data-toggle='dropdown'>&nbsp;<i class='fa fa-angle-down' aria-hidden='true'>&nbsp;</i></button>";
+                                    markup += "<ul class='dropdown-menu' style='cursor:pointer:important;'>";
+                                    markup += "<li style='cursor:pointer:important;'><a  href='javascript:function opnNet() { return false; }' style='cursor:pointer:important;' schedule-id='" + result[x].scheduleId + "' onclick=\"OpenProposalNetworkPopup(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit',0); return false; \" >Select Network(s)</a></li>";
+                                    markup += "</ul>";
+                                    markup += "</div>";
+
+                                    //    markup += "<a id='ancEditProposalddl' style=\"margin-left: -5px;\" schedule-id='" + result[x].scheduleId + "'  onclick=\"OpenProposalNetworkPopup(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit',0); return false; \" style='display:none;' class=\"btn btn-alt-success\">&nbsp;<i class='fa fa-angle-down' aria-hidden='true'>&nbsp;</i></a>&nbsp;";
+                                }
+                                else
+                                {
+                                    markup += "<div class='dropdown' id='ancEditProposalddl' style='margin-left: -5px;margin-right:5px;'>";
+                                    markup += "<button class='btn btn-alt-success dropdown' type='button' data-toggle='dropdown'>&nbsp;<i class='fa fa-angle-down' aria-hidden='true'>&nbsp;</i></button>";
+                                    markup += "<ul class='dropdown-menu' style='cursor:pointer:important;'>";
+                                    markup += "<li style='cursor:pointer:important;'><a href='javascript:function opnNet() { return false; }' style='cursor:pointer:important;' schedule-id='" + result[x].scheduleId + "' onclick=\"OpenProposalNetworkPopup(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit',0); return false; \"  >Select Network(s)</a></li>";
+                                    markup += "</ul>";
+                                    markup += "</div>";
+                                //markup += "<a id='ancEditProposalddl' style=\"margin-left: -5px;\" schedule-id='" + result[x].scheduleId + "'  onclick=\"OpenProposalNetworkPopup(" + result[x].scheduleId + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "','Edit',0); return false; \" class=\"btn btn-alt-success\">&nbsp;<i class='fa fa-angle-down' aria-hidden='true'>&nbsp;</i></a>&nbsp;";
+                                }
+                            }
+                        }
+                        if (result[x].canViewSchedule === 1) {
+                            markup += "<a id='ancViewProposal' onclick=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + screen.Width + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "'); localStorage.removeItem('DataTables_/ScheduleProposal/ViewProposal_" + result[x].scheduleId + "'); return false; \" onkeypress=\"OpenNewWindow (" + @Model.LastWindowHeight + ", " + @Model.LastWindowWidth + ", this.href, '/ManageMedia/Proposal?ProposalId=" + result[x].scheduleId + "'); return false;\" class=\"btn btn-alt-success\" href=\"/ScheduleProposal/ViewProposal?ProposalId=" + result[x].scheduleId + "\"><i class=\"fa fa-search mr-5\"></i>View</a>&nbsp;";
+                        }
+                        // If admin, allow user to unlock locked proposals
+                        if (result[x].proposalLockedByName != null && result[x].proposalLockedByName != undefined && result[x].proposalLockedByName != ""
+                            && (@Model.LoggedOnUser.PermissionLevelId === 1 || ((@Model.LoggedOnUser.PermissionLevelId === 2 || @Model.LoggedOnUser.PermissionLevelId === 3) && (result[x].lockedByUser != null) ? @Model.LoggedOnUser.UserId === result[x].lockedByUser.userId : @Model.LoggedOnUser.UserId == @Model.LoggedOnUser.UserId))) {
+                        markup += "<a id='ancUnlockProposal' href=\"javascript: UnlockProposal(" + result[x].scheduleId + ");\" class=\"btn btn-alt-success\"><i class=\"fa fa-unlock mr-5\"></i>Unlock</a>&nbsp;";
+                        }
+                        else
+                        {
+                        if (result[x].lockedByUser != null && (@Model.LoggedOnUser.PermissionLevelId === 1 || ((@Model.LoggedOnUser.PermissionLevelId === 2 || @Model.LoggedOnUser.PermissionLevelId === 3) && @Model.LoggedOnUser.UserId === result[x].lockedByUser.userId))) {
+                            markup += "<a id='ancUnlockProposal' href=\"javascript: UnlockProposal(" + result[x].scheduleId + ");\" class=\"btn btn-alt-success\"><i class=\"fa fa-unlock mr-5\"></i>Unlock</a>&nbsp;";
+                        }
+                        }
+                        // 7/29/19 Just got instructions to remove this feature but I'm keeping this here since launching this feature has
+                        // already been implemented.  However, it doesn't actually CREATE the proposal because when I was about to write this and I referred
+                        // the Excel tool was broken and never actually does anything.
+                        // Remember to add this above if you want to put this feature back
+                        // Html.Partial("~/Views/ScheduleProposal/_CreateProposal_Copy.cshtml", Model)
+                        //if (result[x].lockedByUser == null) {
+                        //    markup += "<a href=\"javascript: CopyProposal('4Q" + (parseInt($("#ddlplanyear").val()) - 1).toString() + "', " + result[x].scheduleId + ");\" class=\"btn btn-alt-success\"><i class=\"fa fa-clone mr-5\"></i>Copy To New Proposal</a>&nbsp;";
+                        //}
+                      
+                        if (
+                            result[x].lockedByUser == null
+                                && (result[x].proposalLockedByName == null || result[x].proposalLockedByName == undefined || result[x].proposalLockedByName == "")
+                               && "@PL" == "admin") {
+                            markup += "<a id='ancDeleteProposal' href=\"javascript: DeleteProposal('" + result[x].scheduleName + "', " + result[x].scheduleId + ");\" class=\"btn btn-alt-success\"><i class=\"fa fa-remove mr-5\"></i>Delete</a>&nbsp;";
+                        }
+                        markup += "</div>";
+                        markup += "</div>";
+
+                        if (result[x].broadcastQuarterNbr == 1) {
+                            $("#btabs-animated-slideup-4q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 2) {
+                            $("#btabs-animated-slideup-1q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 3) {
+                            $("#btabs-animated-slideup-2q").html(markup);
+                        }
+                        else if (result[x].broadcastQuarterNbr == 4) {
+                            $("#btabs-animated-slideup-3q").html(markup);
+                        }
+                    }
+                }
+                var createProposalVisible = false;
+                if ($("#btabs-animated-slideup-1q").html() == "" || $("#btabs-animated-slideup-2q").html() == "" || $("#btabs-animated-slideup-3q").html() == "" || $("#btabs-animated-slideup-4q").html() == "") {
+                    $.ajax({
+                        url: "/ScheduleProposal/CreateProposalVisible",
+                        data: {
+                            clientId: $("#ddlclients").val()
+                        },
+                        async: false,
+                        cache: false,
+                        type: "POST",
+                        success: function (result) {
+                            if (result == true) {
+                                createProposalVisible = true;
+                            }
+                        }
+                    });
+                }
+
+                if ($("#btabs-animated-slideup-4q").html() == "") {
+                    markup = "<p>No proposal for this quarter.</p>";
+                    if ("@PL" == "admin" || createProposalVisible) {
+    @*markup += "<p><a href=\"javascript: CreateProposal('4Q" + (parseInt($("#ddlplanyear").val()) - 1).toString() + "');\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";*@
+                            markup += "<p><a id='ancCreateProposal' href=\"javascript: CheckUnAllocationProposals('4Q" + (parseInt($("#ddlplanyear").val()) - 1).toString() + "','','','Create',0);\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";
+                    }
+                    $("#btabs-animated-slideup-4q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-1q").html() == "") {
+                    markup = "<p>No proposal for this quarter.</p>";
+                    if ("@PL" == "admin" || createProposalVisible) {
+    @*  markup += "<p><a href=\"javascript: CreateProposal('1Q" + $("#ddlplanyear").val() + "');\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";*@
+                            markup += "<p><a id='ancCreateProposal' href=\"javascript: CheckUnAllocationProposals('1Q" + $("#ddlplanyear").val() + "','','','Create',0);\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";
+                    }
+                    $("#btabs-animated-slideup-1q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-2q").html() == "") {
+                    markup = "<p>No proposal for this quarter.</p>";
+                    if ("@PL" == "admin" || createProposalVisible) {
+    @*markup += "<p><a href=\"javascript: CreateProposal('2Q" + $("#ddlplanyear").val() + "');\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";*@
+                            markup += "<p><a id='ancCreateProposal' href=\"javascript: CheckUnAllocationProposals('2Q" + $("#ddlplanyear").val() + "','','','Create',0);\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";
+                    }
+                    $("#btabs-animated-slideup-2q").html(markup);
+                }
+                if ($("#btabs-animated-slideup-3q").html() == "") {
+                    markup = "<p>No proposal for this quarter.</p>";
+                    if ("@PL" == "admin" || createProposalVisible) {
+                        //markup += "<p><a href=\"javascript: CreateProposal('3Q" + $("#ddlplanyear").val() + "');\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";
+                        markup += "<p><a id='ancCreateProposal' href=\"javascript: CheckUnAllocationProposals('3Q" + $("#ddlplanyear").val() + "','','','Create',0);\" class=\"btn btn-alt-success\"><i class=\"fa fa-plus mr-5\"></i>Create Proposal</a></p>";
+                    }
+                    $("#btabs-animated-slideup-3q").html(markup);
+                }
+            },
+            error: function (response) {
+                swal('Wait ...', response, 'error');
+            }
+        });
+
+    }
+
+    function ChangeCountry(_countryid, _countryshort) {
+        GetClients (_countryid);
+        SaveSettings("ScheduleProposalLog_CountryId", _countryid);
+    }
+
+    function ChangePlanYear(_year) {
+        GetProposal();
+        SetupQuarters(_year);
+        SaveSettings("ScheduleProposalLog_PlanYear", _year);
+    }
+
+    function ChangeClient(_clientid) {
+        GetProposal();
+        SaveSettings("ScheduleProposalLog_ClientId", _clientid);
+    }
+
+
+    function SetupQuarters(_year) {
+        $("#Q4").html("Q4 " + (_year-1)).show();
+        $("#Q1").html("Q1 " + _year).show();
+        $("#Q2").html("Q2 " + _year).show();
+        $("#Q3").html("Q3 " + _year).show();
+    }
+
+     $("#Q1, #Q2, #Q3, #Q4").on('click', function (e) {
+         SaveSettings("ScheduleProposalLog_BroadcastQuarterNbr", parseInt(this.id.slice(1)) == 4 ? 1 : parseInt(this.id.slice(1)) + 1);
+    });
+   
+  
+</script>
+
+
+<script language="javascript" type="text/javascript">
+    GetClients(@Model.LastSelectedCountryId);
+    SetupQuarters(@Model.LastSelectedPlanYear);
+</script>
+<script src="~/js/scheduleproposal/UnAllocatedProposalLibrary.js" asp-append-version="true"></script>
+<script src="~/js/scheduleproposal/UnAllocatedPropsalsImportLibrary.js" asp-append-version="true"></script>

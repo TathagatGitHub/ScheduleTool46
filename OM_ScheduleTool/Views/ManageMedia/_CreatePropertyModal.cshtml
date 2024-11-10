@@ -1,0 +1,13 @@
+@model CreateNewPropertyViewModel
+
+<input name="isModal" id="isModal" type="text" value="1" hidden />
+
+<div class="modal fade" id="modal-createproperty" tabindex="-1" role="dialog" aria-labelledby="modal-createproperty" aria-hidden="true">
+    <div class="modal-dialog modal-om-1200" role="document">
+        <div class="modal-content">
+            @Html.Partial("_CreateNewProperty", Model)
+        </div>
+    </div>
+</div>
+
+

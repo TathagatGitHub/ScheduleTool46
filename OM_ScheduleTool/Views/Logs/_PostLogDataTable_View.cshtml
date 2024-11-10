@@ -1,0 +1,134 @@
+@model PostLogViewModel
+<!-- Auto Column Hiding-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js "></script>
+
+<!-- Data Table Buttons -->
+@*<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">*@
+@*<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>*@
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.colVis.min.js "></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+
+@*Mine*@
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" />
+
+
+@*<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.js"></script>
+    <script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-pageLoadMore/1.0.0/js/dataTables.pageLoadMore.min.js"></script>*@
+<script src="~/js/plugins/moment/moment-with-locales.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.1.5/js/dataTables.fixedHeader.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.5/css/fixedHeader.dataTables.min.css ">
+
+<script asp-append-version="true"  src="~/js/plugins/excel-sorting-filtering/dist/excel-bootstrap-table-filter-bundle.js"></script>
+<link rel="stylesheet" href="~/js/plugins/excel-sorting-filtering/dist/excel-bootstrap-table-filter-style.css">
+
+<script asp-append-version="true" src="~/js/common.js"></script>
+
+<style type="text/css">
+    body {
+        overflow-y: visible;
+        overflow-x: visible;
+        line-height: 1;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    #PostLogViewTable thead th {
+        position: sticky;
+        top: 0px !important;
+        background-color: white;
+        z-index: 1;
+        }
+    #PostLogViewTable thead th:after, #PostLogViewTable thead th:before {
+        position: absolute;
+        content: '';
+        left: 0px;
+        width: 100%;
+        }
+    #PostLogViewTable thead th:before {
+        top: -1px;
+        border-top: 1px solid #ddd;
+        }
+    #PostLogViewTable thead th:after {
+        bottom: -1px;
+        border-bottom: 1px solid black;
+    }
+    #PostLogViewTable_wrapper {
+        overflow: auto;
+        height: 835px;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        var qtrName = sessionStorage.getItem("PostLogQtrName");
+        var country = getParameterByName("logsSelectedCountryId");
+        if (country == 2) {
+            if (qtrName == "Q4 2019") {
+                $(".HeaderUSDGrossRate").text("USD GROSS RATE");
+            }
+            else {
+                $(".HeaderUSDGrossRate").text("USD NET RATE");
+            }
+        }
+    });
+</script>
+
+<div class="block block-themed block-rounded">
+    <div class="block-content block-content-full" id="resize_wrapper">
+
+        @Html.Partial("~/Views/Logs/_Menu_Postlog_View.cshtml", Model)
+
+        <table class="table-bordered table-vcenter js-table-checkable table-hover compact nowrap" id="PostLogViewTable" name="PostLogViewTable" style="width:95%">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderNetwork">NETWORK</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderProperty">PROPERTY</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">M</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">T</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">W</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">Th</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">F</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">Sa</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort">Su</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderStartTime">START TIME</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderEndTime">END TIME</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderDP">DP</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderOMDP">OMDP</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSpotLen">LEN</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderBuyType">BUY TYPE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSpBuy">SP BUY</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderFullRateAmt">FULL RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderRateAmt">RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderUSDGrossRate">USD GROSS RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderImpression">IMP</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderCPM">CPM</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSpotDate">SPOT DATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSpotTime">SPOT TIME</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderMediaType">MEDIA TYPE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderISCI">ISCI</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderProgram">PROGRAM</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderCleared">CLEARED</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderDayPart">DAYPART</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSigma">SIGMA PROGRAM NAME</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderSigma">COMM RATE</th>
+                    <th class="d-none d-sm-table-cell text-center no-sort HeaderType HeaderPostLogId">CA CONV. RATE</th>
+                    @*<th style="visibility:hidden"></th>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+

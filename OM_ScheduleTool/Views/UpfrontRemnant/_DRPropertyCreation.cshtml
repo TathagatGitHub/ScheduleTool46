@@ -1,0 +1,827 @@
+﻿@*@model ProposalViewModel*@
+@model ViewUpfrontsViewModel
+
+@*@{ 
+
+    string selectedQuarterName = Model.UpfrontInfo.Quarter.QuarterName;
+    int selectedBroadcastQuarterNbr = Model.UpfrontInfo.Quarter.BroadcastQuarterNbr;
+}*@
+
+
+<style type="text/css">
+   
+    div.scroll {
+        width: 200px;
+        height: 150px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: left;
+        padding: 20px;
+    }
+
+    /*Overlay Code Style*/
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .overlay-content {
+        position: relative;
+        top: 25%;
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .overlay a {
+        padding: 8px;
+        text-decoration: none;
+        font-size: 36px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+        .overlay a:hover, .overlay a:focus {
+            color: #f1f1f1;
+        }
+
+    .overlay .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 45px;
+        font-size: 60px;
+    }
+    /*Ovelay Loader end here*/
+   /* .loader {
+        position: relative;
+        top: 12em;
+        left: 50em;
+    }
+
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: -0.125em;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        -webkit-animation: 0.75s linear infinite spinner-border;
+        animation: 0.75s linear infinite spinner-border;
+    }
+
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.2em;
+    }*/
+</style>
+
+<script language="javascript" type="text/javascript">
+    var checkboxSetFlag = false;
+    var gAvailableBuyType = [];
+    var gQuarterName = "";
+    var gNetworkId = 0;
+    var gEstimateVersion = -1;
+    var drEditor_ur;
+    var draddnewpropertytable;
+    var gDRExpDatesList, gDREffDatesList, gDRClientNamesList;
+
+    function ShowOverlay() {
+        setTimeout(function () {
+            document.getElementById("DivDROverLay").style.width = "100%";
+        }, 500);
+    }
+    function HideOverlay() {
+        document.getElementById("DivDROverLay").style.width = "0%";
+    }
+
+    $(document).ready(function () {
+
+        init_PriorEstimateTemplateTable();
+         $("#modal-DRPropertyCreation").draggable();
+         $("#modal-checkDRPropertyCreation").draggable();
+        $('#DRAvailablePropertiesTable').on('click', 'tbody input.editor-active', function () {
+       
+        });
+
+        $('#DRAvailablePropertiesTable').on('change', 'tbody input.editor-active', function () {
+            //cb = $(this).prop('checked');
+        });
+
+        $('input[type=checkbox]').on('change', function () {
+            //var oTable = $('#DRAvailablePropertiesTable').dataTable();
+            //var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+            //rowcollection.each(function (index, elem) {
+            //    var checkbox_value = $(elem).val();
+            //});
+        });
+
+
+        $('#drProperties-select-all').on('click', function () {
+           // Get all rows with search applied
+           var oTable = $('#DRAvailablePropertiesTable').DataTable();
+           var rows = oTable.rows({ 'search': 'applied' }).nodes();
+           // Check/uncheck checkboxes for all rows in the table
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            DREnableAdd();
+        });
+
+        $('#DRAvailablePropertiesTable tbody').on('change', 'input[type="checkbox"]', function(){
+            if (!$(this).prop("checked")) {
+                $("#drProperties-select-all").prop("checked", false);
+            }
+        });
+
+        $('#DRAvailablePropertiesTable tbody').on('click', 'input[type="checkbox"]', function(){
+            checkboxSetFlag = true;
+            var oTable = $('#DRAvailablePropertiesTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+            if (totalCheckboxes == numberOfChecked) {
+                $("#drProperties-select-all").prop("checked", true);
+            }
+        });
+
+        $('#DRAvailablePropertiesTable').on('click', 'tbody td:not(:first-child)', function (e) {
+            //drEditor_ur.inline(this);
+        });
+
+        $('#DRAvailablePropertiesTable').on('click', 'tbody tr', function () {
+
+
+            var checkbox = $(this).find("input[type='checkbox']");
+            var oTable = $('#DRAvailablePropertiesTable').dataTable();
+            var numberOfChecked = oTable.$(".editor-active:checked", { "page": "all" }).length;
+            var totalCheckboxes = oTable.$(".editor-active", { "page": "all" }).length;
+
+            if (totalCheckboxes == numberOfChecked) {
+                $("#drProperties-select-all").prop("checked", true);
+            }
+            else {
+                $("#drProperties-select-all").prop("checked", false);
+            }
+          
+        });
+
+        $('#btnDRClose').click(function () {
+            DRClearAllModalFields();
+        });
+
+        $('#btnDRCloseTop').click(function () {
+            DRClearAllModalFields();
+        });
+
+
+    });
+
+
+    $(window).on('shown.bs.modal', function () {
+        //ClearAllModalFields();
+    });
+
+    $(window).on('shown.bs.modal', function () {
+        //ClearAllModalFields();
+    });
+
+    function DRClearAllModalFields() {
+        $('#DRAvailablePropertiesTable').DataTable().clear().draw();
+    }
+
+
+    function DREnableAdd() {
+        $('#btnDRAdd').attr('disabled', 'disabled');
+        //var rowIndex = $(ele).data('id');
+        var oTable = $('#DRAvailablePropertiesTable').dataTable();
+       // var data = oTable.row(this).data();
+
+        var selRowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+        if (selRowcollection.length > 0) {
+            $('#btnDRAdd').removeAttr('disabled');
+        }
+
+        //selRowcollection.each(function (index, elem) {
+        //    $('#btnDRAdd').removeAttr('disabled');
+        //});
+    }
+    //function init_PriorEstimateTemplateTable_2() {
+    //    alert("Calling DR Prop Creation");
+    //$.ajax({
+    //        url: '/UpfrontRemnant/GetDRAvailableEstimateVerions',
+    //        type: 'POST',
+    //        data: {
+    //            NetworkId: '@Model.NetworkInfo.NetworkId',
+    //            QuarterName: '@Model.UpfrontInfo.Quarter.QuarterName'
+    //        },
+    //        success: function (response) {
+    //            //console.log( JSON.parse(response));
+    //            console.log(response);
+    //        },
+    //        error: function (XMLHttpRequest, textStatus, errorThrown) {
+    //            console.log("An Ajax server error was returned");
+    //            console.log(XMLHttpRequest);
+    //            console.log(textStatus);
+    //            console.log(errorThrown);
+    //        }
+    //    });
+    //            return false;
+    //}
+
+    function init_PriorEstimateTemplateTable() {
+
+        var DRAvailableEstimateVerionstable = $("#DRPriorEstimatesTable").DataTable({
+            destroy: true,
+            processing: false,
+            ajax: {
+                url: '/UpfrontRemnant/GetDRAvailableEstimateVerions',
+                type: 'POST',
+                data: {
+                    NetworkId: '@Model.NetworkInfo.NetworkId',
+                    QuarterName: '@Model.UpfrontInfo.Quarter.QuarterName' 
+                },
+            },
+    columnDefs: [
+        //{
+        //    defaultContent: "-",
+        //    targets: "_all",
+
+        //},
+        {
+            targets: 0,
+            data: "networkName",
+            title: 'Network Name',
+            class: "d-none d-sm-table-cell text-center",
+        },
+        {
+            targets: 1,
+            data: "quarterName",
+            title: 'Quarter Name',
+            class: "d-none d-sm-table-cell text-center",
+        },
+        {
+            targets: 2,
+            data: "estimateVersion",
+            title: 'EstimateVersion',
+            class: "d-none d-sm-table-cell text-center",
+        },
+
+        {
+            targets: 3,
+            data: "versionDate",
+            title: 'Version Date',
+            class: "d-none d-sm-table-cell text-center",
+        },
+        {
+            targets: 4,
+            orderable: false,
+            title: 'Select',
+            render: (data, type, row) => {
+
+                return '<input type= "button" value="Select" onclick="LoadDRAvailableProperties(' + row.networkId + ', \'' + row.quarterName + '\',' + row.estimateVersion + ')"  data-type="view" /> '
+            }
+        },
+
+            ],
+
+            initComplete: function (settings, json) {
+                HideOverlay();
+                // drEditor_ur.field('expirationDate').update(json.drexpirationdateoptions);
+                //drEditor_ur.field('effectiveDate').update(json.dreffectivedateoptions);
+                //drEditor_ur.field('clientName').update(json.drmandateclientoptions);
+
+                gDREffDatesList = json.dreffectivedateoptions;
+                gDRExpDatesList = json.drexpirationdateoptions;
+                gDRClientNamesList = json.drmandateclientoptions;
+
+            }
+
+        });
+
+    };
+
+    function CheckSelectedDRProperties(IsCreateDRPropertyRates) {
+    
+        var oTable = $('#DRAvailablePropertiesTable').DataTable();
+        var allRowscollection = oTable.$(".editor-active:checked", { "page": "all" });
+        var rowsCount = allRowscollection.length;
+  
+        var listDRSelectedData = new Array();
+        var isClientNameRequired = false;
+        var isValidEffExpDates = true;
+        allRowscollection.each(function (index, elem) {
+            var currentRow_value = $(elem).val();
+            var rowId = $($(this).closest('tr').find('td')[0]).find("input").attr("id");
+            var propId = $($(this).closest('tr').find('td')[0]).find("input").attr("pId");
+            rowData = draddnewpropertytable.rows().data().filter(oo => oo.id == rowId)[0];
+
+            var objRowData = {
+                Id: rowId,
+                DemoName: rowData.demoName,
+                PropertyName: rowData.propertyName,
+                PropertyId: propId,
+                DP: rowData.dp,
+                Days: rowData.days,
+                //SpotLen: 30,
+                Imp: rowData.imp,
+                CPM: rowData.cpm,
+                RateAmt: rowData.rateAmt,
+                Status: rowData.status,
+                Revision: rowData.revision,
+                StartTimeFormatted: rowData.startTimeFormatted,
+                EndTimeFormatted: rowData.endTimeFormatted,
+                ClientName: (rowData.status== 'Client Mandate' || rowData.status=='Client Specific')? $($(this).closest('tr').find('select')[0]).val(): "",
+                BuyTypeCode: rowData.buyTypeCode,
+                EffectiveDate: (rowData.status == 'Client Mandate' || rowData.status == 'Client Specific') ? $($(this).closest('tr').find('select')[1]).val() : $($(this).closest('tr').find('select')[0]).val(),
+                ExpirationDate:(rowData.status == 'Client Mandate' || rowData.status == 'Client Specific') ? $($(this).closest('tr').find('select')[2]).val(): $($(this).closest('tr').find('select')[1]).val()
+            };
+
+            if (objRowData.Status == 'Client Mandate' || objRowData.Status == 'Client Specific') {
+                if (objRowData.ClientName == '' || objRowData.ClientName == '-1')
+                //EnableAdd();
+                isClientNameRequired = true;
+            }
+
+            var selectedEffDate = new Date (objRowData.EffectiveDate);
+            var selectedExpDate = new Date (objRowData.ExpirationDate);
+
+            if (selectedEffDate.getTime() > selectedExpDate.getTime()) {
+                isValidEffExpDates = false;
+            }
+
+            listDRSelectedData.push(objRowData);
+
+        });
+
+        if (isClientNameRequired) {
+            swal('Wait!', 'Please Select Client Name', 'error');
+            return false;
+        }
+
+
+        if (!isValidEffExpDates) {
+            swal('Wait!', 'Expiration date should be greater than Effective date', 'error');
+            return false;
+        }
+
+        if (IsCreateDRPropertyRates == 0)
+        {
+            PopulateDRPropertiesRevisionScreen(gNetworkId, gQuarterName, gEstimateVersion, listDRSelectedData, 0);
+            try {
+                $("#modal-DRPropertyCreation").modal('toggle');
+                $('#modal-checkDRPropertyCreation').modal();
+            }
+            catch (err) {
+                window.location.reload();
+            }
+        }
+        else {
+            PopulateDRPropertiesRevisionScreen(gNetworkId, gQuarterName, gEstimateVersion, listDRSelectedData, 1);
+            //console.log('delegated click event-43');
+            //$('#modal-checkDRPropertyCreation').modal('toggle');
+            //swal('Success!', 'Properties are created Successfully', 'success');
+            //setTimeout(function () { window.location.reload(); }, 3000);
+        }
+
+
+       return true;
+    }
+
+   function PopulateDRAvailableProperties(networkId, quarterName, estimateVersion) {
+        // if ($.fn.DataTable.isDataTable('#DRAvailablePropertiesTable')) {
+        //    return;
+        //}
+        ShowOverlay();
+        setTimeout(function () {
+               draddnewpropertytable = $('#DRAvailablePropertiesTable').DataTable({
+                info: false,
+                scrollX: false,
+                scrollY: 400,
+                scrollCollapse: true,
+                paging: false,
+                destroy: true,
+                deferRender: true,
+                processing: true,
+                ordering: true,
+                language: {
+                    infoFiltered: "",
+                    processing: "<i class='fa fa-refresh fa-spin'></i>"
+                },
+                   ajax: {
+                    url: '/UpfrontRemnant/GetDRAvailableProperties',
+                    type: 'POST',
+                    data: {
+                        NetworkId: networkId, //'@Model.NetworkInfo.NetworkId',
+                        QuarterName: quarterName,
+                        EstimateVersion: estimateVersion
+                       }
+                       //success: function (result) {
+                       //    if (result.success) {
+                       //        gDRExpDatesList = result.drexpirationdateoptions;
+                       //    }
+
+                       //},
+
+                    //beforeSend: function (xhr, settings) {
+                    //    ShowOverlay();
+                    //}
+                },
+                keys: {
+                },
+                columnDefs: [
+                    {
+                        targets: 0,
+                        data: null,
+                        defaultContent: '',
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row) {
+                            if (type === 'display') {
+                                return '<input type="checkbox" class="editor-active" id="' + data.id + '", pId="' + data.propertyId + '" onclick="javascript:DREnableAdd();">';
+                            }
+                            return data;
+                        },
+                        //className: 'select-checkbox',
+                        width: 10,
+                        orderable: false,
+                        searchable: false,
+                        selectRow: true
+                    },
+                    {
+                        targets: 1,
+                        data: "demoName",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(2000, true),
+                        visible: true
+                    },
+                    {
+                        targets: 2,
+                        data: "propertyName",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.ellipsis(2000, true),
+                        visible: true
+                    },
+                    //{
+                    //    targets: 3,
+                    //    data: "time",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    {
+                        targets: 3,
+                        data: "dp",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 4,
+                        data: "days",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    //{
+                    //    targets: 6,
+                    //    data: "spBuy",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    {
+                        targets: 5,
+                        data: "spotLen",
+                        visible: true,
+                        class: "d-none d-sm-table-cell text-center",
+                        render: function (data, type, row, meta) {
+                            if (data === 120) {
+                                return "<span class='badge badge-pill badge-danger'>" + data + "</span>";
+                            }
+                            else if (data === 60) {
+                                return "<span class='badge badge-pill badge-primary'>" + data + "</span>";
+                            }
+                            else if (data === 15) {
+                                return "<span class='badge badge-pill badge-warning'>" + data + "</span>";
+                            }
+                            else {
+                                return "<span class='badge badge-pill badge-success'>" + data + "</span>";
+                            }
+                        }
+                    },
+                    {
+                        targets: 6,
+                        data: "rateAmt",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                        visible: true
+                    },
+                    {
+                        targets: 7,
+                        data: "imp",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, ''),
+                        visible: true
+                    },
+                    {
+                        targets: 8,
+                        data: "cpm",
+                        class: "d-none d-sm-table-cell text-center",
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$'),
+                        visible: true
+                    },
+                    {
+                        targets: 9,
+                        data: "status",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 10,
+                        data: "clientName",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true,
+                        render: function (d, t, r, json) {
+                            if (r.status === 'Client Mandate' || r.status === 'Client Specific')
+                            {
+                                var $select = $("<select id='ddlClientName'></select>", {
+                                    "id": r[0] + "start",
+                                    "value": d
+                                });
+                                $.each(gDRClientNamesList, function (k, v) {
+                                    var $option = $("<option></option>", {
+                                        "text": v.label,
+                                        "value": v.value
+                                    });
+                                    if (d === v) {
+                                        $option.attr("selected", "selected")
+                                    }
+                                    $select.append($option);
+                                });
+                                return $select.prop("outerHTML");
+                            }
+                            else {
+                                return "";
+                                //var list = [];
+                                //var $select = $("<select id='ddlClientName'></select>", {
+                                //    "id": r[0] + "start",
+                                //    "value": d
+                                //});
+                                //$.each(list, function (k, v) {
+                                //    var $option = $("<option></option>", {
+                                //        "text": v.label,
+                                //        "value": v.value
+                                //    });
+                                //    if (d === v) {
+                                //        $option.attr("selected", "selected")
+                                //    }
+                                //    $select.append($option);
+                                //});
+                                //return $select.prop("outerHTML");
+                            }
+                        }
+                      
+                    },
+                    //{
+                    //    targets: 11,
+                    //    data: "effExp",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    //{
+                    //    targets: 12,
+                    //    data: "revision",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    {
+                        targets: 11,
+                        data: "startTimeFormatted",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 12,
+                        data: "endTimeFormatted",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    //{
+                    //    targets: 15,
+                    //    data: "buyTypeDescription",
+                    //    class: "d-none d-sm-table-cell text-center",
+                    //    visible: true
+                    //},
+                    {
+                        targets: 13,
+                        data: "buyTypeCode",
+                        class: "d-none d-sm-table-cell text-center",
+                        visible: true
+                    },
+                    {
+                        targets: 14,
+                        data: "effectiveDate",
+                        class: "d-none d-sm-table-cell text-center",
+                        className: "editable",
+                        //render: function (d) {
+                        //    if (d != null)
+                        //        return moment(d).format("MM/DD/YYYY");
+                        //    else
+                        //        return "";
+                        //},
+                        orderable: false,
+                        render: function (d, t, r, json) {
+                            var $select = $("<select id='ddlEffDate'></select>", {
+                                "id": r[0] + "start",
+                                "value": d
+                            });
+                            $.each(gDREffDatesList, function (k, v) {
+                                var $option = $("<option></option>", {
+                                    "text": v.label,
+                                    "value": v.value
+                                });
+                                //if (d === v) {
+                                //    $option.attr("selected", "selected")
+                                //}
+                                if (r.effectiveDate != '') {
+                                    if (r.effectiveDate === v) {
+                                        $option.attr("selected", "selected")
+                                    }
+                                }
+                                else {
+                                    if (k == 1) {
+                                        $option.attr("selected", "selected")
+                                    }
+                                }
+                                $select.append($option);
+                            });
+                            return $select.prop("outerHTML");
+                        }
+                    },
+                    {
+                        targets: 15,
+                        data: "expirationDate",
+                        class: "d-none d-sm-table-cell text-center",
+                        className: "editable",
+                        orderable: false,
+                        render: function (d, t, r, json) {
+                            var $select = $("<select id='ddlExpDate'></select>", {
+                                "id": r[0] + "start",
+                                "value": d
+                            });
+                            $.each(gDRExpDatesList, function (k, v) {
+                                var $option = $("<option></option>", {
+                                    "text": v.label,
+                                    "value": v.value
+                                });
+                                //if (d === v) {
+                                //    $option.attr("selected", "selected")
+                                //}
+                                //$select.append($option);
+                                if (r.expirationDate != '') {
+                                    if (r.expirationDate === v) {
+                                        $option.attr("selected", "selected")
+                                    }
+                                }
+                                else {
+                                    if (k == (gDRExpDatesList.length -1)) {
+                                        $option.attr("selected", "selected")
+                                    }
+                                }
+                                $select.append($option);
+                            });
+                            return $select.prop("outerHTML");
+                        }
+                    },
+              
+                ],
+                   initComplete: function (settings,json) {
+                        HideOverlay();
+                   }
+
+            });
+        }, 1000);
+
+        // Filter event handler
+        //$(addnewpropertytable.table().container()).on('change', '#ddlStartTime', function () {
+        //    table
+        //        .column($(this).data('index'))
+        //        .search(this.value)
+        //        .draw();
+        //});
+
+        //$('#DRAvailablePropertiesTable tbody').on('click', 'tr', function () {
+        //    if ($(this).hasClass('selected')) {
+
+        //    }
+        //});
+
+        //$('#DRAvailablePropertiesTable').on('change.dt', 'input[type=text],input[type=number], select', function () {
+        //    let row = $(this).closest('tr');
+        //    let data = row.data;
+        //    $(row.children()[14]).html($(row.children()[14]).find('select').val());
+        //   // $('#DRAvailablePropertiesTable .d-none').removeClass('d-none');
+
+        //});
+
+        //$('#DRAvailablePropertiesTable .d-none').removeClass('d-none')
+
+
+        //drEditor_ur.field('effectiveDate').on('change', function (e, d) {
+        //$(drEditor_ur.field('effectiveDate').node()).on('change', function () {
+        //    try {
+
+        //        console.log('change event-35');
+        //        if (draddnewpropertytable) {
+        //            var eff = drEditor_ur.field('effectiveDate').val();
+        //            var effField = drEditor_ur.field('effectiveDate');
+        //            var rowData = gDREffDatesList;
+        //            console.log(eff);
+        //            console.log(rowData);
+        //            if (eff != -1 && new Date(eff).getDate() != new Date(rowData[0].effectiveDate).getDate()) {
+        //                //SaveEffectiveDate(rowData[0].upfrontLineId, eff);
+        //                $($(this).closest('tr').find('td')[14]).html(eff);
+        //                //var rowId = 8582;//$($(this).closest('tr').find('td')[0]).find("input").attr("id");
+        //                var rowId = $($(this).closest('tr').find('td')[0]).find("input").attr("id");
+        //                draddnewpropertytable.rows().data().filter(oo => oo.id == rowId)[0].effectiveDate = eff;
+        //                //drEditor_ur.field('effectiveDate').update(eff);
+        //                effField.val(eff);
+        //                drEditor_ur.draw();
+        //                //draddnewpropertytable.draw();
+        //            }
+        //        }
+        //    }
+        //    catch (err) {
+        //        /*
+        //        var notify = $.notify("onChange effectiveDate Error:  " + err.message, {
+        //            type: 'danger',
+        //            allow_dismiss: true,
+        //        });
+        //        */
+        //    }
+        //});
+
+          
+       $('#DRAvailablePropertiesTable').on('click', 'tbody input.editor-active', function () {
+           cb = $(this).prop('checked');
+           checkboxSetFlag = true;
+       });
+
+        }
+
+    function LoadDRAvailableProperties(networkId, quarterName, estimateVersion) {
+            gNetworkId = networkId;
+            gQuarterName = quarterName;
+            gEstimateVersion = estimateVersion;
+            PopulateDRAvailableProperties(networkId, quarterName, estimateVersion);
+        }
+
+</script>
+
+<div class="modal fade" id="modal-DRPropertyCreation" tabindex="-1" role="dialog" aria-labelledby="modal-DRPropertyCreation" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document" style="max-width:1750px !important;">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">@Model.UpfrontInfo.Name</h3>
+                    <div class="block-options">
+                        <button type="button" id="btnDRCloseTop"  class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="DivDROverLay" class="overlay">
+                    <div id="spinner" class="spinner-border " role="status" style="text-align:center;position:absolute;vertical-align:middle;color:blue;height:150px;width:150px;left:50%;top:50%;margin-left:-75px;margin-top:-75px;">
+
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row gutters-tiny">
+                        <div class="block-content block-content-full" id="divDRPriorEstimatesTable">
+                            @{Html.RenderPartial("_DRPriorEstimatesTable", Model);}
+                        </div>
+                     </div>
+
+                 </div>   
+                <div >
+                    <div class="block-content block-content-full" id="divDRAvailableProperties">
+                        @{Html.RenderPartial("_DRPropertyCreation_AvailablePropertiesTable", Model);}
+                    </div>
+            
+                </div>
+                @*</div>*@
+            </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnDRClose" class="btn btn-alt-secondary" data-dismiss="modal" >Close</button>
+                        <button type="button" disabled class="btn btn-alt-success" id="btnDRAdd" onclick="javascript: CheckSelectedDRProperties(0);">
+                            <i class="fa fa-check"></i> Add Selected Properties
+                        </button>
+</div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,117 @@
+@model ExchangeRateDemoViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+    });
+
+    function PopulateQuarter() {
+        if ($("#CanadianExchange_SelectedPlanYear").val() > 0) {
+
+            $("#CanadianExchange_SelectedQuarter").removeAttr("disabled");
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#CanadianExchange_SelectedQuarter").html(procemessage).show();
+            var url = "/CreateNewProperty/GetQuarters";
+
+            $.ajax({
+                url: url,
+                data: {
+                    Year: $("#CanadianExchange_SelectedPlanYear").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option>Please select ...</option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#CanadianExchange_SelectedQuarter").html(markup).show();
+                },
+                error: function (response, exception) {
+                    var msg = '';
+                    if (response.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (response.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (response.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + response.responseText;
+                    }
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: msg,
+                    })
+                }
+            });
+        }
+        else {
+            $("#CanadianExchange_SelectedQuarter").attr("disabled", "disabled");
+        }
+        //$("#text-propertyname").val('');
+    }
+
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Bootstrap Forms Validation -->
+        <h2 class="content-heading">Canadian Exchange Rates (Conversion is from CAD to USD)</h2>
+        <div class="block block-rounded block-themed">
+            <div class="block-header block-header-default bg-gd-sea">
+                <h3 class="block-title">Demonstration of API</h3>
+            </div>
+            <div class="block-content">
+                <div class="row justify-content-center py-20">
+                    <div class="col-xl-6">
+                        <!-- jQuery Validation (.js-validation-bootstrap class is initialized in js/pages/be_forms_validation.js) -->
+                        @using (Html.BeginForm("ExchangeRateDemo",
+                            "CanadianExchange",
+                            FormMethod.Get,
+                            new { @class = "js-validation-bootstrap" }
+                            ))
+                        {
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label" for="CanadianExchange_Rate">Date <span class="text-danger">*</span></label>
+                            <div class="col-lg-6">
+                                @Html.TextBoxFor(m => m.StartDate, new { @id = "DateToGet",
+                                    @class = "datepicker form-control input-datepicker",
+                                    placeholder = "mm/dd/yyyy",
+                                    data_date_format = "mm/dd/yyyy"
+                                })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-8 ml-auto">
+                                <button type="submit" class="btn btn-alt-primary">
+                                    <i class="fa fa-save mr-5"></i> Get Exchange Rates
+                                </button>
+                                <input type="button" id="btnReset" class="btn btn-alt-primary" value="Reset" />
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="mb-0">
+                        @Model.ReturnedJson
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap Forms Validation -->
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->

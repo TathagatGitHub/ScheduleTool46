@@ -1,0 +1,95 @@
+@model PostLogViewModel
+
+<link href="~/css/timeout-dialog.css" rel="stylesheet" />
+
+<style></style>
+
+
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/Logs/_PostLogHeader_Edit.cshtml", Model)
+            </div>
+        </div>
+        @Html.Partial("~/Views/Logs/_PostLogDataTable_Edit.cshtml", Model)
+    </div>
+</main>
+
+<script asp-append-version="true" type="text/javascript" src="~/js/check_browser_close.js"></script>
+<script asp-append-version="true" src="~/js/timeout-dialog.js"></script>
+
+<script asp-append-version="true" src="~/js/logs/PostLog.js"></script>
+<script asp-append-version="true" src="~/js/logs/PostLog_Edit.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width() - 20);
+        promptExit(0);
+        reloadParent(1);
+
+        $(document).prop('title', '@Model.PostLog.Schedule.ScheduleName');
+    });
+
+    var unloadEvent = function (e) {
+        var PostLogId = $('#postlogId').val();
+
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: '/Logs/UnLockPostLog',
+            data: { PostLogId },
+            success: function (result) {             
+                //window.close();
+            },
+            error: function (response) {
+                //window.close();
+            }
+        });
+        window.setTimeout(function () {
+            window.location.href = "~/ManageMedia/Logs"
+        }, 7000);
+       
+    };
+
+    $(window).on('unload', function () {
+        try {
+            unloadEvent();
+        }
+        catch (err) {
+        }
+    });
+
+</script>
+<input id="postlogId" name="postlogId" type="hidden" value="@Model.PostLog.PostLogId" />
+@*<link href="~/css/timeout-dialog.css" rel="stylesheet" />
+    <script asp-append-version="true" type="text/javascript" src="~/js/check_browser_close.js"></script>
+    <script asp-append-version="true" src="~/js/timeout-dialog.js"></script>
+
+    <script asp-append-version="true" src="~/js/logs/PostLog.js"></script>
+    <script asp-append-version="true" src="~/js/logs/PostLog_Edit.js"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#divHeader").width($(window).width() - 20);
+            promptExit(0);
+            reloadParent(1);
+
+            $(document).prop('title', '@Model.PostLog.Schedule.ScheduleName');
+        });
+    </script>
+
+
+    <main id="main-container">
+        <div class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    @Html.Partial("~/Views/Logs/_PostLogHeader_Edit.cshtml", Model)
+                </div>
+            </div>
+            @Html.Partial("~/Views/Logs/_PostLogHeader_Edit.cshtml", Model)
+        </div>
+    </main>*@
+

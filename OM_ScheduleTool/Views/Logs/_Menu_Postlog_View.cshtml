@@ -1,0 +1,156 @@
+@model PostLogViewModel
+
+<script language="javascript" type="text/javascript">
+  @*function GetNotes() {
+        $.ajax({
+            url: "/Logs/GetNotes",
+            data: { prelogid: @Model.PostLog.PostLogId },
+            type: "GET",
+            success: function (result) {
+                $("#modal-notes").find('.modal-body').text(result);
+                $('#modal-notes').modal({
+                    draggable: true
+                }, 'show');
+            },
+            error: function (response) {
+                swal('Error!', error.responseText, 'warning');
+            }        
+        });
+    }*@    
+
+</script>
+
+<div class="row">
+    <div class="col-12">
+        <div class="btn-group btn-group" role="group" aria-label="btnGroupDataTable">
+            <div id="divNotes"
+                 title="Notes"
+                 data-toggle="popover"
+                 data-original-title="Notes"
+                 data-placement="top">
+                <button tooltip="Notes" onclick="GetPostLogNotes();"
+                        class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        data-toggle="modal"
+                        data-target="#modal-notes">
+                    <i class="fa fa-comments-o mr-5"></i>
+                </button>
+            </div>
+            <div id="divExcelExport"
+                 title="Postlog Edit Export"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnPostlogViewExport"
+                        style="margin-left:9px;"
+                        name="btnPostlogEditExport">
+                    Excel Export
+                </button>
+            </div>
+            <div id="divViewValidISCI"
+                 title="View Valid ISCI"
+                 data-toggle="popover"
+                 data-original-title=""
+                 data-placement="top"
+                 data-content="">
+                <button class="btn btn-success"
+                        aria-describedby="popover880418"
+                        type="button"
+                        id="btnViewValidISCI"
+                        style="margin-left:9px;"
+                        name="btnViewValidISCI"
+                        data-target="#divValidISCIs"
+                        data-toggle="modal"
+                        onclick="PostLogGetValidISCIs();">
+                    View Valid ISCI
+                </button>
+            </div>
+
+            @*<div id="divColumns"
+             title="Column Visibility"
+             data-toggle="popover"
+             data-original-title="Column Visibility"
+             data-placement="top"
+             data-content="Show/Hide Columns">
+                <button tooltip="Show Columns"
+                        class="btn btn-success"
+                        id="btnPropShowColumns">
+                    <i class="fa fa-columns mr-5"></i>
+                </button>
+            </div>
+        <div id="divColumnsReset"
+             title="Reset Table State"
+             data-toggle="popover"
+             data-original-title="Reset Table State"
+             data-placement="top"
+             data-content="This will reset saved state of columns back to default settings.">
+            <button tooltip="Reset Columns"
+                    class="btn btn-success"
+                    id="btnPropResetColumns">
+                <i class="si si-ban mr-5"></i>
+            </button>
+        </div>
+            <div id="divFilterReset"
+                 title="Reset Filters"
+                 data-toggle="popover"
+                 data-original-title="Reset Filters"
+                 data-placement="top"
+                 data-content="This will reset filters back to show all rows.">
+                <button tooltip="Reset Filters"
+                        class="btn btn-success"
+                        id="btnPropResetFilters">
+                    <i class="fa fa-filter mr-5"></i>
+                </button>
+            </div>
+            <div id="divResetState"
+                 title="Refresh Table"
+                 data-toggle="popover"
+                 data-original-title="Refresh Table"
+                 data-placement="top"
+                 data-content="Refresh table only not the entire page.">
+                <button type="button"
+                        id="btnReload"
+                        tooltip="Reload data"
+                        class="btn btn-success">
+                    <i class="fa fa-refresh mr-5"></i>
+                </button>
+            </div>*@
+
+
+            @*<div style="margin-left:0px">*@
+
+            @*@Html.ActionLink("EXPORT LOG", "ExportToExcel", new { prelogid = @Model.PreLog.PreLogId })*@
+            @*<button tooltip="Export Log" style="margin-left:20px; background-color:gainsboro" id="btnExportSubmit"
+                class="btn btn-default"
+                aria-describedby="popover880418"
+                type="button">
+            EXPORT LOG
+        </button>*@
+
+            @*<button tooltip="Summary" style="margin-left:20px; background-color:gainsboro" id="btnSummary"
+                class="btn btn-default"
+                aria-describedby="popover880418"
+                type="button">
+            SUMMARY
+        </button>*@
+
+            @*<button tooltip="Notes" style="margin-left:20px; background-color:gainsboro" id="btnNotes"
+                class="btn btn-default"
+                aria-describedby="popover880418"
+                type="button">
+            NOTES
+        </button>*@
+
+            @*</div>*@
+
+        </div>
+    </div>
+</div>
+<br />
+
+

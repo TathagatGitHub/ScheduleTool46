@@ -1,0 +1,307 @@
+﻿@model ExchangeRateActualsViewModel
+
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        var excTbl = $('#ExchangeRateTable').DataTable({
+            columnDefs: [{ orderable: false }],
+            pageLength: 20,
+            lengthMenu: [[5, 10, 15, 20], [5, 10, 15, 20]],
+            autoWidth: false,
+            searching: false,
+            oLanguage: {
+                sLengthMenu: ""
+            },
+            dom: "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-6'i><'col-sm-6'p>>"
+        });
+
+        $("#ddlYear").change(function () {
+            if ($("#ddlYear option:selected").val() > 0) {
+                PopulateQuarter();
+                $("#ddlQuarter").removeAttr("disabled");
+            }
+            else {
+                $("#ddlQuarter").attr("disabled", "disabled");
+            }
+        });
+
+        $("#ddlQuarter").change(function () {
+            if ($("#ddlQuarter option:selected").val() > 0) {
+                PopulateWeeks();
+                PopulateHistory();                
+                $("#ddlWeeks").removeAttr("disabled");
+            }
+            else {
+                $("#ddlWeeks").attr("disabled", "disabled");
+            }
+
+
+        });
+
+        $("#ddlWeeks").change(function () {
+            PopulateHistory();
+        });
+       
+        $("#ddlYear").removeAttr("disabled");
+
+    });
+  
+    function PopulateQuarter() {
+        if ($("#ddlYear option:selected").val() > 0) {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlQuarter").html(procemessage).show();
+            var url = "/CreateNewProperty/GetQuarters";
+
+            $.ajax({
+                url: url,
+                data: {
+                    Year: $("#ddlYear option:selected").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option>Please select quarter...</option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlQuarter").html(markup).show();
+                },
+                error: function (response, exception) {
+                    var msg = '';
+                    if (response.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (response.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (response.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + response.responseText;
+                    }
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: msg,
+                    })
+                }
+            });
+        }
+    }
+
+    function PopulateWeeks() {
+        if ($("#ddlQuarter").val() > 0) {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#ddlWeeks").html(procemessage).show();
+            var url = "/ClientCommission/GetStartWeekByQuarter";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QuarterId: $("#ddlQuarter").val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    var markup = "<option>Please select week...</option>";
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlWeeks").html(markup).show();
+                },
+                error: function (result) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: result.responseText,
+                    })
+                }
+            });
+            $("#ddlStartWeek").removeAttr("disabled");
+        }
+        else {
+            $("#ddlStartWeek").attr("disabled", "disabled");
+        }
+
+
+    }
+
+    function PopulateHistory() {
+        if ($("#ddlQuarter option:selected").val() > 0) {
+            var procemessage = "<tr><td colspan='6' class='text-center'>Please wait...</td></tr>";
+            $("#bodyHistory").html(procemessage).show();
+            var url = "/CanadianExchange/GetHistory";
+
+            $.ajax({
+                url: url,
+                data: {
+                    QuarterId: $("#ddlQuarter option:selected").val(),
+                    Week: $("#ddlWeeks option:selected").text()
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    $('#ExchangeRateTable').DataTable().destroy();
+                    $('#ExchangeRateTable').find('tbody').html("").show();
+                    var markup = "";
+                    for (var x = 0; x < result.length; x++) {
+                        var dayDate = new Date(result[x].dayDate);
+                        markup = "";
+                        markup += "<tr>";
+                        markup += "<td class='text-center'>" + (x+1) + "</td>";
+                        markup += "<td class='font-w600 text-center'>" + result[x].quarter.quarterName + "</td>";
+                        markup += "<td class='d-none d-sm-table-cell text-center'>" + result[x].wkNbr + "</td>";
+                        markup += "<td class='d-none d-sm-table-cell text-center'>" + (dayDate.getMonth()+1) + "/" + dayDate.getDate() + "/" + dayDate.getFullYear() + "</td>";
+                        markup += "<td class='d-none d-sm-table-cell text-center'>" + result[x].rate + "</td>";
+                        markup += "<td class='d-none d-sm-table-cell text-center'>" + result[x].wkAvgRate + "</td>";
+                        markup += "</tr>";
+
+                        $('#ExchangeRateTable').find('tbody').append(markup);
+
+
+                    }
+                    $('#ExchangeRateTable').DataTable({
+                        columnDefs: [{ orderable: false }],
+                        pageLength: 20,
+                        lengthMenu: [[5, 10, 15, 20], [5, 10, 15, 20]],
+                        autoWidth: false,
+                        searching: false,
+                        oLanguage: {
+                            sLengthMenu: ""
+                        },
+                        dom: "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-6'i><'col-sm-6'p>>"
+                    }).draw();
+                },
+                error: function (result) {
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: result.responseText,
+                    })
+                }
+            });
+        }
+        else {
+        }
+
+    }
+        
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!-- Bootstrap Forms Validation -->
+        <h2 class="content-heading">Actual (Non-Client Specific) Planning</h2>
+        <div class="row">
+            <div class="col-4">
+                <div class="block block-rounded block-themed">
+                    <div class="block-header block-header-default bg-gd-sea">
+                        <h3 class="block-title">CA Exchange Rate Actuals</h3>
+                    </div>
+                    <div class="block-content">
+                        <div class="row justify-content-center py-20">
+                            <div class="col-xl-10">
+                                <div class="form-group row">
+                                    <label class="col-lg-12 col-form-label" for="Year">Year<span class="text-danger">*</span></label>
+                                    <div class="col-lg-12">
+                                        @Html.DropDownListFor(m => m.Year
+                                            , new SelectList(Model.Years, "Text", "Value")
+                                            , "Please select year..."
+                                            , new { @class = "form-control", @id="ddlYear", @disabled = "disabled" }
+                                    )
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-12 col-form-label" for="QuarterId">Quarter<span class="text-danger">*</span></label>
+                                    <div class="col-lg-12">
+                                        @Html.DropDownListFor(m => m.QuarterId
+                                                , Enumerable.Empty<SelectListItem>()
+                                                , "Please select quarter..."
+                                                , new { @class = "form-control", @size = "1", @disabled="disabled", @id="ddlQuarter"}
+                                    )
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-12 col-form-label" for="WeekNbr">Week </label>
+                                    <div class="col-lg-12">
+                                        @Html.DropDownListFor(m => m.WeekNbr
+                                                , new SelectList(Model.Weeks, "Text", "Value")
+                                                , "Please select week ..."
+                                                , new { @class = "form-control", @size = "1", @disabled="disabled", @id="ddlWeeks"}
+                                    )
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+
+            <div class="col-8">
+                <!-- Dynamic Table Full -->
+                <div class="block">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Previous Week Exchange Rates</h3>
+                    </div>
+                    <div class="block-content block-content-full">
+                        <!-- DataTables init on table by adding .js-dataTable-full class, functionality initialized in js/pages/be_tables_datatables.js -->
+                        <table class="table table-bordered table-striped table-vcenter" id="ExchangeRateTable" name="ExchangeRateTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"></th>
+                                    <th>Qtr</th>
+                                    <th class="d-none d-sm-table-cell">Week</th>
+                                    <th class="d-none d-sm-table-cell">Date</th>
+                                    <th class="text-center">Rate</th>
+                                    <th class="text-center">Wk Avg Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyHistory">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- END Dynamic Table Full -->
+            </div>
+        </div>
+
+                        @if (Model.ErrMessage.ResponseText.Length > 0)
+            {
+                            @if (Model.ErrMessage != null && Model.ErrMessage.Success == true)
+                {
+                                <div class="alert alert-success alert-dismissable" role="alert">
+                                    <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h3 class="alert-heading font-size-h4 font-w400">Success</h3>
+                                    <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger alert-dismissable" role="alert">
+                                    <button class="close" aria-label="Close" type="button" data-dismiss="alert">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h3 class="alert-heading font-size-h4 font-w400">Error</h3>
+                                    <p class="mb-0">@Model.ErrMessage.ResponseText</p>
+                                </div>
+                            }
+                        }
+
+
+                        <!-- Bootstrap Forms Validation -->
+                    </div>
+                    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->

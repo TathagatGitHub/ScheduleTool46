@@ -1,0 +1,114 @@
+﻿@model ViewUpfrontsViewModel
+
+<style type="text/css">
+    div.cb-dropdown-wrap:hover {
+        z-index: 2;
+    }    
+    .HeaderPropertyName .cb-dropdown-wrap:hover {
+        width:350px !important;        
+    }
+    .HeaderStartTime .cb-dropdown-wrap:hover, .HeaderEndTime .cb-dropdown-wrap:hover {
+        width: 120px !important;
+    }    
+    .HeaderSPBuy span:empty {
+        display: inline-block;
+    }
+</style>
+<script asp-append-version="true" type="text/javascript" src="~/js/check_browser_close.js"></script>
+<link href="~/css/timeout-dialog.css" rel="stylesheet" />
+<script asp-append-version="true" src="~/js/timeout-dialog.js"></script>
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        $("#divHeader").width($(window).width() - 20);
+        reloadParent(1);
+    });
+        
+    $(document).on("click", ".btn-success", function (event) {
+        $.get("@Url.Action("AjaxClick", "Home")", function (data) {
+            try {
+                jQuery.timeoutDialog.setupDialogTimer();
+            }
+            catch (err) { }
+        });
+        $.ajax({
+            url: "/UpfrontRemnant/IsSessionActive",
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success === false) {
+                    promptExit(0);
+                    window.location.href = '/Home/Logout';
+                }
+            },
+            error: function (response) {
+            }
+
+        });
+    });
+    
+    //$(window).resize(function () {
+    //    $("#divHeader").width($(window).width()-20);
+    //});
+
+    // Begin Close All Child Windows
+    var approvalPopup = false;
+    var popupChangeProgram = false;
+    var popupCreateProperty = false;
+    var popupExport = false;
+    $(window).on('unload', function () {
+        try {
+            if (approvalPopup && !approvalPopup.Closed) {
+                approvalPopup.close();
+            }
+            if (popupChangeProgram && !popupChangeProgram.Closed) {
+                popupChangeProgram.close();
+            }
+            if (popupCreateProperty && !popupCreateProperty.Closed) {
+                popupCreateProperty.close();
+            }
+            if (popupExport && !popupExport.Closed) {
+                popupExport.close();
+            }
+        }
+        catch (err) {
+        }
+    });
+    // End Close All Child Windows
+</script>
+<style>
+    #UpfrontTable_wrapper {
+        overflow-y: scroll;
+        height: 580px;
+        background-color: white;     
+    }
+    #UpfrontTable thead th{
+        position: sticky;
+        top: 0px !important;
+        z-index: 1;
+        background-color: white;
+    }
+    #UpfrontTable thead th:hover {
+        z-index: 2;        
+    }
+    body {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .swal2-content {
+        white-space: pre-line;
+    }           
+</style>
+<main id="main-container">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/UpfrontRemnant/_Header.cshtml", Model)
+            </div>
+        </div>
+        <div id="DataTableEdit">
+            @Html.Partial("~/Views/UpfrontRemnant/_DataTable_Edit.cshtml", Model)
+        </div>
+    </div>
+</main>

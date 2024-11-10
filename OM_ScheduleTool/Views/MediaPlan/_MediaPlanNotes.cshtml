@@ -1,0 +1,202 @@
+﻿<style>
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    a {
+        text-decoration: none;
+        color: #379937;
+    }
+
+    body {
+        margin: 40px;
+    }
+
+    .dropdown {
+        position: relative;
+        font-size: 14px;
+        color: #333;
+    }
+
+        .dropdown .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: absolute;
+            top: 30px;
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform 0.1s ease-in-out 0.1s;
+            max-height: 15vh;
+            overflow-y: scroll;
+            z-index: 100;
+        }
+
+        .dropdown .dropdown-option {
+            display: block;
+            /*padding: 8px 12px;*/
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .dropdown .dropdown-label {
+            display: block;
+            height: 34px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+            .dropdown .dropdown-label:before {
+                content: "▼";
+                float: right;
+                color: gray
+            }
+
+        .dropdown.on .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+        }
+
+            .dropdown.on .dropdown-list .dropdown-option {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+
+        .dropdown.on .dropdown-label:before {
+            content: "▼";
+            color: gray
+        }
+
+        .dropdown [type=checkbox] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+</style>
+<div id="mpMediaPlanNotesModal">
+    <div class="modal draggable fade" id="MediaPlanNotesModal" tabindex="-1" role="dialog"
+         aria-labelledby="MediaPlanNotesModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl" id="MediaPlanNotesModalDialogue" role="document" style="width:2350px;max-width:2350px;">
+            <div class="modal-content" style="height:100%;">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="modal-header block-header" style="background-color: #015B82 !important;display:flex;width:100%!important;">
+                        <div style="float:left;width:50%;">
+                            <h2 class="block-title" id="CreateMediaPlanHeading" style="font-weight: bold; font-size: 30px; color: #FFF !important;">Notes</h2>
+                        </div>
+                        <div style="float:right;width:50%;">
+                            <h2 class="block-title" id="spnCloseMPNotes" style="position:absolute;right:5px;"><i style="font-size: 37px; position: absolute; right: 10px; top: -16px; color: gray;" class="fa fa-times" aria-hidden="true" onclick="CloseMediaPlanNotesPopup();"></i></h2>
+                          
+                        </div>
+                       
+                       
+                    </div>
+                    <div class="block-content">
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <input style="width:2260px;" type="text" class="form-control" id="txtNewNote" placeholder="Add new note...">
+                                <div style="position:absolute;right:0px;top:5px;">                                    
+                                    <span id="spnSaveMPNotes"><i id="mpnSave" title="Save Note" onclick="MediaPlanCheckLock('createnote');" style="color:green; font-size:25px;padding:1px; cursor:pointer;" class="fa fa-check" aria-hidden="true"></i><i id="mpnUpdate" title="Save Note" onclick="UpdateMediaNote();" style="color:green; font-size:25px;padding:1px; cursor:pointer;display:none;" class="fa fa-check" aria-hidden="true"></i></span>
+                                    <span id="spnCloseMPNotes"><i title="Cancel" onclick="ClearMedialNotes();" style="color:red;font-size:25px;cursor:pointer;" class="fa fa-times" aria-hidden="true"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <table id="tblMediaPlanNotes2" border="0" cellspacing="0" cellpadding="0" width="2320px" style="margin-left:-1px">
+                                        <thead>
+                                            <tr class="summary-header-row">
+                                                <th scope="col" style="color: white; font-weight: bold; width: 156px; max-width: 156px; border-right: 1px solid white; text-transform: capitalize; text-align: left; padding-left: 5px">User </th>
+                                                <th scope="col" style="color: white; font-weight: bold; width: 1385px; max-width: 1385px; border-right: 1px solid white; text-transform: capitalize; text-align: left; padding-left: 5px ">Note </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:160px;max-width:200px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Author </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:150px;max-width:150px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Time </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:74px;max-width:74px;border-right:2px solid #42A4F4 !important;text-transform: capitalize;text-align:left;padding-left: 5px"> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border:1px solid #e5e5e5; min-height:30px;max-height:30px;height:30px;">
+                                                <td scope="col" style="width: 150px; max-width: 150px; border: 1px solid #e5e5e5; text-transform: capitalize; text-align: left; padding: 5px; ">
+                                                    <i style="font-size:20px;" class="fa fa-filter tablefilter" aria-hidden="true" id="icoFilter_0" col-index="0" onclick="return ToggleFilter(0);"></i>
+                                                    <div id="divFilterCol_0" class="filterdata" data-col="0" style="position: absolute;z-index: 2147483647;background-color: #ffffff;padding: 5px;width: 180px;border: 1px solid #e9e9e9;display:none;">
+
+                                                    </div>
+                                                </td>
+                                                <td scope="col" style="width: 1350px; max-width: 1350px; border: 1px solid #e5e5e5; text-transform: capitalize; text-align: left; padding: 5px; "  id="divFilterCol_1">
+
+                                                </td>
+                                                <td scope="col" style="width:150px;max-width:300px;border:1px solid #e5e5e5;text-transform: capitalize;text-align:left;padding: 5px;">
+                                                    <i class="fa fa-filter tablefilter" style="font-size:20px;" aria-hidden="true" id="icoFilter_2" col-index="2" onclick="return ToggleFilter(2);"></i>
+                                                    <div id="divFilterCol_2" class="filterdata" data-col="2" style="position: absolute;z-index: 2147483647;background-color: #ffffff;padding: 5px;width: 190px;border: 1px solid #e9e9e9;display:none;">
+                                                    </div>
+                                                </td>
+                                                <td scope="col" style="width:150px;max-width:150px;border:1px solid #e5e5e5;text-transform: capitalize;text-align:left;padding: 5px;"  id="divFilterCol_3">
+
+                                                </td>
+                                                <td scope="col" style="width:74px;max-width:74px;border:1px solid #e5e5e5;text-transform: capitalize;text-align:left;padding: 5px;">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table id="tblMediaPlanNotes" border="0" cellspacing="0" cellpadding="0" width="2320px" class="table table-striped">
+                                        <thead>
+                                            <tr class="summary-header-row">
+                                                <th scope="col" style="color:white;font-weight:bold;width:156px;max-width: 156px; border-right: 1px solid white; text-transform: capitalize; text-align:left;padding-left: 5px">User </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:1385px;max-width: 1385px; border-right: 1px solid white; text-transform: capitalize;text-align:left;padding-left: 5px">Note </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:160px;max-width:200px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Author </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:150px;max-width:150px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Time </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:72px;max-width:72px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px"> </th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th scope="col" style="color:white;font-weight:bold;width:156px;max-width: 156px; border-right: 1px solid white; text-transform: capitalize; text-align:left;padding-left: 5px">User </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:1385px;max-width: 1385px; border-right: 1px solid white; text-transform: capitalize;text-align:left;padding-left: 5px">Note </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:160px;max-width:200px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Author </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:150px;max-width:150px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px">Time </th>
+                                                <th scope="col" style="color:white;font-weight:bold;width:72px;max-width:72px;border-right:1px solid white;text-transform: capitalize;text-align:left;padding-left: 5px"> </th>
+                                            </tr>
+                                        </tfoot>
+                                        <tbody id="tbodyMediaPlanNotes">
+                                            
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div style="width: 100%;">
+                        <button type="button" id="btnCancelMediaPlanPopup" class="btn btn-alt-secondary mr-auto float-right" onclick="CloseMediaPlanNotesPopup();">CLOSE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

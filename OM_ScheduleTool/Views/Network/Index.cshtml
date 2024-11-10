@@ -1,0 +1,638 @@
+﻿@model NetworkViewModel
+@Html.Partial("_NavigationMenu", Model.LoggedOnUser)
+
+<script src="~/js/NetworkAndAlias.js"></script>
+<script language="javascript" type="text/javascript">
+    var urlNetworkSave = '@Url.Action("SaveNewNetwork","Network")';
+    var urlCreateNetworkAlias = '@Url.Action("AddAlias", "Network")';
+    $("document").ready(function() {
+        $("#ddlCountry").on("change", function (e) {
+            GetNetworks($("#ddlCountry").find(":selected").val(), 0);
+        });
+
+
+        // Initialize Page
+        // Fill out networks
+        GetNetworks($("#ddlCountry").find(":selected").val(), 0);
+
+        //GetAliases($("ddlnetwork").value);
+    });
+
+    /*
+     *  GetNetworks -- if _selectnetworkid == 0, select the first item
+     */
+    function GetNetworks(_countryid, _selectnetworkid) {
+        var SelectedNetworkId = 0;
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlnetwork").html(procemessage).show();
+        var url = "/Network/GetNetworkByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+                for (var x = 0; x < result.length; x++) {
+                    if (_selectnetworkid == 0 && x==0) {
+                        markup += "<option value=" + result[x].value + " selected>" + result[x].text + "</option>";
+                        SelectedNetworkId = result[x].value;
+                    }
+                    else if (result[x].value == _selectnetworkid) {
+                        markup += "<option value=" + result[x].value + " selected>" + result[x].text + "</option>";
+                        SelectedNetworkId = result[x].value;
+                    }
+                    else {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                }
+                $("#ddlnetwork").html(markup).show();
+
+                GetAliases(SelectedNetworkId);
+            },
+            error: function (response) {
+                swal('', response.responseText, 'error');
+
+            }
+        });
+    }
+
+    function GetAliases(_networkid) {
+        var procemessage = "<option value='0'> Please wait...</option>";
+        $("#ddlaliases").html(procemessage).show();
+
+        var url = "/Network/GetAliasesByNetworkId/";
+
+        $.ajax({
+            url: url,
+            data: { networkid: _networkid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var MainAliasList = "";
+                if (result.length == 0) {
+                    MainAliasList += "<option value=0>*** NO ALIASES ***</option>";
+                }
+                for (var x = 0; x < result.length; x++) {
+                    MainAliasList += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                }
+                // Fill the dropdownlist for alias
+                $("#ddlaliases").html(MainAliasList).show();
+
+                // Set the headers for Network and Alias list boxes
+                $("#h3-alias").html("Aliases for " + $("#ddlnetwork").find(":selected").text()).show();
+
+                // Initialize "ADD NETWORK" modl dialog
+                $("#h3-add-alias").html("Network:  " + $("#ddlnetwork").find(":selected").text() + " (" + $("#ddlCountry").find(":selected").text() + ")").show();
+                $("#ddlaliaslist").html(MainAliasList).show();
+
+                // Initialize "EDIT NETWORK" modal dialog
+                $("#txtEditNetworkNameCountry").val($("#ddlCountry").find(":selected").text());
+                $("#txtEditNetworkNameCurrent").val($("#ddlnetwork").find(":selected").text());
+                $("#txtEditNetworkName").val("");
+            },
+            error: function (response) {
+                swal('', response.responseText, 'error');
+            }
+        });
+
+        if ($("#btnEditNetwork" != "undefined")) {
+            if (_networkid > 0) {
+                $("#btnEditNetwork").removeAttr("hidden");
+            }
+            else {
+                $("#btnEditNetwork").attr("hidden", "hidden");
+            }
+        }
+
+        if (_networkid > 0) {
+            $("#btnAddAlias").removeAttr("hidden");
+        }
+        else {
+            $("#btnAddAlias").attr("hidden", "hidden");
+        }
+
+        $("#btnDeleteAlias").attr("hidden", "hidden");
+
+    }
+
+    function ClickAlias(_aliasid) {
+        if (_aliasid > 0) {
+            $("#btnDeleteAlias").removeAttr("hidden");
+        }
+        else {
+            $("#btnDeleteAlias").attr("hidden", "hidden");
+        }
+    }
+
+    //function ValidateNewNetwork(_NetworkName, _FeedTypeId, _MediaTypeId, _CountryId) {
+    //    if (_NetworkName == "") {
+    //        $("#txtNetworkName").addClass("is-invalid");
+    //    }
+    //    else {
+    //        $("#txtNetworkName").removeClass("is-invalid");
+    //    }
+
+    //    if (_MediaTypeId == 0) {
+    //        $("#ddlAddNetworkMediaType").addClass("is-invalid");
+    //    }
+    //    else {
+    //        $("#ddlAddNetworkMediaType").removeClass("is-invalid");
+    //    }
+
+    //    if (_FeedTypeId == 0) {
+    //        $("#ddlAddNetworkFeedType").addClass("is-invalid");
+    //    }
+    //    else {
+    //        $("#ddlAddNetworkFeedType").removeClass("is-invalid");
+    //    }
+
+    //    if (_CountryId == 0) {
+    //        $("#ddlAddNetworkCountry").addClass("is-invalid");
+    //    }
+    //    else {
+    //        $("#ddlAddNetworkCountry").removeClass("is-invalid");
+    //    }
+
+    //}
+
+    //function ResetAddNetworkDialog () {
+    //    // Empty out modal dialog
+    //    $("#txtNetworkName").val("");
+    //    $("#ddlAddNetworkMediaType").val ("");
+    //    $("#ddlAddNetworkFeedType").val("");
+    //    $("#ddlAddNetworkCountry").val("");
+
+    //    $("#txtNetworkName").removeClass("is-invalid");
+    //    $("#ddlAddNetworkMediaType").removeClass("is-invalid");
+    //    $("#ddlAddNetworkFeedType").removeClass("is-invalid");
+    //    $("#ddlAddNetworkCountry").removeClass("is-invalid");
+    //}
+
+    //function SaveNewNetwork(_NetworkName, _FeedTypeId, _MediaTypeId, _CountryTypeId) {
+    //    var url = "/Network/SaveNewNetwork/";
+    //    var isValid = true;
+
+    //    $.ajax({
+    //        url: url,
+    //        data: {
+    //            NetworkName: _NetworkName,
+    //            MediaTypeId: _MediaTypeId,
+    //            FeedTypeId: _FeedTypeId,
+    //            CountryId: _CountryTypeId
+    //        },
+    //        cache: false,
+    //        type: "POST",
+    //        success: function (result) {
+    //            if (result.success == true) {
+    //                // Refresh the network listbox
+    //                GetNetworks($("#ddlCountry").val(), result.responseCode);
+
+    //                // Empty dialog
+    //                ResetAddNetworkDialog();
+    //            }
+    //            else {
+    //                ValidateNewNetwork(_NetworkName, _FeedTypeId, _MediaTypeId, _CountryTypeId);
+    //                $("#txtNetworkName").addClass("is-invalid");
+
+    //            }
+    //            //if (result.success == true) {
+    //            //    var notify = $.notify(result.responseText, {
+    //            //        type: 'success',
+    //            //        allow_dismiss: true
+    //            //    });
+    //            //}
+    //            //else {
+    //            //    swal('', result.responseText, 'error');
+    //            //}
+    //        },
+    //        error: function (response) {
+    //            swal('', response.responseText, 'error');
+
+    //        }
+    //    });
+
+    //    return false;
+
+    //}
+
+    function EditNetwork(_NetworkId, _CountryId, _OldNetworkName, _NewNetworkName) {
+        var url = "/Network/EditNetwork/";
+
+        $.ajax({
+            url: url,
+            data: {
+                NetworkId: _NetworkId,
+                CountryId: _CountryId,
+                OldNetworkName: _OldNetworkName,
+                NewNetworkName: _NewNetworkName
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    // Refresh the network listbox
+                    //GetNetworks($("#ddlCountry").val(), _NetworkId);
+                    $("#ddlnetwork").find(":selected").text(_NewNetworkName);
+
+                    // Empty "EDIT NETWORK
+                    $("#txtEditNetwork").val("");
+                }
+
+                if (result.success == true) {
+                    var notify = $.notify(result.responseText, {
+                        type: 'success',
+                        allow_dismiss: true
+                    });
+                }
+                else {
+                    swal('', result.responseText, 'error');
+                }
+            },
+            error: function (response) {
+                swal('', response.responseText, 'error');
+            }
+        });
+
+        return false;
+
+    }
+
+    function DeleteAlias(_networkid, _aliasid) {
+        var url = "/Network/DeleteAlias/";
+
+        $.ajax({
+            url: url,
+            data: {
+                AliasId: _aliasid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.success == true) {
+                    GetAliases(_networkid);
+                }
+                if (result.success == true) {
+                    var notify = $.notify(result.responseText, {
+                        type: 'success',
+                        allow_dismiss: true
+                    });
+                }
+                else {
+                    swal('', result.responseText, 'error');
+                }
+            },
+            error: function (response) {
+                swal('', response.responseText, 'error');
+            }
+        });
+
+        return false;
+
+    }
+
+</script>
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+
+        <!-- Mega Form -->
+        <!--
+        <h2 class="content-heading"><label class="text-primary">Network Names and Aliases</label></h2>
+        -->
+        <div class="block">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Network Names and Aliases</h3>
+            </div>
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-firstname">Select Country to List Networks</label>
+                                    @Html.DropDownListFor(m => m.Countries, new SelectList(Model.Countries, "CountryId", "CountryShort"), new { @id = "ddlCountry", @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 1)
+                        {
+                            // No Access.  Do not show
+                        }
+                        else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId > 1)
+                        {
+                            // Everybody else should be at least able to view
+                            <div class="col-md-6">
+                                <div class="block-header block-header-default">
+                                    <h3 class="block-title">List of All Network Names</h3>
+                                    <div class="block-options">
+                                        @if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 2)
+                                        {
+                                            // Access/Execute -- Not sure yet what this means but I equate this to view.
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 3)
+                                        {
+                                            // View -- Network names are viewable only
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 4)
+                                        {
+                                            // Edit -- Allow user to add a new network and change the name of an existing one.
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-edit-network" id="btnEditNetwork" name="btnEditNetwork" title="Edit Network" hidden>
+                                                <i class="si si-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-add-network" title="Add New Network">
+                                                <i class="si si-plus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript:GetNetworks(ddlCountry.value, 0);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="15" onchange="javascript: GetAliases(this.value);"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 1)
+                        {
+                            // No Access.  Do not show
+                        }
+                        else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId > 1)
+                        {
+                            // Everybody else should be at least able to view
+                            <div class="col-md-6">
+                                <div class="block-header block-header-default">
+                                    <h3 id="h3-alias" name="h3-alias" class="block-title">All Aliases for Selected Network Name</h3>
+                                    <div class="block-options">
+                                        @if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 2)
+                                        {
+                                            // Access/Execute -- Not sure yet what this means but I equate this to view.
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 3)
+                                        {
+                                            // View -- Network names are viewable only
+                                        }
+                                        else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 4)
+                                        {
+                                            // Edit -- Allow user to add a new network and change the name of an existing one.
+
+                                            <button type="button" class="btn-block-option" title="Delete Alias" id="btnDeleteAlias" name="btnDeleteAlias" onclick="javascript: DeleteAlias(ddlnetwork.options[ddlnetwork.selectedIndex].value, ddlaliases.options[ddlaliases.selectedIndex].value);" hidden>
+                                                <i class="fa fa-trash-o"></i>
+                                            </button>
+                                            <button type="button" class="btn-block-option" data-toggle="modal" data-target="#modal-add-alias" title="Add New Alias" id="btnAddAlias" name="btnAddAlias" hidden>
+                                                <i class="si si-plus"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn-block-option" onclick="javascript: GetAliases(ddlnetwork.value);" title="Refresh">
+                                            <i class="si si-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <select class="form-control" id="ddlaliases" name="ddlaliases" size="15" onchange="javascript: ClickAlias(this.value);"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-6">
+                            <label class="col-12 col-form-label text-danger" id="Message" name="Message"></label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-alt-primary" onclick="javascript:window.location.href='/Network/ExportToExcel'"><i class="fa fa-file-text mr-5"></i> Export to Excel</button>
+                            @if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 1)
+                            {
+                                // No Access.  Do not show
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 2)
+                            {
+                                // Access/Execute -- Not sure yet what this means but I equate this to view.
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 3)
+                            {
+                                // View -- Add Network names are viewable only
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkName.ActionId == 4)
+                            {
+                                // Edit
+                                <button type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-network"><i class="si si-globe mr-5"></i> Add New Network</button>
+                            }
+                            @if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 1)
+                            {
+                                // No Access.  Do not show
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 2)
+                            {
+                                // Access/Execute -- Not sure yet what this means but I equate this to view.
+                                @*<button type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-alias"><i class="fa fa-clone mr-5"></i> Add New Alias</button>*@
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 3)
+                            {
+                                // View -- Add Network names are viewable only
+                            }
+                            else if (Model.LoggedOnUser_Permissions_NetworkAlias.ActionId == 4)
+                            {
+                                // Edit
+                                <button type="button" class="btn btn-alt-primary" data-toggle="modal" data-target="#modal-add-alias"><i class="fa fa-clone mr-5"></i> Add New Alias</button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- END Mega Form -->
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+<!-- Add New Network -->
+<div class="modal fade" id="modal-add-network" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-fromleft" role="document">
+        <div class="modal-content">
+            <form class="js-validation-bootstrap" name="form_addnewnetwork" method="post" onsubmit="javascript: return false;">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Add New Network</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">Network Name<span class="text-danger"> *</span></label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtNetworkName" name="txtNetworkName" placeholder="Enter network name..." onchange="$(this).removeClass('is-invalid')">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="example-select">Feed Type<span class="text-danger"> *</span></label>
+                            <div class="col-md-12">
+                                @Html.DropDownListFor(m => m.FeedTypes, new SelectList(Model.FeedTypes, "FeedTypeId", "Description"), "Please select a feed type ...", new { @id = "ddlAddNetworkFeedType", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="example-select">Media Type<span class="text-danger"> *</span></label>
+                            <div class="col-md-12">
+                                @Html.DropDownListFor(m => m.MediaTypes, new SelectList(Model.MediaTypes, "MediaTypeId", "MediaTypeName"), "Please select a media type ...", new { @id = "ddlAddNetworkMediaType", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12 col-form-label" for="val-select2-country">Country<span class="text-danger"> *</span></label>
+                            <div class="col-md-12">
+                                @Html.DropDownListFor(m => m.Countries, new SelectList(Model.Countries, "CountryId", "CountryShort"), "Please select country ...", new { @id = "ddlAddNetworkCountry", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12 col-form-label text-danger" id="errorMessage" name="errorMessage"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <img id="loading-ajax-image" src="~/img/loadingImg.gif" width="32" alt="Loading..." style="display:none" />
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal" id="btnNetworkCancel">Close</button>
+                    <button type="submit" class="btn btn-alt-success" id="btnSaveNewNetwork" name="btnSaveNewNetwork">
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- END Add New Network -->
+<!-- Edit Network -->
+@using (Html.BeginForm())
+{
+    <div class="modal fade" id="modal-edit-network" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromright" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Change Network Name</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">Country</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtEditNetworkNameCountry" name="txtEditNetworkNameCountry" disabled="">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">Existing Network Name</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtEditNetworkNameCurrent" name="txtEditNetworkNameCurrent" disabled="">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="txtNetworkName">New Network Name</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtEditNetworkName" name="txtEditNetworkName" placeholder="Enter new network name ...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" data-dismiss="modal" onclick='javascript: EditNetwork($("#ddlnetwork").val(), $("#ddlCountry").val(), $("#ddlnetwork").find(":selected").text(), $("#txtEditNetworkName").val());'>
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Edit Network -->
+<!-- New Alias -->
+@using (Html.BeginForm("","",FormMethod.Post,new { @class = "js-validation-material" }))
+{
+    <div class="modal fade" id="modal-add-alias" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromleft" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title" id="h3-add-alias" name="h3-add-alias">Add New Alias</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="form-group row">
+                            <label class="col-12" for="txtAddAlias">New Alias</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="txtAddAlias" name="txtAddAlias" placeholder="Enter new alias ...">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12" for="ddlaliaslist">Current Alias Name List</label>
+                            <div class="col-md-12">
+                                <select class="form-control" id="ddlaliaslist" name="ddlaliaslist" size="5"></select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-12 col-form-label text-success" id="aliasSuccessMessage" name="aliasSuccessMessage"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <img id="loading-ajax-image_btnAliasCreate" src="~/img/loadingImg.gif" width="32" alt="Loading..." style="display:none" />
+                    <button type="button" class="btn btn-alt-secondary" id="btnCloseAddAliasModal" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" id="btnAliasCreate">
+                        <i class="fa fa-check"></i> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Add Alias -->
+<!-- Edit Alias -->
+@using (Html.BeginForm())
+{
+    <div class="modal fade" id="modal-del-alias" tabindex="-1" role="dialog" aria-labelledby="modal-top" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-fromright" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Edit Alias</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <p>Dolor posuere proin blandit accumsan senectus netus nullam curae, ornare laoreet adipiscing luctus mauris adipiscing pretium eget fermentum, tristique lobortis est ut metus lobortis tortor tincidunt himenaeos habitant quis dictumst proin odio sagittis purus mi, nec taciti vestibulum quis in sit varius lorem sit metus mi.</p>
+                        <p>Dolor posuere proin blandit accumsan senectus netus nullam curae, ornare laoreet adipiscing luctus mauris adipiscing pretium eget fermentum, tristique lobortis est ut metus lobortis tortor tincidunt himenaeos habitant quis dictumst proin odio sagittis purus mi, nec taciti vestibulum quis in sit varius lorem sit metus mi.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-alt-success" data-dismiss="modal">
+                        <i class="fa fa-check"></i> Perfect
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- END Edit alias -->

@@ -1,0 +1,329 @@
+﻿<style>
+    .overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+        opacity: 0.5;
+    }
+
+    .btnBTG:hover {
+        border: 1px solid grey !important;
+        box-shadow: revert-layer;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    a {
+        text-decoration: none;
+        color: #379937;
+    }
+
+    body {
+        margin: 40px;
+    }
+
+    .dropdown {
+        position: relative;
+        font-size: 14px;
+        color: #333;
+    }
+
+        .dropdown .dropdown-list {
+            padding: 12px;
+            background: #fff;
+            position: absolute;
+            top: 30px;
+            left: 2px;
+            right: 2px;
+            box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+            transform-origin: 50% 0;
+            transform: scale(1, 0);
+            transition: transform 0.1s ease-in-out 0.1s;
+            max-height: 15vh;
+            overflow-y: scroll;
+            z-index: 100;
+        }
+
+        .dropdown .dropdown-option {
+            display: block;
+            /*padding: 8px 12px;*/
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .dropdown .dropdown-label {
+            display: block;
+            height: 34px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+            .dropdown .dropdown-label:before {
+                content: "▼";
+                float: right;
+                color: gray
+            }
+
+        .dropdown.on .dropdown-list {
+            transform: scale(1, 1);
+            transition-delay: 0s;
+        }
+
+            .dropdown.on .dropdown-list .dropdown-option {
+                opacity: 1;
+                transition-delay: 0.2s;
+            }
+
+        .dropdown.on .dropdown-label:before {
+            content: "▼";
+            color: gray
+        }
+
+        .dropdown [type=checkbox] {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* .mpQuickPlanNetwork-Dropdown {
+        position: absolute;
+        display: inline-block;
+    } */
+
+    .mpQuickPlanNetwork-DropdownContent {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 145px;
+        z-index: 1;
+        margin-top: 32px;
+        margin-left: -125px;
+        border-radius: 3px;
+        text-align: left;
+        color: #5c852c;
+        background-color: #ebf5df;
+        border-color: #ebf5df;
+        height: 34px;
+        font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        font-weight: 500;
+    }
+
+        .mpQuickPlanNetwork-DropdownContent a {
+            color: #171717;
+            padding: 8px 14px;
+            text-decoration: none;
+            display: block;
+        }
+
+            .mpQuickPlanNetwork-DropdownContent a:hover {
+                background-color: #cde0b6;
+                min-width: 145px;
+                border-radius: 3px;
+                text-align: left;
+                border-color: #ebf5df;
+                height: 34px;
+                font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+                font-weight: 500;
+            }
+
+    .mp-cross-icon {
+        color: #aaa4a4;
+        font-weight: 100;
+        float: right;
+        cursor: pointer;
+        font-size: 20px;
+        margin-top: -5px;
+    }
+
+        .mp-cross-icon:hover {
+            color: #a64b4b;
+        }
+
+    .vr {
+        border-left: 1px solid #ddd;
+        padding-left: 5px;
+    }
+
+    .swal2-buttonswrapper {
+        float: right;
+    }
+</style>
+
+<div class="modal draggable fade" id="mpQuickPlanNetworkModal" tabindex="-1" role="dialog"
+     aria-labelledby="mpQuickPlanNetworkModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="mpQuickPlanNetworkDialogue" role="document" style="max-width: 800px;margin-top:5%">
+        <div class="modal-content" style="height:100%;">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="modal-header block-header top-summary-header">
+                    <h3 class="block-title" id="mpQuickPlanNetworkHeading" style="font-weight: bold;"></h3>
+                </div>
+                <div class="block-content">
+                    <div class="form-row" style="margin-bottom: -14px;margin-left:2px;">
+                        <div class="form-group" style="width:95px;margin-right:10px;">
+                            <label for="" style="font-size: 16px;font-weight: bold;">Year<span style="color:red;display: inline;">*</span></label>
+                            <select name="ddlMediaPlanQuickPlanYears" id="ddlMediaPlanQuickPlanYears" class="form-control" size="1" onchange="javascript: ResetQuickPlanData('year',true);" style="width:95px;height:34px;">
+                                @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 2; idx++)
+                                {
+                                    @if (idx == Model.LastSelectedPlanYear)
+                                    {
+                                        <option value="@idx" selected>@idx</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@idx">@idx</option>
+                                    }
+                                }
+                            </select>                            
+                        </div>
+                        <div class="form-group" style="width:90px;margin-right:10px;">
+                            <label for="ddlMediaPlanQuickPlanQuarter" style="font-size: 16px;font-weight: bold;">Quarter<span style="color:red;display: inline;">*</span></label>
+                            <select style="width:90px;height:34px;" class="form-control" id="ddlMediaPlanQuickPlanQuarter" onchange="javascript: ResetQuickPlanData('quarter',true);">
+                            </select>
+                            <input type="hidden" id="hdnCurQuarter" value="" />
+                        </div>
+
+                        <div class="form-group" style="width:130px;margin-right:10px;">
+                            <label for="ddlMediaPlanQuickPlanQuarter" style="font-size: 16px;font-weight: bold;">Demographic<span style="color:red;display: inline;">*</span></label>
+                            <select style="width:130px;height:34px;" class="form-control" id="ddlMediaPlanQuickPlanDemo" onchange="javascript: ResetQuickPlanData('demo',true);">
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="width:90px;margin-right:20px; ">
+                            <label for="ddlMediaPlanQuickPlanBuytype" style="font-size: 16px;font-weight: bold;">Buy Type<span style="color:red;display: inline;">*</span></label>
+                            <select style="width:100px;height:34px;" class="form-control" id="ddlMediaPlanQuickPlanBuyType" onchange="javascript: ResetQuickPlanData('buytype',true);">
+                            </select>
+                        </div>
+
+                        <span style="background-color: #dcdfe3;width: 1px;margin-right: 20px;margin-left: 10px;height: 65px;">
+                        </span>
+                        <div class="form-group" style="width:100px;margin-right:10px;">
+                            <i onclick="return ClearAdjustmentsQuickPlan('Rates', 'create');" class="fa fa-close" id="icoRatesQuickPlan" style="position:absolute; right:200px;top:108px;cursor:pointer; display:none;"></i>
+                            <label for="" style="font-size: 16px;font-weight: bold;">Adjust Rates</label>
+                            <input autocomplete="off" onkeydown="return ValidateAdjustmentFormat(event);" onkeyup="ValidateAdjustment(this,'Rates',event, 'create');" type="text" class="form-control" id="txtAdjustRatesQuickPlan" placeholder="" maxlength="7" onchange="return FormatAdjustRates(this,'Rates', 'create');">
+                        </div>
+                        <div class="form-group" style="width:115px;">
+                            <i class="fa fa-close" onclick="return ClearAdjustmentsQuickPlan('Imps', 'create');" id="icoImpsQuickPlan" style="position:absolute; right:75px;top:108px;cursor:pointer; display:none;"></i>
+                            <label for="" style="font-size: 16px;font-weight: bold;">Adjust IMPs<span style="display: inline;padding-left: 5px;"><i class="fa fa-info-circle" style="color: #42a5f5;" title="You may adjust the Rates and/or IMP of the properties shown in the table below. Type in a number preceded by either + or - to indicate an increase or decrease by the percentage entered. To undo your changes, click the 'X'."></i></span></label>
+                            <input type="text" autocomplete="off" class="form-control" onkeydown="return ValidateAdjustmentFormat(event);" onkeyup="ValidateAdjustment(this,'Imps',event, 'create');" id="txtAdjustImpsQuickPlan" placeholder="" maxlength="7" onchange="return FormatAdjustIMPS(this,'Imps', 'create');">
+                        </div>
+                      @*   <span id="spnQuickPlanNoDataMsg" style="color:red; display:none;">No data is available based on the information provided.</span> *@
+                    </div>
+                    <div class="form-row" style="margin-bottom: -25px;margin-left:2px;margin-top: 5px;">
+                    <div class="form-group col-6">
+                            <span id="spnQuickPlanNoDataMsg" style="color: red;display: inline;line-height: 30px;">No data is available based on the information provided.</span>
+
+                    </div>
+
+                    <div class="form-group col-6">
+                            <span for="" style="font-size: 16px;font-weight: bold;float: right;padding-left: 6px;line-height: 30px;" id="spnWeeklyBudgetQuickPlan"></span>
+                            <span for="" style="font-size: 16px;font-weight: bold;float: right;line-height: 30px;">Weekly budget:</span>
+
+                    </div>
+                    </div>
+                   
+                    <div class="form-row" style="max-height:465px; overflow:auto;">
+                        <div class="form-group col-lg-12">
+                            <table class="table table-striped" id="tblmpQuickPlanNetwork" style="margin-top:20px!important;margin-bottom: -10px;">
+                                <thead id="thmpQuickPlanNetwork">
+                                    <tr class="summary-header-row">
+                                        <th scope="col" style="color:black;width:70px;max-width:70px;border-right:1px solid white;text-transform: capitalize; text-align:left;"></th>
+                                        <th scope="col" style="color:black;width:110px;max-width:70px;border-right:1px solid white;text-transform: capitalize;text-decoration:underline; text-align:right;">:30</th>
+                                        <th scope="col" id="th15SecAvgRates" style="color:black;width:110px;max-width:110px;border-right:1px solid white;text-transform: capitalize;text-decoration:underline; text-align:right;">:15</th>
+                                        <th scope="col" id="th15SecPercent" style="color:black;width:70px;max-width:70px;border-right:1px solid white;text-transform: capitalize;text-align:right;">% :15s</th>
+                                        <th scope="col" style="color:black;width:110px;max-width:110px;border-right:1px solid white;text-transform: capitalize;text-align:right;">Spend</th>
+                                        <th scope="col" style="color:black;width:90px;max-width:90px;border-right:1px solid white;text-transform: capitalize;text-align:right;">IMP</th>
+                                        <th scope="col" style="color:black;width:90px;max-width:90px;border-right:1px solid white;text-transform: capitalize;text-align:right;">CPM</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="tbmpQuickPlanNetwork">
+                                    <tr style="color:black;width:50px;max-width:50px;border-right:1px solid white;text-transform: capitalize; text-align:left;">
+                                        <td style="font-weight:bold;" >Rate</td>
+                                        <td style="width:50px;max-width:50px" id="td30SecAvgRates">
+                                            <span id="spn30SecAvgRates"></span>
+                                        </td>
+                                        <td style="width:50px;max-width:50px" id="td15SecAvgRates">
+                                            <span id="spn15SecAvgRates"></span>
+                                        </td>
+                                        <td id="td15SecPercentRates"></td>
+                                        <td id="tdSpend"><span id="spnSpend"></span></td>
+                                        <td id="tdIMPS">
+                                            <span id="spnIMPS"></span>
+                                        </td>
+                                        <td id="tdCPM"><span id="spnCPM"></span></td>
+                                    </tr>
+                                    <tr style="color:black;width:50px;max-width:50px;border-right:1px solid white;text-transform: capitalize; text-align:left;">
+                                        <td style="font-weight:bold;">Spots</td>
+                                        <td><input type="text" value="" id="txt30SecSpots" style="text-align:right;" data-spot-len="30" onkeydown="return ValidateNumber(this,event);" onkeyup="ValidateSpots(this,'weeklySpots');" onchange="CalculateTotalsQuickPlan(this, '30sec');" /></td>
+                                        <td id="td15SecAvgSpots"><input type="text" value="" id="txt15SecSpots" style="text-align:right;" data-spot-len="15" onkeydown="return ValidateNumber(this,event);" onkeyup="ValidateSpots(this,'weeklySpots');" onchange="CalculateTotalsQuickPlan(this, '15sec');" /></td>
+                                        <td id="td15SecPercentSpots"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr style="color:black;width:50px;max-width:50px;border-right:1px solid white;text-transform: capitalize; text-align:left;">
+                                        <td style="font-weight:bold;">Total</td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="td30SecTotal">
+                                            <span id="spn30SecTotal"></span>
+                                        </td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="td15SecTotal">
+                                            <span id="spn15SecTotal"></span>
+                                        </td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="td15SecSpotPerc">
+                                            <span id="spn15SecSpotPerc"></span>
+                                        </td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="tdTotalsSpend">
+                                            <span id="spnTotalsSpend"></span>
+                                        </td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="tdTotalIMPS">
+                                            <span id="spnTotalIMPS"></span>
+                                        </td>
+                                        <td style="text-decoration:underline;font-weight:bold;" id="tdTotalCPM">
+                                            <span id="spnTotalCPM"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer" style="width: 95%;margin-left: 20px;">
+                <div style="width: 100%;">
+                    <button type="button" id="btnCancelQuickPlanModal" class="btn btn-alt-secondary mr-auto float-left" style="margin-left: -18px;" onclick="ValidateCancelQuickPlan(this);">CANCEL</button>
+                    <button type="button" id="btnSaveAndAddQuickPlan" class="btn btn-alt-success mr-auto float-right" style="margin-left: -133px;position: absolute;color:#171717;" onclick="return SaveQuickPlan('save and add');">SAVE & ADD</button>
+                    <div class="mpQuickPlanNetwork-Dropdown" style="margin-right:25px;">
+                        <button type="button" id="btnSaveAndCloseQuickPlan" class="btn btn-alt-success mr-auto float-right" style="position: absolute;border-left: 1px solid #ccc;">
+                            <i class="fa fa-angle-down" aria-hidden="true">&nbsp;</i>
+                        </button>
+                        <div class="mpQuickPlanNetwork-DropdownContent" style="position: absolute;right: 23px;">
+                            <a style="cursor:pointer;" onclick="return SaveQuickPlan('save and close');">SAVE & CLOSE</a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+@model OM_ScheduleTool.Models.DemographicSettings
+
+<form asp-action="_DemographicSettingsUniverse">
+    <div class="form-horizontal">
+        <h4>DemographicSettings</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="DemographicSettingsId" />
+        <div class="form-group">
+            <label asp-for="DemoName" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="DemoName" class="form-control" />
+                <span asp-validation-for="DemoName" class="text-danger"></span>
+            </div>
+        </div>
+        <!--
+        <div class="form-group">
+            <label asp-for="CountryId" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId"></select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+        </div>
+        -->
+        <div class="form-group">
+            <label asp-for="SortOrder" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="SortOrder" class="form-control" />
+                <span asp-validation-for="SortOrder" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Gender" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Gender" class="form-control" />
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="AgeMin" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="AgeMin" class="form-control" />
+                <span asp-validation-for="AgeMin" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="AgeMax" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="AgeMax" class="form-control" />
+                <span asp-validation-for="AgeMax" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="CreateDt" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="CreateDt" class="form-control" />
+                <span asp-validation-for="CreateDt" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="UpdateDt" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="UpdateDt" class="form-control" />
+                <span asp-validation-for="UpdateDt" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="UpdatedByUserId" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="UpdatedByUserId" class="form-control" asp-items="ViewBag.UpdatedByUserId"></select>
+                <span asp-validation-for="UpdatedByUserId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

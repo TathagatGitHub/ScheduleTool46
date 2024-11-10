@@ -1,0 +1,328 @@
+﻿@model LogsViewModel
+
+@Html.Partial("_NavigationMenu", Model.manageMediaViewModel.LoggedOnUser)
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        document.getElementById("hiddenLogsSelectedCountryId").value = '@Model.manageMediaViewModel.LastSelectedCountryId';
+    });
+
+    function GetLogs(BroadcastQuarterNbr) {
+        $.ajax({
+            url: "/ManageMedia/LogsTab_Change",
+            data: { Year: $("#ddlplanyear option:selected").val(), BroadcastQuarterNbr: BroadcastQuarterNbr, ClientId: $("#ddlclients option:selected").val() },
+            cache: false,
+            type: "GET",
+            success: function (result) {
+                $("#div_LogsWeeks").html(result);
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });
+    }
+
+    function GetClients(_countryid) {
+        var procemessage = "<option value='0'> Loading clients...</option>";
+        $("#ddlclients").html(procemessage).show();
+
+        var url = "/ManageMedia/GetClientsByCountryId/";
+
+        $.ajax({
+            url: url,
+            data: { countryid: _countryid },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                var markup = "";
+
+                for (var x = 0; x < result.length; x++) {
+                    if (@Model.manageMediaViewModel.LastSelectedClientId == result[x].value) {
+                        if (_countryid == 5)
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option selected value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                    else {
+                        if (_countryid == 5)
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                        else
+                            markup += "<option value=" + result[x].value + ">" + result[x].text + " (CANADA)" + "</option>";
+                    }
+                }
+                $("#ddlclients").html(markup).show();
+            },
+            error: function (response) {
+                swal('Error!', response.responseText, 'error');
+            }
+        });
+    }
+
+    function ChangeCountry(_countryid, _countryshort) {
+        document.getElementById("hiddenLogsSelectedCountryId").value = _countryid;
+        GetClients(_countryid);
+        GetLogs(GetQuarterTabPosition);
+        SaveSettings("ScheduleProposalLog_CountryId", _countryid);
+    }
+
+    function ChangePlanYear(_year) {
+        SetupQuarters(_year);
+        GetLogs(GetQuarterTabPosition);
+        SaveSettings("ScheduleProposalLog_PlanYear", _year)
+    }
+
+    function ChangeClient(_clientid) {
+        GetLogs(GetQuarterTabPosition);
+        SaveSettings("ScheduleProposalLog_ClientId", _clientid)
+    }
+
+
+    function SetupQuarters(_year) {
+        $("#Q4").html("Q4 " + (_year-1)).show();
+        $("#Q1").html("Q1 " + _year).show();
+        $("#Q2").html("Q2 " + _year).show();
+        $("#Q3").html("Q3 " + _year).show();
+    }
+
+    function GetQuarterTabPosition() {
+        var QuarterNbr = parseInt($('.nav-tabs .active')[0].id.slice(1));
+        if (QuarterNbr === 4)
+            QuarterNbr = 1;
+        else
+            QuarterNbr += 1;
+        return QuarterNbr;
+    }
+
+</script>
+
+<input type="hidden" id="hiddenLogsSelectedCountryId" />
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="content">
+        <!--
+        <div class="block block-themed">
+            <div class="block-header @Model.manageMediaViewModel.LoggedOnUser.PermissionLevel.ThemeBackground">
+                <h3 class="block-title">Manage Media</h3>
+            </div>
+        </div>
+            -->
+        @Html.Partial("~/Views/ManageMedia/_ManageMediaSel.cshtml", Model.manageMediaViewModel)
+        <div class="block block-themed">
+            <div class="block-content">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <label for="mega-country">Country</label><br />
+                                    @foreach (var country in Model.manageMediaViewModel.Countries)
+                                    {
+                                        if (country.CountryId == Model.manageMediaViewModel.LastSelectedCountryId)
+                                        {
+                                            <label class="css-control css-control-success css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" checked="checked" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                        else
+                                        {
+                                            <label class="css-control css-control-success css-radio">
+                                                <input name="radio-group-country" class="css-control-input" type="radio" onclick="javascript:ChangeCountry(@country.CountryId, '@country.CountryShort');">
+                                                <span class="css-control-indicator"></span> @country.CountryShort
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6">
+                                    <label for="mega-lastname">Plan Year Type</label><br />
+                                    <label class="css-control css-control-success css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" checked="checked">
+                                        <span class="css-control-indicator"></span> Broadcast
+                                    </label>
+                                    <!--
+                                    <label class="css-control css-control-primary css-radio">
+                                        <input name="radio-group-planyeartype" class="css-control-input" type="radio" >
+                                        <span class="css-control-indicator"></span> Calendar
+                                    </label>
+                                        -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="mega-lastname">Plan Year</label>
+                                    <select name="ddlplanyear" id="ddlplanyear" class="form-control" size="1" onchange="javascript: ChangePlanYear(this.value);">
+                                        @for (int idx = DateTime.Now.Year - 2; idx <= DateTime.Now.Year + 2; idx++)
+                                        {
+                                            @if (idx == Model.manageMediaViewModel.LastSelectedPlanYear)
+                                            {
+                                                <option value="@idx" selected>@idx</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idx">@idx</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlnetwork">Network Name</label>
+                                    <select class="form-control" id="ddlnetwork" name="ddlnetwork" size="1" onchange='javascript: ChangeNetwork(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="ddlclients">Client Name</label>
+                                    <select class="form-control" id="ddlclients" name="ddlclients" size="1" onchange='javascript: ChangeClient(this.value);'></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+            <div class="block">
+                @using (Html.BeginForm())
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group-row">
+                                <div class="col-12">
+                                    <!-- Block Tabs Animated Slide Up -->
+                                    <div class="block">
+                                        <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                                            <li class="nav-item">
+                                                @if (Model.manageMediaViewModel.LastQuarter == 1)
+                                                {
+                                                <a class="nav-link active" href="#btabs-animated-slideup-4q" name="Q4" id="Q4" onclick="GetLogs(1);">4Q 2017</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-4q" name="Q4" id="Q4" onclick="GetLogs(1);">4Q 2017</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item">
+                                                @if (Model.manageMediaViewModel.LastQuarter == 2)
+                                                {
+                                                    <a class="nav-link active" href="#btabs-animated-slideup-1q" name="Q1" id="Q1" onclick="GetLogs(2);">1Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-1q" name="Q1" id="Q1" onclick="GetLogs(2);">1Q 2018</a>
+                                                }
+                                                </li>
+                                            <li class="nav-item">
+                                                @if (Model.manageMediaViewModel.LastQuarter == 3)
+                                                {
+                                                <a class="nav-link active" href="#btabs-animated-slideup-2q" name="Q2" id="Q2" onclick="GetLogs(3);">2Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="nav-link" href="#btabs-animated-slideup-2q" name="Q2" id="Q2" onclick="GetLogs(3);">2Q 2018</a>
+                                                }
+                                                </li>
+                                            <li class="nav-item">
+                                                @if (Model.manageMediaViewModel.LastQuarter == 4)
+                                                {
+                                                <a class="nav-link active" href="#btabs-animated-slideup-3q" name="Q3" id="Q3" onclick="GetLogs(4);">3Q 2018</a>
+                                                }
+                                                else
+                                                {
+                                                <a class="nav-link" href="#btabs-animated-slideup-3q" name="Q3" id="Q3" onclick="GetLogs(4);">3Q 2018</a>
+                                                }
+                                            </li>
+                                            <li class="nav-item ml-auto">
+                                                <a class="nav-link" href="#btabs-animated-slideup-4q"><i class="si si-settings"></i></a>
+                                            </li>
+                                        </ul>
+                                        <div class="block-content tab-content overflow-hidden">
+                                            @if (Model.manageMediaViewModel.LastQuarter == 1)
+                                            {
+                                                <div class="tab-pane fade fade-up show active" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up show" id="btabs-animated-slideup-4q" name="btabs-animated-slideup-4q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.manageMediaViewModel.LastQuarter == 2)
+                                            {
+                                                <div class="tab-pane fade fade-up active" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-1q" name="btabs-animated-slideup-1q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.manageMediaViewModel.LastQuarter == 3)
+                                            {
+                                                <div class="tab-pane fade fade-up active" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-2q" name="btabs-animated-slideup-2q" role="tabpanel">
+                                                </div>
+                                            }
+                                            @if (Model.manageMediaViewModel.LastQuarter == 4)
+                                            {
+                                                <div class="tab-pane fade fade-up active" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tab-pane fade fade-up" id="btabs-animated-slideup-3q" name="btabs-animated-slideup-3q" role="tabpanel">
+                                                </div>
+                                            }
+                                            <div class="tab-pane fade fade-up" id="btabs-animated-slideup-settings" role="tabpanel">
+                                                <h4 class="font-w400">Settings Content</h4>
+                                                <p>Content slides up..</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END Block Tabs Animated Slide Up -->
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="div_LogsWeeks">
+                        @await Html.PartialAsync("../Logs/_LogsWeeks", Model)
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="block block-themed">
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+<script language="javascript" type="text/javascript">
+    GetClients(@Model.manageMediaViewModel.LastSelectedCountryId);
+    SetupQuarters(@Model.manageMediaViewModel.LastSelectedPlanYear);
+    $("#Q1, #Q2, #Q3, #Q4").on('click', function (e) {
+        SaveSettings("ScheduleProposalLog_BroadcastQuarterNbr", parseInt(this.id.slice(1)) == 4 ? 1 : parseInt(this.id.slice(1)) + 1);
+    });
+</script>

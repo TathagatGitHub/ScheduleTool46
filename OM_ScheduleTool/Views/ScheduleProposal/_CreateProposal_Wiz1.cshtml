@@ -1,0 +1,559 @@
+@model ManageMediaViewModel
+<link rel="stylesheet" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/css/dataTables.checkboxes.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.css" />
+
+<style>
+    .toolbar {
+        float: left;
+        margin-top:10px;
+    }
+    div.dataTables_filter {
+        margin-top: 10px !important;
+    }
+</style>
+
+<div class="modal fade" id="modal-createproposal-1" tabindex="-1" role="dialog" aria-labelledby="modal-createproposal-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            @using (Html.BeginForm()) {
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title">Create Proposal for <a id="CreateProposal_ClientName"></a>&nbsp;<a id="CreateProposal_QuarterName"></a></h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="si si-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="block block-themed">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label for="ddlDemo">Proposal Name:</label>
+                                        <input name="txtProposalName" class="form-control" id="txtProposalName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block block-themed">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label for="ddlDemo">Select Demo:</label>
+                                        <select name="ddlDemo" class="form-control" id="ddlDemo" size="1"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block block-themed">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label for="ddlNetwork">Select Network(s):</label>
+                                        <table class="display compact table-condensed nowrap" id="tblAvailableNetworks" name="tblAvailableNetworks" width="98%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="d-none d-sm-table-cell text-center"></th>
+                                                    <th class="d-none d-sm-table-cell text-center">Network Name</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Geo</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Feed</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Media</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block block-themed">
+                                <div class="form-group row gutters-tiny">
+                                    <div class="col-md-12">
+                                        <label for="ddlProperties">Select Properties:</label>
+                                        <table class="display compact table-condensed nowrap" id="AddNewPropertyTable" name="AddNewPropertyTable" width="98%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="d-none d-sm-table-cell text-center"></th>
+                                                    <th class="d-none d-sm-table-cell text-center">Network</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Property</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Days</th>
+                                                    <th class="d-none d-sm-table-cell text-center" style="width:120px;">Start-End (DP)</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Rate</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Len</th>
+                                                    <th class="d-none d-sm-table-cell text-center">BT</th>
+                                                    <th class="d-none d-sm-table-cell text-center">Status</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <img id="loading-ajax-image" src="~/img/loadingImg.gif" width="32" alt="Loading..." style="display:none" />
+                    <button type="button" class="btn btn-alt-danger" data-dismiss="modal" id="btnCancelProcess">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-alt-success" id="btnProcess" onclick="javascript: Process(this);">
+                        <i class="fa fa-check"></i> Create Proposal
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.js"></script>
+<script src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/js/dataTables.checkboxes.min.js"></script>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $("#ddlDemo").change(function () {
+            GetNetworks($('#CreateProposal_QuarterName').html());
+        });
+    });
+
+    function formatTime(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'P' : 'A';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ampm;
+        return strTime;
+    }
+
+
+    function CheckAllNetworks() {
+
+    }
+
+    function CheckAllProperties() {
+        var oTable = $('#AddNewPropertyTable').dataTable();
+        var rowcollection = oTable.$(".editor-active", { "page": "all" });
+        rowcollection.each(function (index, elem) {
+            if ($('#chkAllProperties').is(':checked')) {
+                oTable.row[index].select();
+            }
+            else {
+                oTable.row[index].deselect();
+            }
+        });
+    }
+
+    function EnableAdd() {
+        $('#btnProcess').attr('disabled', 'disabled');
+        var oTable = $('#AddNewPropertyTable').dataTable();
+        var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+        rowcollection.each(function (index, elem) {
+            $('#btnProcess').removeAttr('disabled');
+            var checkbox_value = $(elem).val();
+            var checkbox_rateId = $(elem).attr('id');
+            //Do something with 'checkbox_value
+        });
+    }
+
+    function ReloadProperties() {
+        var table = $('#AddNewPropertyTable').DataTable();
+        if (table) {
+            try {
+                table.ajax.reload();
+            }
+            catch (err) {
+                initPropertiesTable();
+            }
+        }
+    }
+
+    function initPropertiesTable() {
+        var propertiestable = $('#AddNewPropertyTable').DataTable({
+            dom: 'tirp',
+            rowId: 'rateId',
+            scrollX: "100%",
+            scrollY: 150,
+            scrollCollapse: true,
+            destroy: true,
+            processing: true,
+            paging: false,
+            serverSide: true,
+            deferRender: true,
+            language: {
+                infoFiltered: "",
+                processing: "<i class='fa fa-refresh fa-spin'></i>"
+            },
+            ajax: {
+                url: '/ManageMedia/GetPropertiesForNetwork',
+                type: 'POST',
+                data: function (d) {
+                    var _networkids = '';
+                    var oTable = $('#tblAvailableNetworks').dataTable();
+                    var rowcollection = oTable.$(".editor-active:checked", { "page": "all" });
+                    rowcollection.each(function (index, elem) {
+                        var checkbox_value = $(elem).val();
+                        var checkbox_rateId = $(elem).attr('id');
+                        //Do something with 'checkbox_value
+                        _networkids = _networkids + checkbox_rateId + ',';
+                    });
+
+
+                    d.networkids = _networkids;
+                    d.quartername = $('#CreateProposal_QuarterName').html();
+                    d.clientid = $("#ddlclients :selected").val();
+                    d.demographicsettingsid = $('#ddlDemo').val()
+                }
+            },
+            select: {
+                style: 'multi'
+            },
+            order: [[1, 'asc']],
+            columns: [
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    checkboxes: {
+                        selectRow: true
+                    },
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 1,
+                    data: "property.network.stdNetName",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    searchable: true,
+                },
+                {
+                    targets: 2,
+                    data: "property.propertyName",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 3,
+                    data: null,
+                    defaultContent: '',
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        var _WeekDays = "";
+                        if (data.property.monday == true) {
+                            _WeekDays = _WeekDays + 'M';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.tuesday == true) {
+                            _WeekDays = _WeekDays + 'T';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.wednesday == true) {
+                            _WeekDays = _WeekDays + 'W';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.thursday == true) {
+                            _WeekDays = _WeekDays + 'Th';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.friday == true) {
+                            _WeekDays = _WeekDays + 'F';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.saturday == true) {
+                            _WeekDays = _WeekDays + 'S';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        if (data.property.sunday == true) {
+                            _WeekDays = _WeekDays + 'Su';
+                        }
+                        else {
+                            _WeekDays = _WeekDays + '-';
+                        }
+                        return _WeekDays;
+                    },
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 4,
+                    data: null,
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        //return formatTime(new Date(data.property.startTime)) + '-' + formatTime(new Date(data.property.endTime)) + '(' + data.property.dayPart.dayPartCd + ')';
+                      return   data.startTimeFormatted + '-' + data.endTimeFormatted + '(' + data.property.dayPart.dayPartCd + ')';
+                    },
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 5,
+                    data: "rateAmt",
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        return formatCurrency(data);
+                    },
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 6,
+                    data: null,
+                    class: "d-none d-sm-table-cell text-center",
+                    render: function (data, type, row, meta) {
+                        return data.spotLen.toString() + ' (' + data.split.splitNo + ')';
+                    },
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 7,
+                    data: "buyType.buyTypeCode",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    searchable: true
+                },
+                {
+                    targets: 8,
+                    data: "doNotBuyType.description",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true,
+                    searchable: true
+                }
+            ]
+        });
+
+    }
+
+    function CreateProposal(_quartername) {
+        var procemessage = "<option value='0'> Loading clients...</option>";
+        $("#ddlDemo").html(procemessage).show();
+
+        var _countryid = 5;
+        if ($('#US').is(':checked')) {
+            _countryid = 5;
+        }
+        else if ($('#CA').is(':checked')) {
+            _countryid = 2;
+        }
+
+        var _clientid = $("#ddlclients :selected").val()
+
+        var url = "/ManageMedia/GetDemoByClientQuarter/";
+
+        $.ajax({
+            url: url,
+            data: {
+                countryid: _countryid,
+                quartername: _quartername,
+                clientid: _clientid
+            },
+            cache: false,
+            type: "POST",
+            success: function (result) {
+                if (result.length > 0) {
+                    var markup = "";
+                    var version
+                    for (var x = 0; x < result.length; x++) {
+                        markup += "<option value=" + result[x].value + ">" + result[x].text + "</option>";
+                    }
+                    $("#ddlDemo").html(markup).show();
+                    GetNetworks(_quartername);
+
+                    if ($("#ddlclients")) {
+                        $("#CreateProposal_ClientName").html($("#ddlclients :selected").text());
+                    }
+                    $('#CreateProposal_QuarterName').html(_quartername);
+                    $('#txtProposalName').val($("#ddlclients :selected").text() + '_' + _quartername + '_P_0');
+                    $('#modal-createproposal-1').modal();
+
+                }
+                else {
+                    swal({
+                        title: $("#ddlclients :selected").text() + ' ' + _quartername,
+                        text: 'No properties exist for the current client, quarter and country.  Proposal cannot be created.',
+                        type: 'warning',
+                    });
+                }
+                initPropertiesTable();
+            },
+            error: function (response) {
+                swal("error : " + response);
+            }
+        });
+    }
+
+    function GetNetworks(_quartername) {
+        var _countryid = 5;
+        if ($('#US').is(':checked')) {
+            _countryid = 5;
+        }
+        else if ($('#CA').is(':checked')) {
+            _countryid = 2;
+        }
+
+        var _clientid = $("#ddlclients :selected").val()
+
+        //var proptable = $('#AddNewPropertyTable').DataTable();
+        //proptable.clear().draw();
+
+        var networktable = $('#tblAvailableNetworks').DataTable({
+            dom: 't<"toolbar">fr',
+            scrollX: "100%",
+            scrollY: 150,
+            scrollCollapse: true,
+            paging: false,
+            destroy: true,
+            processing: true,
+            language: {
+                infoFiltered: "",
+                processing: "<i class='fa fa-refresh fa-spin'></i>"
+            },
+            ajax: {
+                url: '/ManageMedia/GetNetworksForDemo',
+                type: 'POST',
+                data: function (d) {
+                    d.countryid = _countryid,
+                        d.quartername = _quartername,
+                        d.clientid = _clientid,
+                        d.demographicsettingsid = $('#ddlDemo').val()
+                }
+            },
+            order: [[1, 'asc']],
+            columns: [
+                {
+                    targets: 0,
+                    data: null,
+                    defaultContent: '',
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            return '<input type="checkbox" class="editor-active" id="' + data.networkId + '">';
+                        }
+                        return data;
+                    },
+                    class: "d-none d-sm-table-cell text-center",
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 1,
+                    data: "stdNetName",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 2,
+                    data: "country.countryShort",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 3,
+                    data: "feedType.description",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                },
+                {
+                    targets: 4,
+                    data: "mediaType.mediaTypeCode",
+                    class: "d-none d-sm-table-cell text-center",
+                    visible: true
+                }
+            ],
+            fixedColumns: true,
+            initComplete: function () {
+                $("div.toolbar").html('<button type="button" class="btn  btn-outline-secondary btn-sm" onclick="javascript:ReloadProperties();">Get Properties</button>');
+            }
+        });
+    }
+
+    function Process(btn) {
+        $(btn).attr("disabled", true).prop("disabled", true);
+        $('#btnCancelProcess').attr("disabled", true).prop("disabled", true);
+        var proptable = $('#AddNewPropertyTable').DataTable();
+
+        var _schedulename = $('#txtProposalName').val();
+        var _demographicsettingsid = $('#ddlDemo').val();
+        var _quartername = $('#CreateProposal_QuarterName').html();
+        var _clientid = $("#ddlclients :selected").val();
+        $('#loading-ajax-image').show();
+        var ids = '';
+
+        $.each(proptable.rows('.selected').data(), function (index, row) {
+            ids = ids + row.rateId.toString() + ',';
+        });
+
+        if (ids != "") {
+            $.ajax({
+                url: '/ScheduleProposal/CreateProposal',
+                data: {
+                    scheduleName: _schedulename,
+                    demographicsettingsid: _demographicsettingsid,
+                    quartername: _quartername,
+                    clientid: _clientid,
+                    rateids: ids
+                },
+                cache: false,
+                type: "POST",
+                success: function (result) {
+                    if (result.success) {
+                        $('#loading-ajax-image').hide();
+                        swal({
+                            title: _schedulename,
+                            text: result.responseText,
+                            type: 'success',
+                        });
+                        window.location.replace('/ManageMedia/Proposal?ProposalId=' + result.responseCode.toString());
+                    }
+                    else {
+                        $('#loading-ajax-image').hide();
+                        swal({
+                            title: _schedulename,
+                            text: result.responseText,
+                            type: 'error',
+                        });
+                    }
+                },
+                error: function (response) {
+                    $(btn).attr("disabled", false).prop("disabled", false);
+                    $('#btnCancelProcess').attr("disabled", false).prop("disabled", false);
+                    swal({
+                        title: _schedulename,
+                        text: response.responseText,
+                        type: 'error',
+                    });
+                }
+            });
+        }
+        else {
+            $('#loading-ajax-image').hide();
+            $(btn).attr("disabled", false).prop("disabled", false);
+            $('#btnCancelProcess').attr("disabled", false).prop("disabled", false);
+            swal({
+                title: _schedulename,
+                text: 'There are currently no properties selected.',
+                type: 'error',
+            });
+        }
+
+
+
+    }
+</script>
+
+
